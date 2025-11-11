@@ -1,0 +1,51 @@
+package az.less.designsystem.base
+
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import kotlin.text.Typography
+
+
+object LessTheme {
+    val colors: ColorTokens
+        @Composable
+        get() = LocalColors.current
+
+    val typography: Typography
+        @Composable
+        get() = LocalTypography.current
+
+    val spacing: Spacing
+        @Composable
+        get() = LocalSpacing.current
+
+    val radius: Radius
+        @Composable
+        get() = LocalRadius.current
+
+    val elevation: Elevation
+        @Composable
+        get() = LocalElevation.current
+}
+
+
+@Composable
+fun LessTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colors =
+//        if (darkTheme)
+//            DarkPalette else
+       LightPalette
+
+    CompositionLocalProvider(
+        LocalColors provides colors,
+        LocalTypography provides LessTheme.typography,
+        LocalSpacing provides LessTheme.spacing,
+        LocalRadius provides LessTheme.radius,
+        LocalElevation provides LessTheme.elevation,
+    ) {
+        content()
+    }
+}
