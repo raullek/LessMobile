@@ -58,6 +58,10 @@ kotlin {
             implementation(libs.koin.composeVM)
 
             implementation(libs.navigation.compose)
+
+            implementation(libs.androidx.datastore)
+            // The Preferences DataStore library
+            implementation(libs.androidx.datastore.preferences)
         }
 
         iosMain.dependencies {
