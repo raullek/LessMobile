@@ -1,139 +1,130 @@
 package az.less.mobile.presentation.main
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import az.less.designsystem.base.LessTheme
+import az.less.mobile.navigation.HomeScreens
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ic_explore_24dp
+import lessmobile.composeapp.generated.resources.ic_more_24dp
+import lessmobile.composeapp.generated.resources.ic_offers_24dp
+import lessmobile.composeapp.generated.resources.ic_orders_24dp
+import lessmobile.composeapp.generated.resources.ic_saved_24dp
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AppBottomNavigation(
-    modifier: Modifier = Modifier.background(Color.Transparent),
+    modifier: Modifier = Modifier,
     navController: NavController
 ) {
-    var selectedItem by rememberSaveable { mutableStateOf(0) }
-
-    // Update selected item based on current route
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Sync selectedItem with current route
-//    bottomNavItems.forEachIndexed { index, item ->
-//        if (item.route == currentRoute) {
-//            selectedItem = index
-//        }
-//    }
-
-//    Surface(
-//        modifier = modifier
-//            .height(64.dp)
-//            .shadow(
-//                elevation = 4.dp,
-//                spotColor = AppTheme.colors.background
-//            ),
-//        color = AppTheme.colors.background
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(horizontal = 24.dp),
-//
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            bottomNavItems.forEachIndexed { index, barItem ->
-//                val isSelected = selectedItem == index
-//                val animatedWeight = animateFloatAsState(
-//                    targetValue = if (isSelected) 1.5f else 1f,
-//                    animationSpec = tween(durationMillis = 400)
-//                )
-//                BottomNavItem(
-//                    modifier = Modifier.weight(animatedWeight.value),
-//                    barItem,
-//                    isSelected = isSelected,
-//                    onClick = {
-//                        // Only navigate if we're not already on this route
-//                        if (currentRoute != barItem.route) {
-//                            navController.navigate(barItem.route) {
-//                                // Clear the entire backstack and make this the new root
-//                                popUpTo(navController.graph.findStartDestination().id) {
-//                                    saveState = true
-//                                }
-//                                // Prevent multiple copies of the same destination
-//                                launchSingleTop = true
-//                                // Restore state when reselecting a previously selected item
-//                                restoreState = true
-//                            }
-//                        }
-//                    }
-//                )
-//            }
-//        }
-//    }
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(LessTheme.size.huge),
+        color = LessTheme.colors.backgroundPrimary,
+        shadowElevation = LessTheme.elevation.xSmall
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            bottomNavItems.forEach { item ->
+                val isSelected = currentRoute == item.route
+                BottomNavItem(
+                    modifier = Modifier.weight(1f),
+                    item = item,
+                    isSelected = isSelected,
+                    onClick = {
+                        if (currentRoute != item.route) {
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
 private fun BottomNavItem(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     item: BottomNavItemData,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val animatedTextState = animateFloatAsState(
-        targetValue = if (isSelected) 1f else 0f,
-        animationSpec = tween(durationMillis = 1000)
+    val iconColor by animateColorAsState(
+        targetValue = if (isSelected) LessTheme.colors.textIconsBrand else LessTheme.colors.textIconsGrey,
+        animationSpec = tween(durationMillis = 100)
     )
 
-//    Row(
-//        modifier = modifier
-//            .height(48.dp)
-//            .background(
-//                color = if (isSelected) AppTheme.colors.secondary.copy(alpha = 0.2f) else Color.Transparent,
-//                shape = RoundedCornerShape(12)
-//            )
-//            .clickable { onClick() },
-//        verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.Center
-//
-//        ) {
-//        Icon(
-//            painter = painterResource(resource = item.icon),
-//            contentDescription = item.label,
-//            tint = if (isSelected) AppTheme.colors.secondary else AppTheme.colors.textSecondary,
-//            modifier = Modifier.size(24.dp)
-//        )
-//        if (isSelected) {
-//            Text(
-//                modifier = Modifier.padding(start = AppTheme.spacing.Medium).alpha(animatedTextState.value),
-//                text = item.label,
-//                style = AppTheme.typography.LabelSmall,
-//                color = AppTheme.colors.primary
-//            )
-//        }
-//    }
-
+    Column(
+        modifier = modifier
+            .clickable(
+                onClick = onClick,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            )
+            .padding(vertical = LessTheme.spacing.xSmall),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painter = painterResource(resource = item.icon),
+            contentDescription = item.label,
+            tint = iconColor,
+            modifier = Modifier.size(LessTheme.size.medium)
+        )
+        Text(
+            text = item.label,
+            style = LessTheme.typography.caption12Medium,
+            color = iconColor,
+            modifier = Modifier.padding(top = LessTheme.spacing.xxSmall)
+        )
+    }
 }
 
-
-//
 private data class BottomNavItemData(
     val icon: DrawableResource,
     val label: String,
     val route: String
 )
 
-//
-//private val bottomNavItems = listOf(
-//    BottomNavItemData(Res.drawable.ic_home_24, "Home", HomeScreens.Home.route),
-//    BottomNavItemData(Res.drawable.ic_calendar_24, "Schedule", HomeScreens.Schedule.route),
-//    BottomNavItemData(Res.drawable.ic_message_24, "Message", HomeScreens.Message.route),
-//    BottomNavItemData(Res.drawable.ic_profile_24, "Profile", HomeScreens.Profile.route)
-//)
+private val bottomNavItems = listOf(
+    BottomNavItemData(Res.drawable.ic_offers_24dp, "Offers", HomeScreens.Offers.route),
+    BottomNavItemData(Res.drawable.ic_explore_24dp, "Explore", HomeScreens.Explore.route),
+    BottomNavItemData(Res.drawable.ic_orders_24dp, "Orders", HomeScreens.Orders.route),
+    BottomNavItemData(Res.drawable.ic_saved_24dp, "Saved", HomeScreens.Saved.route),
+    BottomNavItemData(Res.drawable.ic_more_24dp, "More", HomeScreens.More.route)
+)

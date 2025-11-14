@@ -27,6 +27,10 @@ object LessTheme {
     val elevation: Elevation
         @Composable
         get() = LocalElevation.current
+
+    val size: Size
+        @Composable
+        get() = LocalSize.current
 }
 
 
@@ -44,6 +48,7 @@ fun LessTheme(
         LocalSpacing provides LessTheme.spacing,
         LocalRadius provides LessTheme.radius,
         LocalElevation provides LessTheme.elevation,
+        LocalSize provides LessTheme.size,
     ) {
         content()
     }
