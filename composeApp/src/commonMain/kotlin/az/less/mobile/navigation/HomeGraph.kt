@@ -3,42 +3,44 @@ package az.less.mobile.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import az.less.mobile.presentation.main.home.HomeScreen
-//import org.example.project.presentation.main.home.HomeScreen
-//import org.example.project.presentation.main.home.HomeViewModel
-//import org.example.project.presentation.main.schedule.ScheduleScreen
-//import org.example.project.presentation.main.screens.MessageScreen
-//import org.example.project.presentation.main.screens.ProfileScreen
-import org.koin.compose.viewmodel.koinViewModel
+import az.less.mobile.presentation.main.explore.ExploreScreen
+import az.less.mobile.presentation.main.more.MoreScreen
+import az.less.mobile.presentation.main.offers.HomeScreen
+import az.less.mobile.presentation.main.orders.OrdersScreen
+import az.less.mobile.presentation.main.saved.SavedScreen
 
 sealed class HomeScreens(val route: String) {
-    data object Home : HomeScreens("home")
-    data object Schedule : HomeScreens("schedule")
-    data object Message : HomeScreens("message")
-    data object Profile : HomeScreens("profile")
+    data object Offers : HomeScreens("offers")
+    data object Explore : HomeScreens("explore")
+    data object Orders : HomeScreens("orders")
+    data object Saved : HomeScreens("saved")
+    data object More : HomeScreens("more")
 }
 
 fun NavGraphBuilder.homeGraph(
     navController: NavController
 ) {
-
-    composable(HomeScreens.Home.route) {
+    composable(HomeScreens.Offers.route) {
         HomeScreen()
     }
-//    composable(HomeScreens.Schedule.route) {
-//        ScheduleScreen()
-//    }
-//    composable(HomeScreens.Message.route) {
-//        MessageScreen()
-//    }
-//    composable(HomeScreens.Profile.route) {
-//        ProfileScreen()
-//    }
+    composable(HomeScreens.Explore.route) {
+        ExploreScreen()
+    }
+    composable(HomeScreens.Orders.route) {
+        OrdersScreen()
+    }
+    composable(HomeScreens.Saved.route) {
+        SavedScreen()
+    }
+    composable(HomeScreens.More.route) {
+        MoreScreen()
+    }
 }
 
 val homeRoutes = listOf(
-    HomeScreens.Home.route,
-    HomeScreens.Schedule.route,
-    HomeScreens.Message.route,
-    HomeScreens.Profile.route
+    HomeScreens.Offers.route,
+    HomeScreens.Explore.route,
+    HomeScreens.Orders.route,
+    HomeScreens.Saved.route,
+    HomeScreens.More.route
 )

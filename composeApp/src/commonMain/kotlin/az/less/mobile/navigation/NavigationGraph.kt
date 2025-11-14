@@ -29,7 +29,7 @@ fun AppNavigation() {
     }) {
         NavHost(
             navController = navController,
-            startDestination = HomeScreens.Home.route
+            startDestination = HomeScreens.Offers.route
         ) {
 //            authorizationGraph(navController)
             homeGraph(navController)
