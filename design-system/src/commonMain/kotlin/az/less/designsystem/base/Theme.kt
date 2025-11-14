@@ -3,7 +3,6 @@ package az.less.designsystem.base
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import kotlin.text.Typography
 
 
 object LessTheme {
@@ -11,7 +10,9 @@ object LessTheme {
         @Composable
         get() = LocalColors.current
 
-    val typography: Typography
+    val primitives = Primitives
+
+    val typography: az.less.designsystem.base.Typography
         @Composable
         get() = LocalTypography.current
 
@@ -34,10 +35,8 @@ fun LessTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors =
-//        if (darkTheme)
-//            DarkPalette else
-       LightPalette
+    val colors = if (darkTheme) LightPalette else
+        LightPalette
 
     CompositionLocalProvider(
         LocalColors provides colors,

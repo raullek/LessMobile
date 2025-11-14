@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -9,6 +10,7 @@ plugins {
 }
 
 kotlin {
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -58,6 +60,9 @@ kotlin {
             implementation(libs.koin.composeVM)
 
             implementation(libs.navigation.compose)
+            
+            // Design System Module
+            implementation(projects.designSystem)
         }
 
         iosMain.dependencies {
