@@ -63,6 +63,10 @@ kotlin {
             
             // Design System Module
             implementation(projects.designSystem)
+
+            implementation(libs.androidx.datastore)
+            // The Preferences DataStore library
+            implementation(libs.androidx.datastore.preferences)
         }
 
         iosMain.dependencies {
