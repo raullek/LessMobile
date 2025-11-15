@@ -19,11 +19,14 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.compose_multiplatform
+import org.koin.compose.KoinContext
 
 @Composable
 @Preview
 fun App() {
-    LessTheme {
-        AppNavigation()
+    KoinContext {
+        LessTheme {
+            AppNavigation()
+        }
     }
 }
