@@ -1,5 +1,9 @@
 package az.less.mobile.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -19,21 +23,26 @@ fun AppNavigation() {
     val currentRoute = navBackStackEntry.value?.destination?.route
     showBottomBar.value = homeRoutes.contains(currentRoute)
 
-    Scaffold(bottomBar = {
-        if (showBottomBar.value) {
-            AppBottomNavigation(
-                modifier = Modifier,
-                navController = navController
-            )
+    Scaffold(
+        contentWindowInsets = WindowInsets.systemBars,
+        bottomBar = {
+            if (showBottomBar.value) {
+                AppBottomNavigation(
+                    modifier = Modifier,
+                    navController = navController
+                )
+            }
         }
-    }) {
+    ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = HomeScreens.Offers.route
+            startDestination = HomeScreens.Offers.route,
+            modifier = Modifier
+                .padding(paddingValues)
+                .consumeWindowInsets(paddingValues)
         ) {
 //            authorizationGraph(navController)
             homeGraph(navController)
         }
-
     }
 }

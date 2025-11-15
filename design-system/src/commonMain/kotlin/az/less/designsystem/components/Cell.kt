@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -80,6 +81,7 @@ fun DsCell(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(min = LessTheme.size.huge)
                 .then(clickableModifier)
                 .padding(
                     vertical = LessTheme.spacing.xSmall
@@ -196,10 +198,10 @@ fun DsSectionHeader(
     Text(
         text = title.uppercase(),
         style = LessTheme.typography.caption12Bold,
-        color = LessTheme.colors.textIconsGrey,
+        color = LessTheme.colors.textIconsThird,
         modifier = modifier
             .fillMaxWidth()
-            .background(LessTheme.colors.backgroundSecond)
+            .background(LessTheme.colors.backgroundPrimary)
             .padding(
                 horizontal = LessTheme.spacing.medium,
                 vertical = LessTheme.spacing.xxSmall

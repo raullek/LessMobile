@@ -59,6 +59,10 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.composeVM)
 
+            implementation(libs.orbit.compose)
+            implementation(libs.orbit.core)
+            implementation(libs.orbit.viewmodel)
+
             implementation(libs.navigation.compose)
             
             // Design System Module

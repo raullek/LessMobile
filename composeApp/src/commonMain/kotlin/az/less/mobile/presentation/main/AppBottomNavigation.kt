@@ -85,8 +85,7 @@ private fun BottomNavItem(
     onClick: () -> Unit
 ) {
     val iconColor by animateColorAsState(
-        targetValue = if (isSelected) LessTheme.colors.textIconsBrand else LessTheme.colors.textIconsGrey,
-        animationSpec = tween(durationMillis = 100)
+        targetValue = if (isSelected) LessTheme.colors.textIconsBrand else LessTheme.colors.textIconsGrey
     )
 
     Column(

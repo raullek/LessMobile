@@ -33,7 +33,7 @@ fun NavGraphBuilder.homeGraph(
         SavedScreen()
     }
     composable(HomeScreens.More.route) {
-        MoreScreen()
+        MoreScreen(navController = navController)
     }
 }
 
