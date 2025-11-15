@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import az.less.mobile.presentation.main.explore.ExploreScreen
 import az.less.mobile.presentation.main.more.MoreScreen
-import az.less.mobile.presentation.main.offers.HomeScreen
+import az.less.mobile.presentation.main.offers.OffersScreen
 import az.less.mobile.presentation.main.orders.OrdersScreen
 import az.less.mobile.presentation.main.saved.SavedScreen
 
@@ -21,7 +21,7 @@ fun NavGraphBuilder.homeGraph(
     navController: NavController
 ) {
     composable(HomeScreens.Offers.route) {
-        HomeScreen()
+        OffersScreen(navController = navController)
     }
     composable(HomeScreens.Explore.route) {
         ExploreScreen()
@@ -30,7 +30,7 @@ fun NavGraphBuilder.homeGraph(
         OrdersScreen()
     }
     composable(HomeScreens.Saved.route) {
-        SavedScreen()
+        SavedScreen(navController = navController)
     }
     composable(HomeScreens.More.route) {
         MoreScreen(navController = navController)

@@ -96,7 +96,7 @@ object LightColors {
     val TextIconsBrand = Color(0xFF3A9062)
     val TextIconsLightBrand = Color(0xFFBEF98D)
     val BackgroundPrimary = Color(0xFFFFFFFF)
-    val BackgroundSecond = Color(0xFFF4F7F6)
+    val BackgroundSecond = Color(0xFFF5F7F7)
     val BackgroundBrand = Color(0xFFFCFFF9)
     val ElementsPrimaryElement = Color(0xFFFFFFFF)
     val ElementsSecondaryElement = Color(0xFFF4F7F6)
@@ -122,7 +122,7 @@ object LightColors {
 object DarkColors {
     val TextIconsNested = Color(0xFFFFFFFF)
     val TextIconsBlack = Color(0xFFF4F7F6)
-    val TextIconsGrey = Color(0xFFA9AFAB)
+    val TextIconsGrey = Color(0xFF5F6862)
     val TextIconsThird = Color(0xFF757E79)
     val TextIconsBrand = Color(0xFF3A9062)
     val TextIconsLightBrand = Color(0xFFBEF98D)
