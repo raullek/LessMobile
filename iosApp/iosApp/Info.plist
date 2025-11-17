@@ -4,5 +4,12 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	
+	<!-- Location permissions for MapKit -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to show you on the map and nearby services</string>
+	
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location to provide location-based services</string>
 </dict>
 </plist>
