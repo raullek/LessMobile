@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_bubble_question_24dp
+import lessmobile.composeapp.generated.resources.ic_filter_24dp
+import lessmobile.composeapp.generated.resources.ic_search_24dp
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -53,7 +55,7 @@ fun SearchFilterBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.ic_bubble_question_24dp),
+                    painter = painterResource(Res.drawable.ic_search_24dp),
                     contentDescription = "Search",
                     tint = LessTheme.colors.textIconsGrey,
                     modifier = Modifier.size(LessTheme.size.medium)
@@ -85,7 +87,7 @@ fun SearchFilterBar(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                painter = painterResource(Res.drawable.ic_bubble_question_24dp),
+                painter = painterResource(Res.drawable.ic_filter_24dp),
                 contentDescription = "Filter",
                 tint = LessTheme.colors.textIconsBlack,
                 modifier = Modifier.size(LessTheme.size.medium)

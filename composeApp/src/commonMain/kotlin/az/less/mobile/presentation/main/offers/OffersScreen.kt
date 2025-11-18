@@ -3,6 +3,7 @@ package az.less.mobile.presentation.main.offers
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -78,47 +79,41 @@ fun OffersScreenContent(
     onIntent: (OffersIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(LessTheme.colors.backgroundSecond)
     ) {
-        // Spacing from top
-        item(key = "top_spacing") {
-            Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
-        }
+        // Fixed Header Section
+        Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
         
         // Header with User Avatar, Name, and Notification Buttons
-        item(key = "header") {
-            OffersHeader(
-                userName = state.userName,
-                onNotificationClick = { /* Handle notification */ },
-                onMessageClick = { /* Handle message */ },
-                userAvatarUrl = state.userAvatarUrl
-            )
-        }
+        OffersHeader(
+            userName = state.userName,
+            onNotificationClick = { /* Handle notification */ },
+            onMessageClick = { /* Handle message */ },
+            userAvatarUrl = state.userAvatarUrl
+        )
         
-        item(key = "header_spacing") {
-            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-        }
+        Spacer(modifier = Modifier.height(LessTheme.spacing.small))
         
         // Search and Filter Bar
-        item(key = "search_filter") {
-            SearchFilterBar(
-                searchQuery = state.searchQuery,
-                onSearchClick = {
-                    onIntent(OffersIntent.OnSearchClicked)
-                },
-                onFilterClick = { /* Handle filter */ }
-            )
-        }
+        SearchFilterBar(
+            searchQuery = state.searchQuery,
+            onSearchClick = {
+                onIntent(OffersIntent.OnSearchClicked)
+            },
+            onFilterClick = { /* Handle filter */ }
+        )
         
-        item(key = "search_spacing") {
-            Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-        }
+        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
         
-        // Horizontal Categories Section
-        item(key = "categories") {
+        // Scrollable Content
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Horizontal Categories Section
+            item(key = "categories") {
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -218,6 +213,7 @@ fun OffersScreenContent(
         // Bottom spacing
         item(key = "bottom_spacing") {
             Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
+        }
         }
     }
 }

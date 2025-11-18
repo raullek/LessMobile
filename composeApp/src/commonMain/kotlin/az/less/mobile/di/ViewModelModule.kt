@@ -1,5 +1,6 @@
 package az.less.mobile.di
 
+import az.less.mobile.presentation.main.explore.ExploreViewModel
 import az.less.mobile.presentation.main.more.MoreViewModel
 import az.less.mobile.presentation.main.offers.OffersViewModel
 import az.less.mobile.presentation.main.orders.OrdersViewModel
@@ -10,6 +11,7 @@ import org.koin.dsl.module
 val viewModelModule = module {
     viewModelOf(::MoreViewModel)
     viewModelOf(::OffersViewModel)
+    viewModelOf(::ExploreViewModel)
     viewModelOf(::SavedViewModel)
     viewModelOf(::OrdersViewModel)
 }

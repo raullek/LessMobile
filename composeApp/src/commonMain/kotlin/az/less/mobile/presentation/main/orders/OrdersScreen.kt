@@ -28,7 +28,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 
 /**
- * Orders Screen with SegmentedButton and OrderItem list
+ * Stateful OrdersScreen that connects to ViewModel
+ * This is the entry point used by navigation
  */
 @Composable
 fun OrdersScreen(
@@ -36,8 +37,25 @@ fun OrdersScreen(
 ) {
     val state by viewModel.collectAsState()
     
+    // Render the stateless UI
+    OrdersScreenContent(
+        state = state,
+        onIntent = viewModel::onIntent
+    )
+}
+
+/**
+ * Stateless OrdersScreen UI implementation
+ * Pure UI that receives state and emits intents
+ */
+@Composable
+fun OrdersScreenContent(
+    state: OrdersState,
+    onIntent: (OrdersIntent) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(LessTheme.colors.backgroundSecond)
             .padding(horizontal = LessTheme.spacing.medium)
@@ -75,7 +93,7 @@ fun OrdersScreen(
             selectedOptionId = state.selectedTab.name,
             onOptionSelected = { optionId ->
                 val tab = OrderTab.valueOf(optionId)
-                viewModel.onIntent(OrdersIntent.OnTabSelected(tab))
+                onIntent(OrdersIntent.OnTabSelected(tab))
             },
             modifier = Modifier,
             selectedTextColor = LessTheme.colors.textIconsNested
@@ -100,7 +118,7 @@ fun OrdersScreen(
             ) { item ->
                 OrderItem(
                     item = item,
-                    onClick = { viewModel.onIntent(OrdersIntent.OnCartItemClicked(item.id)) },
+                    onClick = { onIntent(OrdersIntent.OnCartItemClicked(item.id)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 

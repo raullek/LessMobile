@@ -35,6 +35,12 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+            
+            // Google Maps for Android
+            implementation(libs.google.maps.android)
+            implementation(libs.google.maps.compose)
+            implementation(libs.google.maps.android.compose.utils)
+            implementation(libs.google.play.services.location)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
