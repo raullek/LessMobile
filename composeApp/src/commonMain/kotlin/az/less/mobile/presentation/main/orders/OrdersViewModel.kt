@@ -85,6 +85,30 @@ class OrdersViewModel : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
                 price = "12.99"
+            ),
+            CartItem(
+                id = "5",
+                title = "Mixed donut bag",
+                pickupTime = "Pick up from 17:00 to 23:00",
+                price = "12.99"
+            ),
+            CartItem(
+                id = "6",
+                title = "Mixed donut bag",
+                pickupTime = "Pick up from 17:00 to 23:00",
+                price = "12.99"
+            ),
+            CartItem(
+                id = "7",
+                title = "Mixed donut bag",
+                pickupTime = "Pick up from 17:00 to 23:00",
+                price = "12.99"
+            ),
+            CartItem(
+                id = "8",
+                title = "Mixed donut bag",
+                pickupTime = "Pick up from 17:00 to 23:00",
+                price = "12.99"
             )
         )
     }
