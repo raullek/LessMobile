@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -86,10 +87,10 @@ fun OffersScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .offset(y=LessTheme.spacing.xLarge)
             .background(LessTheme.colors.backgroundSecond)
             .windowInsetsPadding(WindowInsets.statusBars)
-
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(bottom = LessTheme.size.large) // Space for bottom nav bar
     ) {
         // Fixed Header Section
         Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
