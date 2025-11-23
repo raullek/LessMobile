@@ -1,5 +1,6 @@
 package az.less.mobile.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.main.AppBottomNavigation
 
 @Composable
@@ -24,7 +26,8 @@ fun AppNavigation() {
     showBottomBar.value = homeRoutes.contains(currentRoute)
 
     Scaffold(
-        contentWindowInsets = WindowInsets.systemBars,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        containerColor = LessTheme.colors.backgroundSecond,
         bottomBar = {
             if (showBottomBar.value) {
                 AppBottomNavigation(
@@ -39,7 +42,6 @@ fun AppNavigation() {
             startDestination = HomeScreens.Offers.route,
             modifier = Modifier
                 .padding(paddingValues)
-                .consumeWindowInsets(paddingValues)
         ) {
 //            authorizationGraph(navController)
             homeGraph(navController)

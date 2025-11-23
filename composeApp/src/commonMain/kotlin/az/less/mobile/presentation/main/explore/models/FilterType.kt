@@ -10,3 +10,4 @@ enum class FilterType(val displayName: String?=null) {
     MORE_DISCOUNT("More discount")
 }
 
+

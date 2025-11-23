@@ -1,5 +1,6 @@
 package az.less.mobile.presentation.main.explore
 
+import az.less.mobile.presentation.main.explore.models.ExploreVenueItem
 import az.less.mobile.presentation.main.explore.models.FilterType
 
 /**
@@ -11,7 +12,8 @@ data class ExploreState(
     val isLoading: Boolean = false,
     val selectedVenueId: String? = null,
     val userLocation: az.less.mobile.presentation.maps.models.LatLong? = null,
-    val locationPermissionGranted: Boolean = false
+    val locationPermissionGranted: Boolean = false,
+    val venues: List<ExploreVenueItem> = emptyList()
 )
 
 /**
@@ -35,5 +37,6 @@ sealed interface ExploreIntent {
     data class OnMapMarkerClicked(val venueId: String) : ExploreIntent
     data class OnLocationPermissionChanged(val granted: Boolean) : ExploreIntent
     data class OnMapClick(val latLong: az.less.mobile.presentation.maps.models.LatLong) : ExploreIntent
+    data class OnVenueItemClicked(val venueId: String) : ExploreIntent
 }
 
