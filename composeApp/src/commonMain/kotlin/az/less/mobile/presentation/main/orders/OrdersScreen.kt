@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -63,7 +64,8 @@ fun OrdersScreenContent(
             .background(LessTheme.colors.backgroundSecond)
             .padding(horizontal = LessTheme.spacing.medium)
             .windowInsetsPadding(WindowInsets.statusBars)
-            .offset(y=LessTheme.spacing.xLarge)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(bottom = LessTheme.size.large) // Space for bottom nav bar
     ) {
         // Top spacing
         Spacer(modifier = Modifier.height(LessTheme.spacing.small))

@@ -76,7 +76,6 @@ fun DsCell(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(LessTheme.colors.backgroundPrimary)
     ) {
         Row(
             modifier = Modifier
@@ -201,7 +200,6 @@ fun DsSectionHeader(
         color = LessTheme.colors.textIconsThird,
         modifier = modifier
             .fillMaxWidth()
-            .background(LessTheme.colors.backgroundPrimary)
             .padding(
                 horizontal = LessTheme.spacing.medium,
                 vertical = LessTheme.spacing.xxSmall

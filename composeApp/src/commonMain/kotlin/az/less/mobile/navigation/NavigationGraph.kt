@@ -1,14 +1,12 @@
 package az.less.mobile.navigation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -25,26 +23,33 @@ fun AppNavigation() {
     val currentRoute = navBackStackEntry.value?.destination?.route
     showBottomBar.value = homeRoutes.contains(currentRoute)
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        containerColor = LessTheme.colors.backgroundSecond,
-        bottomBar = {
-            if (showBottomBar.value) {
-                AppBottomNavigation(
-                    modifier = Modifier,
-                    navController = navController
-                )
-            }
-        }
-    ) { paddingValues ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LessTheme.colors.backgroundSecond)
+    ) {
+        // Navigation content
         NavHost(
             navController = navController,
             startDestination = HomeScreens.Offers.route,
-            modifier = Modifier
-                .padding(paddingValues)
+            modifier = Modifier.fillMaxSize()
         ) {
 //            authorizationGraph(navController)
             homeGraph(navController)
+        }
+        
+        // Bottom Navigation Bar - positioned at bottom
+        if (showBottomBar.value) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxSize()
+            ) {
+                AppBottomNavigation(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    navController = navController
+                )
+            }
         }
     }
 }

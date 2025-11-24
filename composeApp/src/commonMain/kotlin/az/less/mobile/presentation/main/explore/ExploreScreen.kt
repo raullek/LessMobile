@@ -1,5 +1,6 @@
 package az.less.mobile.presentation.main.explore
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.main.explore.components.ExploreVenueCard
@@ -96,15 +99,15 @@ fun ExploreScreenContent(
 ) {
     var locationPermissionGranted by remember { mutableStateOf(false) }
     var locationPermissionDenied by remember { mutableStateOf(false) }
-    
+
     // Material bottom sheet scaffold state
     val scaffoldState = rememberBottomSheetScaffoldState()
-    
+
     // Update location permission in state
     LaunchedEffect(locationPermissionGranted) {
         onIntent(ExploreIntent.OnLocationPermissionChanged(locationPermissionGranted))
     }
-    
+
     LocationPermissionHandler(
         onPermissionGranted = {
             locationPermissionGranted = true
@@ -121,28 +124,23 @@ fun ExploreScreenContent(
             modifier = modifier,
             scaffoldState = scaffoldState,
             sheetContainerColor = LessTheme.colors.backgroundSecond,
+            sheetPeekHeight = 200.dp, // Make bottom sheet visible by default
             sheetContent = {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize() .offset(y=-LessTheme.spacing.xLarge),
-                    contentPadding = PaddingValues(
-                        horizontal = LessTheme.spacing.medium,
-                        vertical = LessTheme.spacing.medium
-                    )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(bottom = LessTheme.size.large) // Push sheet content up from bottom nav bar
                 ) {
-                    // Title
-                    item(key = "title") {
-                        Text(
-                            text = "Explore Venues",
-                            style = LessTheme.typography.body16Bold,
-                            color = LessTheme.colors.textIconsBlack,
-                            modifier = Modifier.padding(bottom = LessTheme.spacing.xSmall)
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            start = LessTheme.spacing.medium,
+                            end = LessTheme.spacing.medium,
+                            top = LessTheme.spacing.small,
                         )
-                    }
-                    
-                    item(key = "title_spacing") {
-                        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-                    }
-                    
+                    ) {
+
                     // Venue Items
                     items(
                         items = state.venues,
@@ -154,9 +152,10 @@ fun ExploreScreenContent(
                                 onIntent(ExploreIntent.OnVenueItemClicked(item.id))
                             }
                         )
-                        
+
                         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
                     }
+                }
                 }
             },
         ) { paddingValues ->
@@ -170,7 +169,7 @@ fun ExploreScreenContent(
                         zoom = 13f
                     ),
                     mapType = MapType.NORMAL,
-                    isZoomControlsVisible = true,
+                    isZoomControlsVisible = false,
                     isCompassVisible = true,
                     isTrackingEnabled = locationPermissionGranted,
                     markers = emptyList(), // No markers for now
@@ -180,52 +179,39 @@ fun ExploreScreenContent(
                     onMapClick = { latLong ->
                         onIntent(ExploreIntent.OnMapClick(latLong))
                     },
-                    onFindMeButtonClick = if (locationPermissionGranted) {
-                        { println("Find me clicked - location enabled") }
-                    } else null
+                    onFindMeButtonClick = null // Remove recenter location button
                 )
 
-                // Search Filter Bar and Filter Chips - fixed at top
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.TopCenter)
                         .windowInsetsPadding(WindowInsets.statusBars)
+                        .padding(
+                            top = LessTheme.spacing.medium,
+                            start = LessTheme.spacing.medium,
+                            end = LessTheme.spacing.medium,)
+                        .background(color = Color.Transparent)
+                    ,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-
-                    // Search and Filter Bar
-                    SearchFilterBar(
-                        searchQuery = state.searchQuery,
-                        onSearchClick = {
-                            onIntent(ExploreIntent.OnSearchClicked)
-                        },
-                        onFilterClick = {
-                            onIntent(ExploreIntent.OnFilterClicked)
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-
-                    // Filter Chips: Liked, Nearest, Rating, More discount
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = LessTheme.spacing.medium),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        FilterType.entries.forEach { filterType ->
-                            FilterChip(
-                                text = filterType.displayName,
-                                isSelected = state.selectedFilterType == filterType,
-                                showIconContainer = filterType == FilterType.LIKED, // Icon only for Liked
-                                onClick = {
-                                    onIntent(ExploreIntent.OnFilterTypeSelected(filterType))
-                                }
-                            )
-                        }
+                    FilterType.entries.forEach { filterType ->
+                        FilterChip(
+                            text = filterType.displayName,
+                            isSelected = state.selectedFilterType == filterType,
+                            showIconContainer = filterType == FilterType.LIKED, // Icon only for Liked
+                            onClick = {
+                                onIntent(ExploreIntent.OnFilterTypeSelected(filterType))
+                            }
+                        )
                     }
                 }
+
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(LessTheme.spacing.medium)
+                    .background(LessTheme.colors.backgroundSecond)
+                    .align(Alignment.BottomCenter))
+
             }
         }
     }
