@@ -19,10 +19,19 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,6 +41,7 @@ import az.less.mobile.presentation.main.offers.components.CategoryCard
 import az.less.mobile.presentation.main.offers.components.OfferCard
 import az.less.mobile.presentation.main.offers.components.OffersHeader
 import az.less.mobile.presentation.main.offers.components.SearchFilterBar
+import az.less.mobile.presentation.reserve.ReserveScreen
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import org.jetbrains.compose.resources.painterResource
@@ -43,12 +53,20 @@ import org.orbitmvi.orbit.compose.collectSideEffect
  * Stateful OffersScreen that connects to ViewModel
  * This is the entry point used by navigation
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OffersScreen(
     viewModel: OffersViewModel = koinViewModel(),
     navController: NavController
 ) {
     val state by viewModel.collectAsState()
+    val scope = rememberCoroutineScope()
+    
+    // Reserve bottom sheet state
+    var isReserveBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    val reserveSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     
     // Collect side effects for navigation
     viewModel.collectSideEffect { sideEffect ->
@@ -61,6 +79,12 @@ fun OffersScreen(
                 // Handle navigation to search screen
                 // navController.navigate("search")
             }
+            is OffersSideEffect.NavigateToReserve -> {
+                isReserveBottomSheetVisible = true
+                scope.launch {
+                    reserveSheetState.expand()
+                }
+            }
             is OffersSideEffect.ShowError -> {
                 // Show error snackbar
             }
@@ -71,6 +95,19 @@ fun OffersScreen(
     OffersScreenContent(
         state = state,
         onIntent = viewModel::onIntent
+    )
+    
+    // Reserve Bottom Sheet
+    ReserveScreen(
+        isVisible = isReserveBottomSheetVisible,
+        sheetState = reserveSheetState,
+        onDismiss = {
+            scope.launch {
+                reserveSheetState.hide()
+            }.invokeOnCompletion {
+                isReserveBottomSheetVisible = false
+            }
+        }
     )
 }
 
