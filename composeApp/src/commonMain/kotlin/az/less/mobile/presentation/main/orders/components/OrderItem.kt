@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -81,14 +82,16 @@ fun OrderItem(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .padding(top = LessTheme.spacing.small)
             ,
             horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.large),
         ) {
             // Text content - flex-1 with gap-6 between title and pickup time
             Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(vertical = LessTheme.spacing.xxSmall),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 // Title
                 Text(
@@ -98,6 +101,13 @@ fun OrderItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                Text(
+                    style = LessTheme.typography.body14Medium,
+                    color = LessTheme.colors.textIconsGrey,
+                    text = "Reserve number:${item.reserveNumber}",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
                 
                 // Pickup time - gap-6 from title
                 Text(
@@ -111,9 +121,9 @@ fun OrderItem(
             
             // Price section - gap-4
             Row(
+                modifier = Modifier.padding(top = LessTheme.spacing.xxSmall),
                 horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxxSmall),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = LessTheme.spacing.small)
             ) {
                 Text(
                     text = item.price,

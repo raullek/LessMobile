@@ -68,7 +68,8 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
     }
     
     private fun handleOfferItemClicked(offerId: String) = intent {
-        postSideEffect(OffersSideEffect.NavigateToOfferDetail(offerId))
+        // Navigate to Reserve screen when clicking on offer item
+        postSideEffect(OffersSideEffect.NavigateToReserve)
     }
     
     // Mock data - replace with repository calls in real app

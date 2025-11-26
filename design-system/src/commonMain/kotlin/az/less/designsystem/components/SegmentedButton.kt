@@ -206,11 +206,7 @@ private fun SegmentedButtonItem(
     ) {
         Text(
             text = text,
-            style = if (isSelected) {
-                LessTheme.typography.body14Semibold
-            } else {
-                LessTheme.typography.body14Medium
-            },
+            style = LessTheme.typography.body14Semibold,
             color = if (isSelected) {
                 selectedTextColor
             } else {

@@ -40,7 +40,11 @@ class SavedViewModel : ViewModel(), ContainerHost<SavedState, SavedSideEffect> {
     }
     
     private fun handleItemClicked(itemId: String) = intent {
-        postSideEffect(SavedSideEffect.NavigateToItemDetail(itemId))
+        // Find the favorite item and navigate to reserve
+        val favoriteItem = state.favoriteItems.find { it.id == itemId }
+        if (favoriteItem != null) {
+            postSideEffect(SavedSideEffect.NavigateToReserve(favoriteItem))
+        }
     }
     
     private fun handleRemoveFromFavorites(itemId: String) = intent {

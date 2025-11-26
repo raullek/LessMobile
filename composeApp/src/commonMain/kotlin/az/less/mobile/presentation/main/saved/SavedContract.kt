@@ -17,7 +17,7 @@ data class SavedState(
  */
 sealed interface SavedSideEffect {
     data class ShowError(val message: String) : SavedSideEffect
-    data class NavigateToItemDetail(val itemId: String) : SavedSideEffect
+    data class NavigateToReserve(val favoriteItem: FavoriteItem) : SavedSideEffect
     data object NavigateToExplore : SavedSideEffect
 }
 

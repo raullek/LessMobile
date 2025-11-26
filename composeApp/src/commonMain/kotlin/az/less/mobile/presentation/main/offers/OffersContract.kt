@@ -23,6 +23,7 @@ sealed interface OffersSideEffect {
     data class ShowError(val message: String) : OffersSideEffect
     data class NavigateToOfferDetail(val offerId: String) : OffersSideEffect
     data object NavigateToSearch : OffersSideEffect
+    data object NavigateToReserve : OffersSideEffect
 }
 
 /**

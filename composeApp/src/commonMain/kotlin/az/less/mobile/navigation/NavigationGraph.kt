@@ -36,6 +36,7 @@ fun AppNavigation() {
         ) {
 //            authorizationGraph(navController)
             homeGraph(navController)
+            reserveGraph(navController)
         }
         
         // Bottom Navigation Bar - positioned at bottom
