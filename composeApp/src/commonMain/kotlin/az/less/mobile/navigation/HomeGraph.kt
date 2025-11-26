@@ -15,7 +15,6 @@ sealed class HomeScreens(val route: String) {
     data object Orders : HomeScreens("orders")
     data object Saved : HomeScreens("saved")
     data object More : HomeScreens("more")
-    data object Reserve : HomeScreens("reserve")
 }
 
 fun NavGraphBuilder.homeGraph(
@@ -35,9 +34,6 @@ fun NavGraphBuilder.homeGraph(
     }
     composable(HomeScreens.More.route) {
         MoreScreen(navController = navController)
-    }
-    composable(HomeScreens.Reserve.route) {
-
     }
 }
 

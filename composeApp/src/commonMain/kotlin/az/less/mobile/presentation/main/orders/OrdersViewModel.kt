@@ -46,7 +46,13 @@ class OrdersViewModel : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect
     }
 
     private fun handleCartItemClicked(itemId: String) = intent {
-        postSideEffect(OrdersSideEffect.NavigateToItemDetail(itemId))
+        // Find the cart item and show reserve info
+        val cartItem = state.cartItems.find { it.id == itemId } 
+            ?: state.historyItems.find { it.id == itemId }
+        
+        if (cartItem != null) {
+            postSideEffect(OrdersSideEffect.ShowReserveInfo(cartItem))
+        }
     }
 
     private fun handleCheckoutClicked() = intent {
@@ -66,49 +72,57 @@ class OrdersViewModel : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect
                 id = "1",
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99"
+                price = "12.99",
+                reserveNumber = "123456"
             ),
             CartItem(
                 id = "2",
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99"
+                price = "12.99",
+                reserveNumber = "123456"
             ),
             CartItem(
                 id = "3",
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99"
+                price = "12.99",
+                reserveNumber = "123456"
             ),
             CartItem(
                 id = "4",
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99"
+                price = "12.99",
+                reserveNumber = "123456"
             ),
             CartItem(
                 id = "5",
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99"
+                price = "12.99",
+                reserveNumber = "123456"
             ),
             CartItem(
                 id = "6",
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99"
+                price = "12.99",
+                reserveNumber = "123456"
             ),
             CartItem(
                 id = "7",
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99"
+                price = "12.99",
+                reserveNumber = "123456"
             ),
             CartItem(
                 id = "8",
                 title = "Mixed donut bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99"
+                price = "12.99",
+                reserveNumber = "123456"
             )
         )
     }

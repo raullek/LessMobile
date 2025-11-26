@@ -25,7 +25,7 @@ enum class OrderTab {
  */
 sealed interface OrdersSideEffect {
     data object NavigateToCheckout : OrdersSideEffect
-    data class NavigateToItemDetail(val itemId: String) : OrdersSideEffect
+    data class ShowReserveInfo(val cartItem: CartItem) : OrdersSideEffect
     data object NavigateBack : OrdersSideEffect
     data class ShowError(val message: String) : OrdersSideEffect
 }

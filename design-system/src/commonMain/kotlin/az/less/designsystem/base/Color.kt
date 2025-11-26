@@ -100,7 +100,7 @@ object LightColors {
     val BackgroundBrand = Color(0xFFFCFFF9)
     val ElementsPrimaryElement = Color(0xFFFFFFFF)
     val ElementsSecondaryElement = Color(0xFFF4F7F6)
-    val ElementsPrimaryBrand = Color(0xFF3A9062)
+    val ElementsPrimaryBrand = Color(0xFF31BC5C)
     val ElementsSecondaryBrand = Color(0xFFE0FCC0)
     val ElementPressedPrimaryBrand = Color(0xFF2D7043)
     val ElementPressedSecondaryBrand = Color(0xFFBEF98D)

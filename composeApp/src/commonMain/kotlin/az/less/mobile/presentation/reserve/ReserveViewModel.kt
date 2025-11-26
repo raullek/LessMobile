@@ -2,9 +2,13 @@ package az.less.mobile.presentation.reserve
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.presentation.reserve.models.CardType
+import az.less.mobile.presentation.reserve.models.OrderAccepted
+import az.less.mobile.presentation.reserve.models.PaymentCard
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
+import kotlin.random.Random
 
 /**
  * ViewModel for Reserve Screen using Orbit MVI
@@ -26,6 +30,7 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
             is ReserveIntent.OnBackClicked -> handleBackClicked()
             is ReserveIntent.OnPlaceOrderClicked -> handlePlaceOrderClicked()
             is ReserveIntent.OnPaymentMethodClicked -> handlePaymentMethodClicked()
+            is ReserveIntent.OnPaymentCardSelected -> handlePaymentCardSelected(intent.card)
             is ReserveIntent.OnIncrementQuantity -> handleIncrementQuantity()
             is ReserveIntent.OnDecrementQuantity -> handleDecrementQuantity()
             is ReserveIntent.OnSeeMoreDealsClicked -> handleSeeMoreDealsClicked()
@@ -38,6 +43,30 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
         val serviceFee = 0.20
         val subtotal = calculateSubtotal(quantity, pricePerPiece, serviceFee)
         
+        // Mock payment cards data
+        val mockPaymentCards = listOf(
+            PaymentCard(
+                id = "card_1",
+                type = CardType.MASTERCARD,
+                lastFourDigits = "2412",
+                isSelected = true
+            ),
+            PaymentCard(
+                id = "card_2",
+                type = CardType.VISA,
+                lastFourDigits = "3440",
+                isSelected = false
+            ),
+            PaymentCard(
+                id = "add_new",
+                type = CardType.ADD_NEW,
+                lastFourDigits = "",
+                isSelected = false
+            )
+        )
+        
+        val selectedCard = mockPaymentCards.firstOrNull { it.isSelected }
+        
         reduce {
             state.copy(
                 venueName = "Small Surprise Bag",
@@ -47,7 +76,15 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
                 pricePerPiece = pricePerPiece,
                 serviceFee = serviceFee,
                 subtotal = subtotal,
-                paymentMethodDisplay = ""
+                availablePaymentCards = mockPaymentCards,
+                selectedPaymentCard = selectedCard,
+                paymentMethodDisplay = selectedCard?.let {
+                    when (it.type) {
+                        CardType.MASTERCARD -> "Mastercard •••• ${it.lastFourDigits}"
+                        CardType.VISA -> "Visa •••• ${it.lastFourDigits}"
+                        CardType.ADD_NEW -> ""
+                    }
+                } ?: ""
             )
         }
     }
@@ -66,12 +103,49 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
             return@intent
         }
         
-        // Place order logic here
-        postSideEffect(ReserveSideEffect.OrderPlaced)
+        // Generate order number (6 digits)
+        val orderNumber = Random.nextInt(100000, 999999).toString()
+        
+        // Create order info
+        val orderInfo = OrderAccepted(
+            orderNumber = orderNumber,
+            venueName = state.venueName,
+            pickupTime = state.pickupTime
+        )
+        
+        // Place order and navigate to success screen
+        postSideEffect(ReserveSideEffect.OrderPlaced(orderInfo))
     }
 
     private fun handlePaymentMethodClicked() = intent {
         postSideEffect(ReserveSideEffect.NavigateToPaymentMethods)
+    }
+
+    private fun handlePaymentCardSelected(card: PaymentCard) = intent {
+        // Handle "Add new card" separately (TODO: navigate to add card screen)
+        if (card.type == CardType.ADD_NEW) {
+            // TODO: Navigate to add new card screen
+            return@intent
+        }
+        
+        // Update selected card and payment method display
+        val updatedCards = state.availablePaymentCards.map {
+            it.copy(isSelected = it.id == card.id)
+        }
+        
+        val displayText = when (card.type) {
+            CardType.MASTERCARD -> "Mastercard •••• ${card.lastFourDigits}"
+            CardType.VISA -> "Visa •••• ${card.lastFourDigits}"
+            CardType.ADD_NEW -> ""
+        }
+        
+        reduce {
+            state.copy(
+                selectedPaymentCard = card,
+                availablePaymentCards = updatedCards,
+                paymentMethodDisplay = displayText
+            )
+        }
     }
 
     private fun handleIncrementQuantity() = intent {

@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
+import az.less.mobile.navigation.ReserveScreens
 import az.less.mobile.presentation.main.offers.components.CategoryCard
 import az.less.mobile.presentation.main.offers.components.OfferCard
 import az.less.mobile.presentation.main.offers.components.OffersHeader
@@ -101,12 +102,23 @@ fun OffersScreen(
     ReserveScreen(
         isVisible = isReserveBottomSheetVisible,
         sheetState = reserveSheetState,
+        viewModel = koinViewModel (),
         onDismiss = {
             scope.launch {
                 reserveSheetState.hide()
             }.invokeOnCompletion {
                 isReserveBottomSheetVisible = false
             }
+        },
+        onOrderPlaced = { orderInfo ->
+            // Navigate to Order Accepted screen
+            navController.navigate(
+                ReserveScreens.OrderAccepted.createRoute(
+                    orderNumber = orderInfo.orderNumber,
+                    venueName = orderInfo.venueName,
+                    pickupTime = orderInfo.pickupTime
+                )
+            )
         }
     )
 }

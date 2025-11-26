@@ -24,8 +24,14 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +42,9 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
+import az.less.mobile.presentation.reserve.components.SelectPaymentMethodBottomSheet
+import az.less.mobile.presentation.reserve.models.OrderAccepted
+import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_down24dp
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
@@ -59,9 +68,17 @@ fun ReserveScreen(
     isVisible: Boolean,
     sheetState: SheetState,
     onDismiss: () -> Unit,
+    onOrderPlaced: (OrderAccepted) -> Unit = {},
     viewModel: ReserveViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
+    val scope = rememberCoroutineScope()
+    
+    // Payment method selection bottom sheet state
+    var isPaymentBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    val paymentSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     
     // Collect side effects
     viewModel.collectSideEffect { sideEffect ->
@@ -70,7 +87,10 @@ fun ReserveScreen(
                 onDismiss()
             }
             is ReserveSideEffect.NavigateToPaymentMethods -> {
-                // Handle navigation to payment methods
+                isPaymentBottomSheetVisible = true
+                scope.launch {
+                    paymentSheetState.expand()
+                }
             }
             is ReserveSideEffect.NavigateToAddressSelection -> {
                 // Handle navigation to address selection
@@ -79,7 +99,8 @@ fun ReserveScreen(
                 // Show error snackbar
             }
             is ReserveSideEffect.OrderPlaced -> {
-                // Handle order placed
+                // Handle order placed - navigate to order accepted screen
+                onOrderPlaced(sideEffect.orderInfo)
                 onDismiss()
             }
         }
@@ -135,6 +156,23 @@ fun ReserveScreen(
             )
         }
     }
+    
+    // Payment Method Selection Bottom Sheet
+    SelectPaymentMethodBottomSheet(
+        isVisible = isPaymentBottomSheetVisible,
+        sheetState = paymentSheetState,
+        paymentCards = state.availablePaymentCards,
+        onCardSelected = { card ->
+            viewModel.onIntent(ReserveIntent.OnPaymentCardSelected(card))
+        },
+        onDismiss = {
+            scope.launch {
+                paymentSheetState.hide()
+            }.invokeOnCompletion {
+                isPaymentBottomSheetVisible = false
+            }
+        }
+    )
 }
 
 /**

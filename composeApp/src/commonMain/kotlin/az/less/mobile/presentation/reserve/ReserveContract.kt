@@ -1,5 +1,8 @@
 package az.less.mobile.presentation.reserve
 
+import az.less.mobile.presentation.reserve.models.OrderAccepted
+import az.less.mobile.presentation.reserve.models.PaymentCard
+
 /**
  * State of the Reserve Screen
  */
@@ -12,6 +15,8 @@ data class ReserveState(
     val serviceFee: Double = 0.0,
     val subtotal: Double = 0.0,
     val paymentMethodDisplay: String = "",
+    val selectedPaymentCard: PaymentCard? = null,
+    val availablePaymentCards: List<PaymentCard> = emptyList(),
     val isLoading: Boolean = false
 )
 
@@ -24,7 +29,7 @@ sealed interface ReserveSideEffect {
     data object NavigateToPaymentMethods : ReserveSideEffect
     data object NavigateToAddressSelection : ReserveSideEffect
     data class ShowError(val message: String) : ReserveSideEffect
-    data object OrderPlaced : ReserveSideEffect
+    data class OrderPlaced(val orderInfo: OrderAccepted) : ReserveSideEffect
 }
 
 /**
@@ -34,6 +39,7 @@ sealed interface ReserveIntent {
     data object OnBackClicked : ReserveIntent
     data object OnPlaceOrderClicked : ReserveIntent
     data object OnPaymentMethodClicked : ReserveIntent
+    data class OnPaymentCardSelected(val card: PaymentCard) : ReserveIntent
     data object OnIncrementQuantity : ReserveIntent
     data object OnDecrementQuantity : ReserveIntent
     data object OnSeeMoreDealsClicked : ReserveIntent

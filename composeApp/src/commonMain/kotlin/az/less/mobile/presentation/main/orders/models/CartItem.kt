@@ -6,10 +6,6 @@ data class CartItem(
     val imageUrl: String? = null,
     val pickupTime: String,
     val price: String,
-    val quantity: Int = 1
+    val quantity: Int = 1,
+    val reserveNumber: String = "",
 )
-
-
-
-
-
