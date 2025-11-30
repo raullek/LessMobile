@@ -47,11 +47,10 @@ fun OrderAcceptedScreen(
     OrderAcceptedScreenContent(
         orderInfo = orderInfo,
         onGoToOrdersClicked = {
-            navController.navigate("offers",navOptions {
+            navController.navigate("orders",navOptions {
             popUpTo("offers"){inclusive =true}
             launchSingleTop = true
-        })
-            navController.navigate("orders") },
+        })},
 
         onGoToHomeClicked = { navController.navigate("offers",navOptions {
             popUpTo("offers"){inclusive =true}

@@ -8,6 +8,7 @@ import az.less.mobile.presentation.main.more.MoreScreen
 import az.less.mobile.presentation.main.offers.OffersScreen
 import az.less.mobile.presentation.main.orders.OrdersScreen
 import az.less.mobile.presentation.main.saved.SavedScreen
+import az.less.mobile.presentation.main.search.SearchScreen
 
 sealed class HomeScreens(val route: String) {
     data object Offers : HomeScreens("offers")
@@ -15,6 +16,7 @@ sealed class HomeScreens(val route: String) {
     data object Orders : HomeScreens("orders")
     data object Saved : HomeScreens("saved")
     data object More : HomeScreens("more")
+    data object Search : HomeScreens("search")
 }
 
 fun NavGraphBuilder.homeGraph(
@@ -34,6 +36,9 @@ fun NavGraphBuilder.homeGraph(
     }
     composable(HomeScreens.More.route) {
         MoreScreen(navController = navController)
+    }
+    composable(HomeScreens.Search.route) {
+        SearchScreen(navController = navController)
     }
 }
 

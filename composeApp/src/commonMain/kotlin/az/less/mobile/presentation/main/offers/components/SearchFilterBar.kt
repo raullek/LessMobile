@@ -73,26 +73,6 @@ fun SearchFilterBar(
                 )
             }
         }
-        
-        Spacer(modifier = Modifier.width(LessTheme.spacing.xxSmall + LessTheme.spacing.xxxSmall)) // 4 + 2 = 6dp
-        
-        // Filter Button
-        Box(
-            modifier = Modifier
-                .size(LessTheme.size.xxLarge)
-                .clip(RoundedCornerShape(LessTheme.radius.medium))
-                .background(LessTheme.colors.backgroundPrimary)
-                .clickable { onFilterClick() }
-                .padding(LessTheme.spacing.xxSmall),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.ic_filter_24dp),
-                contentDescription = "Filter",
-                tint = LessTheme.colors.textIconsBlack,
-                modifier = Modifier.size(LessTheme.size.medium)
-            )
-        }
     }
 }
 

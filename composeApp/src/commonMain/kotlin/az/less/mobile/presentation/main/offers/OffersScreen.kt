@@ -78,7 +78,7 @@ fun OffersScreen(
             }
             is OffersSideEffect.NavigateToSearch -> {
                 // Handle navigation to search screen
-                // navController.navigate("search")
+                 navController.navigate("search")
             }
             is OffersSideEffect.NavigateToReserve -> {
                 isReserveBottomSheetVisible = true
@@ -142,7 +142,7 @@ fun OffersScreenContent(
             .padding(bottom = LessTheme.size.large) // Space for bottom nav bar
     ) {
         // Fixed Header Section
-        Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
+        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
         
         // Header with User Avatar, Name, and Notification Buttons
         OffersHeader(
@@ -151,8 +151,8 @@ fun OffersScreenContent(
             onMessageClick = { /* Handle message */ },
             userAvatarUrl = state.userAvatarUrl
         )
-        
-        Spacer(modifier = Modifier.height(LessTheme.spacing.small))
+
+        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
         
         // Search and Filter Bar
         SearchFilterBar(
