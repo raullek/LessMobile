@@ -12,7 +12,7 @@ object LessTheme {
 
     val primitives = Primitives
 
-    val typography: az.less.designsystem.base.Typography
+    val typography: Typography
         @Composable
         get() = LocalTypography.current
 

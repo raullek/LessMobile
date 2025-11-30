@@ -1,11 +1,11 @@
-package az.less.mobile.presentation.main.more
+package az.less.mobile.presentation.main.more.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.presentation.main.more.models.CellId
-import az.less.mobile.presentation.main.more.models.MoreCellModel
-import az.less.mobile.presentation.main.more.models.MoreCellType
-import az.less.mobile.presentation.main.more.models.MoreSection
+import az.less.mobile.presentation.main.more.root.models.CellId
+import az.less.mobile.presentation.main.more.root.models.MoreCellModel
+import az.less.mobile.presentation.main.more.root.models.MoreCellType
+import az.less.mobile.presentation.main.more.root.models.MoreSection
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_account_24dp
 import lessmobile.composeapp.generated.resources.ic_bubble_question_24dp
@@ -45,6 +45,9 @@ class MoreViewModel : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
             is MoreIntent.OnLogoutClicked -> handleLogoutClicked()
             is MoreIntent.OnCellClick -> handleCellClick(intent.cellId)
             is MoreIntent.OnNotificationToggleClick -> handleNotificationToggleClick()
+            is MoreIntent.OnContactUsDismiss -> handleContactUsDismiss()
+            is MoreIntent.OnContactUsItemClick -> handleContactUsItemClick(intent.itemId)
+            is MoreIntent.OnTermsDismiss -> handleTermsDismiss()
         }
     }
     
@@ -91,13 +94,41 @@ class MoreViewModel : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
             CellId.Voucher -> postSideEffect(MoreSideEffect.NavigateToVoucher)
             CellId.History -> postSideEffect(MoreSideEffect.NavigateToHistory)
             CellId.Settings -> postSideEffect(MoreSideEffect.NavigateToSettings)
-            CellId.ContactUs -> postSideEffect(MoreSideEffect.NavigateToContactUs)
+            CellId.ContactUs -> {
+                reduce {
+                    state.copy(showContactUsBottomSheet = true)
+                }
+            }
             CellId.SignStore -> postSideEffect(MoreSideEffect.NavigateToSignStore)
-            CellId.TermsOfService -> postSideEffect(MoreSideEffect.NavigateToTermsOfService)
+            CellId.TermsOfService -> {
+                reduce {
+                    state.copy(showTermsBottomSheet = true)
+                }
+            }
             CellId.HowToUse -> postSideEffect(MoreSideEffect.NavigateToHowToUse)
             CellId.Notification -> {
                 // Notification is handled separately via toggle
             }
+        }
+    }
+    
+    private fun handleContactUsDismiss() = intent {
+        reduce {
+            state.copy(showContactUsBottomSheet = false)
+        }
+    }
+    
+    private fun handleContactUsItemClick(itemId: String) = intent {
+        // TODO: Handle contact item click (open Instagram, TikTok, etc.)
+        // For now, just close the bottom sheet
+        reduce {
+            state.copy(showContactUsBottomSheet = false)
+        }
+    }
+    
+    private fun handleTermsDismiss() = intent {
+        reduce {
+            state.copy(showTermsBottomSheet = false)
         }
     }
     
