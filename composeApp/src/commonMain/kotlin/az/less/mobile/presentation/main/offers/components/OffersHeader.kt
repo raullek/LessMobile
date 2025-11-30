@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,31 +71,13 @@ fun OffersHeader(
             color = LessTheme.colors.textIconsBlack,
             modifier = Modifier.weight(1f)
         )
-        
-        // Notification Button 1
-        Box(
-            modifier = Modifier
-                .size(LessTheme.size.xLarge + LessTheme.spacing.xxSmall) // 40 + 4 = 44dp
-                .clip(CircleShape)
-                .background(LessTheme.colors.textIconsNested)
-                .clickable { onNotificationClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.ic_notification_24dp),
-                contentDescription = "Notifications",
-                modifier = Modifier.size(LessTheme.size.small + LessTheme.spacing.xxxSmall), // 20 + 2 = 22dp
-                tint = LessTheme.colors.textIconsBlack
-            )
-        }
-        
-        Spacer(modifier = Modifier.width(LessTheme.spacing.xSmall))
+
         
         // Notification Button 2 (Message/Bell icon)
         Box(
             modifier = Modifier
                 .size(LessTheme.size.xLarge + LessTheme.spacing.xxSmall) // 40 + 4 = 44dp
-                .clip(CircleShape)
+                .clip(RoundedCornerShape(LessTheme.radius.medium))
                 .background(LessTheme.colors.textIconsNested)
                 .clickable { onMessageClick() },
             contentAlignment = Alignment.Center
