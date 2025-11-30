@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +39,7 @@ enum class ButtonSize {
 @Composable
 fun DsButton(
     text: String,
+    textColor: Color? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: ButtonVariant = ButtonVariant.Primary,
@@ -62,6 +64,7 @@ fun DsButton(
             disabledContainerColor = LessTheme.colors.elementsThirdElement,
             disabledContentColor = LessTheme.colors.textIconsThird
         )
+
         ButtonVariant.Secondary -> ButtonDefaults.buttonColors(
             containerColor = when {
                 !enabled -> LessTheme.colors.elementsSecondaryElement.copy(alpha = 0.5f)
@@ -75,6 +78,7 @@ fun DsButton(
             disabledContainerColor = LessTheme.colors.elementsSecondaryElement.copy(alpha = 0.5f),
             disabledContentColor = LessTheme.colors.textIconsThird
         )
+
         ButtonVariant.Tertiary -> ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = if (!enabled) {
@@ -135,7 +139,9 @@ fun DsButton(
             }
             Text(
                 text = text,
-                style = LessTheme.typography.body16Semibold)
+                style = LessTheme.typography.body16Semibold,
+                color = textColor ?: LocalContentColor.current
+            )
         }
     }
 }

@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.main.more.models
+package az.less.mobile.presentation.main.more.root.models
 
 import org.jetbrains.compose.resources.DrawableResource
 

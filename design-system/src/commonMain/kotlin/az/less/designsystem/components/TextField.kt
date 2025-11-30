@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import lessmobile.design_system.generated.resources.Res
-import lessmobile.design_system.generated.resources.ic_delete_rounded_24dp
+import lessmobile.design_system.generated.resources.ic_clear_rounded_24dp
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -51,7 +51,7 @@ fun DsTextField(
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
     
-    val defaultEndIcon = painterResource(Res.drawable.ic_delete_rounded_24dp)
+    val defaultEndIcon = painterResource(Res.drawable.ic_clear_rounded_24dp)
     val actualEndIcon = endIcon ?: defaultEndIcon
 
     val height = 64.dp

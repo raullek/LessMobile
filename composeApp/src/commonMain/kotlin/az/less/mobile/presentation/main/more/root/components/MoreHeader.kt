@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.main.more.components
+package az.less.mobile.presentation.main.more.root.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,7 +31,6 @@ import az.less.designsystem.components.DsButton
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.compose_multiplatform
 import lessmobile.composeapp.generated.resources.ic_eco_leaf_24dp
-import lessmobile.composeapp.generated.resources.ic_more_24dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 

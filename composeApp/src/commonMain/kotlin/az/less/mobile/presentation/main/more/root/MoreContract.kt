@@ -1,7 +1,7 @@
-package az.less.mobile.presentation.main.more
+package az.less.mobile.presentation.main.more.root
 
-import az.less.mobile.presentation.main.more.models.CellId
-import az.less.mobile.presentation.main.more.models.MoreSection
+import az.less.mobile.presentation.main.more.root.models.CellId
+import az.less.mobile.presentation.main.more.root.models.MoreSection
 
 /**
  * State of the More Screen
@@ -19,7 +19,10 @@ data class MoreState(
     val ecoHeroTitle: String? = null,
     val ecoHeroDescription: String? = null,
     // Sections list
-    val sections: List<MoreSection> = emptyList()
+    val sections: List<MoreSection> = emptyList(),
+    // Bottom sheets
+    val showContactUsBottomSheet: Boolean = false,
+    val showTermsBottomSheet: Boolean = false
 )
 
 /**
@@ -47,4 +50,7 @@ sealed interface MoreIntent {
     data object OnLogoutClicked : MoreIntent
     data class OnCellClick(val cellId: CellId) : MoreIntent
     data object OnNotificationToggleClick : MoreIntent
+    data object OnContactUsDismiss : MoreIntent
+    data class OnContactUsItemClick(val itemId: String) : MoreIntent
+    data object OnTermsDismiss : MoreIntent
 }
