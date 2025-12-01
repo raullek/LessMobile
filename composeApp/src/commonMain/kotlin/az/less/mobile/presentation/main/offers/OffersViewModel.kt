@@ -3,13 +3,20 @@ package az.less.mobile.presentation.main.offers
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.mobile.presentation.main.offers.models.Category
+import az.less.mobile.presentation.main.offers.models.FilterSegment
+import az.less.mobile.presentation.main.offers.models.FilterSegmentType
 import az.less.mobile.presentation.main.offers.models.OfferItem
 import az.less.mobile.presentation.main.offers.models.OfferSection
+import az.less.mobile.presentation.main.offers.models.SpecialDiscountItem
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ic_explore_24dp
+import lessmobile.composeapp.generated.resources.ic_mark_16dp
+import lessmobile.composeapp.generated.resources.ic_star_16dp
 import lessmobile.composeapp.generated.resources.test_offer_category_burger
 import lessmobile.composeapp.generated.resources.test_offer_category_pasta
 import lessmobile.composeapp.generated.resources.test_offer_category_pizza
 import lessmobile.composeapp.generated.resources.test_offer_category_sushi
+import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -35,6 +42,7 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
             is OffersIntent.OnSearchQueryChanged -> handleSearchQueryChanged(intent.query)
             is OffersIntent.OnSearchClicked -> handleSearchClicked()
             is OffersIntent.OnCategorySelected -> handleCategorySelected(intent.categoryId)
+            is OffersIntent.OnFilterSegmentSelected -> handleFilterSegmentSelected(intent.segmentId)
             is OffersIntent.OnOfferItemClicked -> handleOfferItemClicked(intent.offerId)
         }
     }
@@ -43,6 +51,8 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
         reduce { 
             state.copy(
                 categories = getMockCategories(),
+                specialDiscounts = getMockSpecialDiscounts(),
+                filterSegments = getMockFilterSegments(),
                 offerSections = getMockOfferSections()
             )
         }
@@ -67,6 +77,16 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
         // In real app, load filtered items based on category
     }
     
+    private fun handleFilterSegmentSelected(segmentId: String) = intent {
+        reduce {
+            state.copy(
+                selectedFilterSegmentId = if (state.selectedFilterSegmentId == segmentId) null else segmentId
+            )
+        }
+        // In real app, load filtered items based on selected filter segment
+        // You can use state.selectedFilterSegmentId to determine which filter is active
+    }
+    
     private fun handleOfferItemClicked(offerId: String) = intent {
         // Navigate to Reserve screen when clicking on offer item
         postSideEffect(OffersSideEffect.NavigateToReserve)
@@ -78,7 +98,70 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
             Category(id = "1", title = "Burger", testImage = Res.drawable.test_offer_category_burger),
             Category(id = "2", title = "Pizza", testImage = Res.drawable.test_offer_category_pizza),
             Category(id = "3", title = "Asian", testImage = Res.drawable.test_offer_category_sushi),
-            Category(id = "4", title = "Italian", testImage = Res.drawable.test_offer_category_pasta)
+            Category(id = "4", title = "Italian", testImage = Res.drawable.test_offer_category_pasta),
+            Category(id = "5", title = "Bakery", testImage = Res.drawable.test_offer_category_pasta),
+            Category(id = "6", title = "Italian", testImage = Res.drawable.test_offer_category_pasta)
+        )
+    }
+    
+    private fun getMockFilterSegments(): List<FilterSegment> {
+        return listOf(
+            FilterSegment(
+                id = "nearest",
+                type = FilterSegmentType.NEAREST,
+                text = "Nearest",
+                icon = Res.drawable.ic_explore_24dp,
+                iconTint = 0xFFFF8B38L // Orange color
+            ),
+            FilterSegment(
+                id = "top_rated",
+                type = FilterSegmentType.TOP_RATED,
+                text = "Top rated",
+                icon = Res.drawable.ic_star_16dp,
+                iconTint = 0xFF5AA9E7L // Blue color
+            ),
+            FilterSegment(
+                id = "hot_deals",
+                type = FilterSegmentType.HOT_DEALS,
+                text = "Hot deals",
+                icon = Res.drawable.ic_mark_16dp,
+                iconTint = 0xFFAD3CDAL // Purple color
+            )
+        )
+    }
+    
+    private fun getMockSpecialDiscounts(): List<SpecialDiscountItem> {
+        return listOf(
+            SpecialDiscountItem(
+                id = "1",
+                title = "Special discount for Desserts 🧁",
+                subtitle = "Hurry to pick up from 22:00",
+                testImage = Res.drawable.test_offer_item_image
+            ),
+            SpecialDiscountItem(
+                id = "2",
+                title = "Special discount for Pizza 🍕",
+                subtitle = "Hurry to pick up from 20:00",
+                testImage = Res.drawable.test_offer_item_image
+            ),
+            SpecialDiscountItem(
+                id = "3",
+                title = "Special discount for Burgers 🍔",
+                subtitle = "Hurry to pick up from 19:00",
+                testImage = Res.drawable.test_offer_item_image
+            ),
+            SpecialDiscountItem(
+                id = "4",
+                title = "Special discount for Sushi 🍣",
+                subtitle = "Hurry to pick up from 21:00",
+                testImage = Res.drawable.test_offer_item_image
+            ),
+            SpecialDiscountItem(
+                id = "5",
+                title = "Special discount for Pasta 🍝",
+                subtitle = "Hurry to pick up from 18:00",
+                testImage = Res.drawable.test_offer_item_image
+            )
         )
     }
     

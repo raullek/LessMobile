@@ -127,11 +127,10 @@ fun SearchScreenContent(
                 columns = GridCells.Fixed(4),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp)
                     .padding(top = LessTheme.spacing.medium), // Adjust height to fit 2 rows
                 horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small),
-                verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.small),
-                contentPadding = PaddingValues(start = LessTheme.spacing.medium)
+                verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall),
+                contentPadding = PaddingValues(horizontal = LessTheme.spacing.medium)
             ) {
                 items(
                     items = state.categories,

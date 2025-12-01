@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +37,8 @@ fun CategoryCard(
 ) {
     Column(
         modifier = modifier
+            .width(81.dp) // Fixed width to match image width and ensure consistency
+            .height(102.dp)
             .clip(RoundedCornerShape(LessTheme.radius.small))
             .background(LessTheme.colors.elementsPrimaryElement)
             .clickable { onClick() }
