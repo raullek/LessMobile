@@ -1,7 +1,9 @@
 package az.less.mobile.presentation.main.offers
 
 import az.less.mobile.presentation.main.offers.models.Category
+import az.less.mobile.presentation.main.offers.models.FilterSegment
 import az.less.mobile.presentation.main.offers.models.OfferSection
+import az.less.mobile.presentation.main.offers.models.SpecialDiscountItem
 
 /**
  * State of the Offers Screen
@@ -12,6 +14,9 @@ data class OffersState(
     val searchQuery: String = "",
     val categories: List<Category> = emptyList(),
     val selectedCategoryId: String? = null,
+    val specialDiscounts: List<SpecialDiscountItem> = emptyList(),
+    val filterSegments: List<FilterSegment> = emptyList(),
+    val selectedFilterSegmentId: String? = null,
     val offerSections: List<OfferSection> = emptyList(),
     val isLoading: Boolean = false
 )
@@ -33,6 +38,7 @@ sealed interface OffersIntent {
     data class OnSearchQueryChanged(val query: String) : OffersIntent
     data object OnSearchClicked : OffersIntent
     data class OnCategorySelected(val categoryId: String) : OffersIntent
+    data class OnFilterSegmentSelected(val segmentId: String) : OffersIntent
     data class OnOfferItemClicked(val offerId: String) : OffersIntent
 }
 
