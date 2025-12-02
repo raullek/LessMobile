@@ -12,6 +12,7 @@ import az.less.mobile.presentation.maps.models.LatLongZoom
 import az.less.mobile.presentation.maps.models.Location
 import az.less.mobile.presentation.maps.models.MapType
 import az.less.mobile.presentation.maps.models.Marker
+import cocoapods.GoogleMaps.GMSMapView
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKCoordinateRegionMake

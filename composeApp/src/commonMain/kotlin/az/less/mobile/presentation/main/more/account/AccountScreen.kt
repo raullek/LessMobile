@@ -119,7 +119,7 @@ fun AccountScreenContent(
             Box(
                 modifier = Modifier
                     .size(112.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(LessTheme.radius.medium))
                     .background(LessTheme.colors.elementsPrimaryElement)
                     .border(
                         width = 2.dp,
@@ -132,7 +132,7 @@ fun AccountScreenContent(
                     painter = painterResource(Res.drawable.test_merchant_logo),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(112.dp)
+                        .fillMaxWidth()
                         .clip(CircleShape)
                 )
             }

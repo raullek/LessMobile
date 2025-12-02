@@ -15,34 +15,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import az.less.mobile.presentation.main.explore.models.FilterIconType
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ic_filter_24dp
 import lessmobile.composeapp.generated.resources.ic_heart_20dp
 import org.jetbrains.compose.resources.painterResource
 
 /**
  * Filter chip component for Explore screen
- * Selectable chip with optional icon container and text
+ * Unified component that handles all filter types: filter button, liked, and dynamic filters
  */
 @Composable
 fun FilterChip(
-    text: String?,
-    isSelected: Boolean,
+    text: String? = null,
+    iconType: FilterIconType = FilterIconType.NONE,
+    isSelected: Boolean = false,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showIconContainer: Boolean = false
+    backgroundColor: Color = LessTheme.colors.backgroundPrimary
 ) {
+    val defaultBackgroundColor = if (isSelected) {
+        LessTheme.colors.elementsPrimaryBrand
+    } else {
+        backgroundColor
+    }
+    
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(LessTheme.radius.medium))
-            .background(
-                if (isSelected) {
-                    LessTheme.colors.elementsPrimaryBrand
-                } else {
-                    LessTheme.colors.backgroundPrimary
-                }
-            )
+            .background(defaultBackgroundColor)
             .clickable(onClick = onClick)
             .padding(
                 horizontal = LessTheme.spacing.medium,
@@ -52,22 +56,43 @@ fun FilterChip(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon container
-            if (showIconContainer) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_heart_20dp),
-                    contentDescription = "liked",
-                    tint = if (isSelected) {
-                        LessTheme.colors.surfaceWhite
-                    } else {
-                        LessTheme.colors.textIconsBlack
-                    },
-                    modifier = Modifier.size(20.dp) // Icon size 20dp
-                )
+            // Icon based on type
+            when (iconType) {
+                FilterIconType.FILTER -> {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_filter_24dp),
+                        contentDescription = "Filter",
+                        tint = if (isSelected) {
+                            LessTheme.colors.surfaceWhite
+                        } else {
+                            LessTheme.colors.textIconsBlack
+                        },
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                FilterIconType.HEART -> {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_heart_20dp),
+                        contentDescription = "Liked",
+                        tint = if (isSelected) {
+                            LessTheme.colors.surfaceWhite
+                        } else {
+                            LessTheme.colors.textIconsBlack
+                        },
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                FilterIconType.NONE -> {
+                    // No icon
+                }
+            }
 
+            // Spacer between icon and text (only if both exist)
+            if (iconType != FilterIconType.NONE && text != null) {
                 Spacer(modifier = Modifier.width(LessTheme.spacing.xSmall))
             }
 
+            // Text
             if (text != null) {
                 Text(
                     text = text,

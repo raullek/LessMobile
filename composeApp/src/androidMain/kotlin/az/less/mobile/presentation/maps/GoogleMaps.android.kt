@@ -1,16 +1,32 @@
 package az.less.mobile.presentation.maps
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.key
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import az.less.designsystem.base.LessTheme
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.test_merchant_logo
+import org.jetbrains.compose.resources.painterResource
 import az.less.mobile.presentation.maps.models.CameraLocationBounds
 import az.less.mobile.presentation.maps.models.CameraPosition
 import az.less.mobile.presentation.maps.models.LatLong
@@ -23,6 +39,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -149,25 +166,36 @@ actual fun GoogleMaps(
                 onMapLongClick?.invoke(LatLong(latLng.latitude, latLng.longitude))
             }
         ) {
-            // Draw markers
+            // Draw markers using MarkerComposable for custom Compose UI
+            // Based on: https://stackoverflow.com/questions/79020838/how-to-create-custom-google-maps-marker-icon-in-compose
             markers?.forEach { marker ->
                 if (marker.isVisible) {
-                    val markerState = rememberMarkerState(
-                        position = LatLng(marker.position.latitude, marker.position.longitude)
-                    )
-                    
-                    GoogleMarker(
-                        state = markerState,
-                        title = marker.title,
-                        snippet = marker.snippet,
-                        alpha = marker.alpha,
-                        rotation = marker.rotation,
-                        draggable = marker.isDraggable,
-                        onClick = {
-                            onMarkerInfoClick?.invoke(marker)
-                            true
+                    // Use key to ensure proper recomposition when marker properties change
+                    key("${marker.id}_${marker.isSelected}") {
+                        val markerState = rememberMarkerState(
+                            key = marker.id,
+                            position = LatLng(marker.position.latitude, marker.position.longitude)
+                        )
+                        
+                        MarkerComposable(
+                            state = markerState,
+                            onClick = {
+                                onMarkerInfoClick?.invoke(marker)
+                                true
+                            }
+                        ) {
+                            // Custom marker content using local merchant logo
+                            // Read isSelected directly from marker to ensure recomposition
+                            val isSelected = marker.isSelected
+                            val slotCount = marker.itemsCount
+                            CustomMerchantMarker(
+                                title = marker.title,
+                                snippet = marker.snippet,
+                                isSelected = isSelected,
+                                slotCount = slotCount
+                            )
                         }
-                    )
+                    }
                 }
             }
 
@@ -180,6 +208,75 @@ actual fun GoogleMaps(
                         width = polyLineWidth
                     )
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Custom merchant marker composable for Google Maps
+ * Uses MarkerComposable to display custom Compose UI as marker
+ * Based on: https://stackoverflow.com/questions/79020838/how-to-create-custom-google-maps-marker-icon-in-compose
+ * 
+ * @param title Optional title text to display
+ * @param snippet Optional snippet text to display
+ * @param isSelected Whether this marker is currently selected
+ * @param slotCount Number of available slots (shown as badge in top-right)
+ */
+@Composable
+private fun CustomMerchantMarker(
+    title: String? = null,
+    snippet: String? = null,
+    isSelected: Boolean = false,
+    slotCount: Int = 0
+) {
+    val markerSize = if (isSelected) 40.dp else 36.dp
+    val shape = RoundedCornerShape(12.dp)
+    val badgeSize = 16.dp
+    
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(markerSize)
+    ) {
+        // Merchant logo from local Compose resource
+        Image(
+            painter = painterResource(Res.drawable.test_merchant_logo),
+            contentDescription = title ?: "Merchant marker",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(markerSize)
+                .clip(shape)
+                .then(
+                    if (isSelected) {
+                        Modifier.border(
+                            width = 2.dp,
+                            color = LessTheme.colors.textIconsBrand,
+                            shape = shape
+                        )
+                    } else {
+                        Modifier
+                    }
+                )
+        )
+        
+        // Slot count badge in top-right corner (based on Figma design)
+        if (slotCount > 1) {
+            Box(
+                modifier = Modifier
+                    .size(badgeSize)
+                    .offset(x = (12).dp, y = (-12).dp) // Position in top-right
+                    .background(
+                        color = LessTheme.colors.textIconsBrand,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(horizontal = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = slotCount.toString(),
+                    style = LessTheme.typography.caption12Regular,
+                    color = LessTheme.colors.textIconsNested
+                )
             }
         }
     }

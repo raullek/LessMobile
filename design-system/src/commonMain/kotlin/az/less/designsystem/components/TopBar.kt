@@ -60,7 +60,7 @@ fun DsToolBar(
 
         Text(
             text = title,
-            style = LessTheme.typography.body16Medium,
+            style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsBlack
         )
 

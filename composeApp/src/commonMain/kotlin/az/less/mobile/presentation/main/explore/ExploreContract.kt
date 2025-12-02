@@ -1,7 +1,11 @@
 package az.less.mobile.presentation.main.explore
 
 import az.less.mobile.presentation.main.explore.models.ExploreVenueItem
+import az.less.mobile.presentation.main.explore.models.FilterData
+import az.less.mobile.presentation.main.explore.models.FilterItem
 import az.less.mobile.presentation.main.explore.models.FilterType
+import az.less.mobile.presentation.main.explore.models.OfferSlot
+import az.less.mobile.presentation.maps.models.Marker
 
 /**
  * State of the Explore Screen
@@ -11,9 +15,14 @@ data class ExploreState(
     val selectedFilterType: FilterType? = null,
     val isLoading: Boolean = false,
     val selectedVenueId: String? = null,
+    val selectedMerchantName: String = "", // Name of selected merchant
+    val selectedMerchantSlots: List<OfferSlot> = emptyList(), // Slots for selected merchant
     val userLocation: az.less.mobile.presentation.maps.models.LatLong? = null,
     val locationPermissionGranted: Boolean = false,
-    val venues: List<ExploreVenueItem> = emptyList()
+    val filterItems: List<FilterItem> = emptyList(),
+    val markers: List<Marker> = emptyList(),
+    val isFilterSheetVisible: Boolean = false,
+    val filterData: FilterData = FilterData()
 )
 
 /**
@@ -34,9 +43,13 @@ sealed interface ExploreIntent {
     data object OnSearchClicked : ExploreIntent
     data object OnFilterClicked : ExploreIntent
     data class OnFilterTypeSelected(val filterType: FilterType) : ExploreIntent
+    data class OnFilterItemClicked(val filterId: String) : ExploreIntent
     data class OnMapMarkerClicked(val venueId: String) : ExploreIntent
     data class OnLocationPermissionChanged(val granted: Boolean) : ExploreIntent
     data class OnMapClick(val latLong: az.less.mobile.presentation.maps.models.LatLong) : ExploreIntent
     data class OnVenueItemClicked(val venueId: String) : ExploreIntent
+    data object OnFilterSheetDismissed : ExploreIntent
+    data class OnFilterOptionClicked(val categoryId: String, val optionId: String) : ExploreIntent
+    data object OnApplyFilters : ExploreIntent
 }
 
