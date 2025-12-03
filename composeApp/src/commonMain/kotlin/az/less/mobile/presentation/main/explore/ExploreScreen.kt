@@ -1,43 +1,33 @@
 package az.less.mobile.presentation.main.explore
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.presentation.main.explore.components.ExploreVenueCard
+import az.less.mobile.presentation.main.explore.components.FilterBottomSheet
 import az.less.mobile.presentation.main.explore.components.FilterChip
-import az.less.mobile.presentation.main.explore.models.FilterType
-import az.less.mobile.presentation.main.offers.components.SearchFilterBar
+import az.less.mobile.presentation.main.explore.components.MerchantSlotsRow
+import kotlinx.coroutines.launch
 import az.less.mobile.presentation.maps.GoogleMaps
 import az.less.mobile.presentation.maps.LocationPermissionHandler
 import az.less.mobile.presentation.maps.models.CameraPosition
@@ -99,13 +89,34 @@ fun ExploreScreenContent(
 ) {
     var locationPermissionGranted by remember { mutableStateOf(false) }
     var locationPermissionDenied by remember { mutableStateOf(false) }
-
-    // Material bottom sheet scaffold state
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    
+    // Filter bottom sheet state
+    val filterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
 
     // Update location permission in state
     LaunchedEffect(locationPermissionGranted) {
         onIntent(ExploreIntent.OnLocationPermissionChanged(locationPermissionGranted))
+    }
+    
+    // Handle filter sheet visibility
+    LaunchedEffect(state.isFilterSheetVisible) {
+        if (state.isFilterSheetVisible) {
+            coroutineScope.launch {
+                filterSheetState.expand()
+            }
+        } else {
+            coroutineScope.launch {
+                filterSheetState.hide()
+            }
+        }
+    }
+    
+    // Handle sheet dismissal
+    LaunchedEffect(filterSheetState.isVisible) {
+        if (!filterSheetState.isVisible && state.isFilterSheetVisible) {
+            onIntent(ExploreIntent.OnFilterSheetDismissed)
+        }
     }
 
     LocationPermissionHandler(
@@ -120,99 +131,94 @@ fun ExploreScreenContent(
             println("❌ Location permission denied")
         }
     ) {
-        BottomSheetScaffold(
-            modifier = modifier,
-            scaffoldState = scaffoldState,
-            sheetContainerColor = LessTheme.colors.backgroundSecond,
-            sheetPeekHeight = 200.dp, // Make bottom sheet visible by default
-            sheetContent = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(bottom = LessTheme.size.large) // Push sheet content up from bottom nav bar
-                ) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            start = LessTheme.spacing.medium,
-                            end = LessTheme.spacing.medium,
-                            top = LessTheme.spacing.small,
-                        )
-                    ) {
+        // Map is full screen
+        Box(modifier = modifier.fillMaxSize()) {
+            // Google Maps - full screen
+            GoogleMaps(
+                modifier = Modifier.fillMaxSize(),
+                shouldSetInitialCameraPosition = CameraPosition(
+                    target = LatLong(40.4093, 49.8671), // Center on Baku
+                    zoom = 13f
+                ),
+                mapType = MapType.NORMAL,
+                isZoomControlsVisible = false,
+                isCompassVisible = true,
+                isTrackingEnabled = locationPermissionGranted,
+                markers = state.markers, // Pass markers from state
+                onMarkerInfoClick = { marker ->
+                    // Extract venue ID from marker tag if available
+                    val venueId = marker.tag as? String ?: marker.id
+                    onIntent(ExploreIntent.OnMapMarkerClicked(venueId))
+                },
+                onMapClick = { latLong ->
+                    onIntent(ExploreIntent.OnMapClick(latLong))
+                },
+                onFindMeButtonClick = null // Remove recenter location button
+            )
 
-                    // Venue Items
-                    items(
-                        items = state.venues,
-                        key = { item -> item.id }
-                    ) { item ->
-                        ExploreVenueCard(
-                            item = item,
-                            onClick = {
-                                onIntent(ExploreIntent.OnVenueItemClicked(item.id))
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-                    }
-                }
-                }
-            },
-        ) { paddingValues ->
-            // Map is full screen, ignoring bottom sheet padding
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Google Maps - full screen behind bottom sheet
-                GoogleMaps(
-                    modifier = Modifier.fillMaxSize(),
-                    shouldSetInitialCameraPosition = CameraPosition(
-                        target = LatLong(40.4093, 49.8671), // Center on Baku
-                        zoom = 13f
-                    ),
-                    mapType = MapType.NORMAL,
-                    isZoomControlsVisible = false,
-                    isCompassVisible = true,
-                    isTrackingEnabled = locationPermissionGranted,
-                    markers = emptyList(), // No markers for now
-                    onMarkerInfoClick = { marker ->
-                        onIntent(ExploreIntent.OnMapMarkerClicked(marker.id))
-                    },
-                    onMapClick = { latLong ->
-                        onIntent(ExploreIntent.OnMapClick(latLong))
-                    },
-                    onFindMeButtonClick = null // Remove recenter location button
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.statusBars)
-                        .padding(
-                            top = LessTheme.spacing.medium,
-                            start = LessTheme.spacing.medium,
-                            end = LessTheme.spacing.medium,)
-                        .background(color = Color.Transparent)
-                    ,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    FilterType.entries.forEach { filterType ->
-                        FilterChip(
-                            text = filterType.displayName,
-                            isSelected = state.selectedFilterType == filterType,
-                            showIconContainer = filterType == FilterType.LIKED, // Icon only for Liked
-                            onClick = {
-                                onIntent(ExploreIntent.OnFilterTypeSelected(filterType))
-                            }
-                        )
-                    }
-                }
-
-                Box(modifier = Modifier
+            // Top filter buttons bar - horizontally scrollable
+            LazyRow(
+                modifier = Modifier
                     .fillMaxWidth()
-                    .height(LessTheme.spacing.medium)
-                    .background(LessTheme.colors.backgroundSecond)
-                    .align(Alignment.BottomCenter))
-
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(
+                        top = LessTheme.spacing.medium,
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small),
+                contentPadding = PaddingValues(start = LessTheme.spacing.medium)
+            ) {
+                items(
+                    items = state.filterItems,
+                    key = { it.id }
+                ) { filterItem ->
+                    FilterChip(
+                        text = filterItem.text,
+                        iconType = filterItem.iconType,
+                        isSelected = filterItem.isSelected,
+                        onClick = {
+                            when (filterItem.id) {
+                                "filter_button" -> {
+                                    onIntent(ExploreIntent.OnFilterClicked)
+                                }
+                                else -> {
+                                    onIntent(ExploreIntent.OnFilterItemClicked(filterItem.id))
+                                }
+                            }
+                        }
+                    )
+                }
             }
+            
+            // Merchant slots row at bottom when marker is selected
+            if (state.selectedMerchantSlots.isNotEmpty()) {
+                MerchantSlotsRow(
+                    slots = state.selectedMerchantSlots,
+                    merchantName = state.selectedMerchantName,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth(),
+                    onSlotClick = { slotId ->
+                        // Handle slot click - navigate to offer detail
+                        // onIntent(ExploreIntent.OnSlotClicked(slotId))
+                    }
+                )
+            }
+            
+            // Filter Bottom Sheet
+            FilterBottomSheet(
+                isVisible = state.isFilterSheetVisible,
+                sheetState = filterSheetState,
+                filterData = state.filterData,
+                onFilterOptionClicked = { categoryId, optionId ->
+                    onIntent(ExploreIntent.OnFilterOptionClicked(categoryId, optionId))
+                },
+                onDismiss = {
+                    onIntent(ExploreIntent.OnFilterSheetDismissed)
+                },
+                onApplyFilters = {
+                    onIntent(ExploreIntent.OnApplyFilters)
+                }
+            )
         }
     }
 }

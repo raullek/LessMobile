@@ -92,6 +92,7 @@ object LightColors {
     val TextIconsNested = Color(0xFFFFFFFF)
     val TextIconsBlack = Color(0xFF171A1C)
     val TextIconsGrey = Color(0xFF5F6862)
+    val TextIconsSecondary = Color(0xFF9A9A9A)
     val TextIconsThird = Color(0xFFA9AFAB)
     val TextIconsBrand = Color(0xFF31BC5C)
     val TextIconsLightBrand = Color(0xFFBEF98D)
@@ -123,6 +124,8 @@ object DarkColors {
     val TextIconsNested = Color(0xFFFFFFFF)
     val TextIconsBlack = Color(0xFFF4F7F6)
     val TextIconsGrey = Color(0xFF5F6862)
+
+    val TextIconsSecondary = Color(0xFF9A9A9A)
     val TextIconsThird = Color(0xFF757E79)
     val TextIconsBrand = Color(0xFF31BC5C)
     val TextIconsLightBrand = Color(0xFFBEF98D)
@@ -154,6 +157,7 @@ data class ColorTokens(
     val textIconsNested: Color,
     val textIconsBlack: Color,
     val textIconsGrey: Color,
+    val textIconsSecondary:Color,
     val textIconsThird: Color,
     val textIconsBrand: Color,
     val textIconsLightBrand: Color,
@@ -184,6 +188,7 @@ val LightPalette = ColorTokens(
     textIconsBlack = LightColors.TextIconsBlack,
     textIconsGrey = LightColors.TextIconsGrey,
     textIconsThird = LightColors.TextIconsThird,
+    textIconsSecondary = LightColors.TextIconsSecondary,
     textIconsBrand = LightColors.TextIconsBrand,
     textIconsLightBrand = LightColors.TextIconsLightBrand,
     backgroundPrimary = LightColors.BackgroundPrimary,
@@ -214,6 +219,7 @@ val DarkPalette = ColorTokens(
     textIconsGrey = DarkColors.TextIconsGrey,
     textIconsThird = DarkColors.TextIconsThird,
     textIconsBrand = DarkColors.TextIconsBrand,
+    textIconsSecondary = DarkColors.TextIconsSecondary,
     textIconsLightBrand = DarkColors.TextIconsLightBrand,
     backgroundPrimary = DarkColors.BackgroundPrimary,
     backgroundSecond = DarkColors.BackgroundSecond,

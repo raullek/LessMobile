@@ -29,6 +29,9 @@ googleMapsCompose = "6.2.1"
 playServicesLocation = "21.3.0"
 google-MapsAndroidComposeVersion = "3.1.0"
 
+pods-google-maps = "9.1.1"
+pods-google-ios-maps-utils = "6.0.0"
+
 [libraries]
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
@@ -89,3 +92,4 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
+cocoapods = {id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin"}
