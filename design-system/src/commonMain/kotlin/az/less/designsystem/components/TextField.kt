@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.input.VisualTransformation
@@ -29,6 +30,38 @@ import az.less.designsystem.base.LessTheme
 import lessmobile.design_system.generated.resources.Res
 import lessmobile.design_system.generated.resources.ic_clear_rounded_24dp
 import org.jetbrains.compose.resources.painterResource
+
+/**
+ * Color configuration for TextField states.
+ * All colors are optional and will default to theme colors if not provided.
+ */
+data class TextFieldColors(
+    // Border colors
+    val borderColorDefault: Color? = null,
+    val borderColorFocused: Color? = null,
+    val borderColorError: Color? = null,
+    val borderColorDisabled: Color? = null,
+    
+    // Background colors
+    val backgroundColorDefault: Color? = null,
+    val backgroundColorFocused: Color? = null,
+    val backgroundColorError: Color? = null,
+    val backgroundColorDisabled: Color? = null,
+    
+    // Text colors
+    val textColorDefault: Color? = null,
+    val textColorDisabled: Color? = null,
+    
+    // Label colors
+    val labelColorDefault: Color? = null,
+    val labelColorError: Color? = null,
+    val labelColorDisabled: Color? = null,
+    
+    // Other colors
+    val placeholderColor: Color? = null,
+    val cursorColor: Color? = null,
+    val errorMessageColor: Color? = null,
+)
 
 @Composable
 fun DsTextField(
@@ -47,7 +80,8 @@ fun DsTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    colors: TextFieldColors = TextFieldColors()
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
     
@@ -58,28 +92,44 @@ fun DsTextField(
     val horizontalPadding = LessTheme.spacing.medium  // 16dp
     val iconSize = LessTheme.spacing.large  // 24dp
 
+    // Border colors with fallback to theme
     val borderColor = when {
-        !enabled -> LessTheme.colors.textIconsThird
-        isError -> LessTheme.colors.textIconsError
-        isFocused -> LessTheme.colors.textIconsThird
-        else -> androidx.compose.ui.graphics.Color.Transparent
+        !enabled -> colors.borderColorDisabled ?: LessTheme.colors.textIconsThird
+        isError -> colors.borderColorError ?: LessTheme.colors.textIconsError
+        isFocused -> colors.borderColorFocused ?: LessTheme.colors.textIconsThird
+        else -> colors.borderColorDefault ?: Color.Transparent
     }
 
+    // Background colors with fallback to theme
     val backgroundColor = when {
-        !enabled -> LessTheme.colors.elementsSecondaryElement.copy(alpha = 0.5f)
-        else -> LessTheme.colors.elementsPrimaryElement
+        !enabled -> colors.backgroundColorDisabled 
+            ?: LessTheme.colors.elementsSecondaryElement
+        isError -> colors.backgroundColorError ?: LessTheme.colors.elementsSecondaryElement
+        isFocused -> colors.backgroundColorFocused ?: LessTheme.colors.elementsSecondaryElement
+        else -> colors.backgroundColorDefault ?: LessTheme.colors.elementsSecondaryElement
     }
 
+    // Text colors with fallback to theme
     val textColor = when {
-        !enabled -> LessTheme.colors.textIconsThird
-        else -> LessTheme.colors.textIconsBlack
+        !enabled -> colors.textColorDisabled ?: LessTheme.colors.textIconsThird
+        else -> colors.textColorDefault ?: LessTheme.colors.textIconsBlack
     }
 
+    // Label colors with fallback to theme
     val labelColor = when {
-        !enabled -> LessTheme.colors.textIconsThird
-        isError -> LessTheme.colors.textIconsError
-        else -> LessTheme.colors.textIconsGrey
+        !enabled -> colors.labelColorDisabled ?: LessTheme.colors.textIconsThird
+        isError -> colors.labelColorError ?: LessTheme.colors.textIconsError
+        else -> colors.labelColorDefault ?: LessTheme.colors.textIconsGrey
     }
+
+    // Placeholder color with fallback to theme
+    val placeholderColor = colors.placeholderColor ?: LessTheme.colors.textIconsThird
+
+    // Cursor color with fallback to theme
+    val cursorColor = colors.cursorColor ?: LessTheme.colors.elementsPrimaryBrand
+
+    // Error message color with fallback to theme
+    val errorMessageColor = colors.errorMessageColor ?: LessTheme.colors.textIconsError
 
     Column(modifier = modifier) {
         // Label
@@ -116,7 +166,7 @@ fun DsTextField(
             maxLines = maxLines,
             visualTransformation = visualTransformation,
             interactionSource = interactionSource,
-            cursorBrush = SolidColor(LessTheme.colors.elementsPrimaryBrand),
+            cursorBrush = SolidColor(cursorColor),
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier
@@ -129,7 +179,7 @@ fun DsTextField(
                         Text(
                             text = placeholder,
                             style = LessTheme.typography.body16Regular,
-                            color = LessTheme.colors.textIconsThird
+                            color = placeholderColor
                         )
                     }
 
@@ -178,7 +228,7 @@ fun DsTextField(
             Text(
                 text = errorMessage,
                 style = LessTheme.typography.body14Regular,
-                color = LessTheme.colors.textIconsError,
+                color = errorMessageColor,
                 modifier = Modifier.padding(top = LessTheme.spacing.xxSmall)
             )
         }

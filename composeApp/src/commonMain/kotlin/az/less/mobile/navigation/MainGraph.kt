@@ -3,10 +3,8 @@ package az.less.mobile.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import az.less.mobile.presentation.main.categoryoffers.CategoryOffersScreen
 import az.less.mobile.presentation.main.explore.ExploreScreen
-import az.less.mobile.presentation.main.more.account.AccountScreen
-import az.less.mobile.presentation.main.more.paymentmethods.PaymentMethodsScreen
-import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardScreen
 import az.less.mobile.presentation.main.more.root.MoreScreen
 import az.less.mobile.presentation.main.offers.OffersScreen
 import az.less.mobile.presentation.main.orders.OrdersScreen
@@ -20,12 +18,10 @@ sealed class HomeScreens(val route: String) {
     data object Saved : HomeScreens("saved")
     data object More : HomeScreens("more")
     data object Search : HomeScreens("search")
-    data object Account : HomeScreens("account")
-    data object PaymentMethods : HomeScreens("paymentMethods")
-    data object AddNewCard : HomeScreens("addNewCard")
+    data object CategoryOffers : HomeScreens("category_offers")
 }
 
-fun NavGraphBuilder.homeGraph(
+fun NavGraphBuilder.mainGraph(
     navController: NavController
 ) {
     composable(HomeScreens.Offers.route) {
@@ -46,14 +42,8 @@ fun NavGraphBuilder.homeGraph(
     composable(HomeScreens.Search.route) {
         SearchScreen(navController = navController)
     }
-    composable(HomeScreens.PaymentMethods.route) {
-        PaymentMethodsScreen(navController = navController)
-    }
-    composable(HomeScreens.Account.route) {
-        AccountScreen(navController = navController)
-    }
-    composable(HomeScreens.AddNewCard.route) {
-        AddNewCardScreen(navController = navController)
+    composable(HomeScreens.CategoryOffers.route) {
+        CategoryOffersScreen(navController = navController)
     }
 }
 

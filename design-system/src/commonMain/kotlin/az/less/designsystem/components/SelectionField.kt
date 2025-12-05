@@ -44,10 +44,7 @@ fun DsSelectionField(
     val height = 64.dp
     val horizontalPadding = LessTheme.spacing.medium
 
-    val backgroundColor = when {
-        !enabled -> LessTheme.colors.elementsSecondaryElement.copy(alpha = 0.5f)
-        else -> LessTheme.colors.elementsPrimaryElement
-    }
+    val backgroundColor = LessTheme.colors.elementsSecondaryElement
 
     val borderColor = when {
         !enabled -> LessTheme.colors.textIconsThird

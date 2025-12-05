@@ -1,8 +1,9 @@
 package az.less.mobile.di
 
+import az.less.mobile.presentation.main.categoryoffers.CategoryOffersViewModel
 import az.less.mobile.presentation.main.explore.ExploreViewModel
-import az.less.mobile.presentation.main.more.account.AccountViewModel
-import az.less.mobile.presentation.main.more.paymentmethods.PaymentMethodsViewModel
+import az.less.mobile.presentation.account.account.AccountViewModel
+import az.less.mobile.presentation.account.paymentmethods.PaymentMethodsViewModel
 import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardViewModel
 import az.less.mobile.presentation.main.more.root.MoreViewModel
 import az.less.mobile.presentation.main.offers.OffersViewModel
@@ -24,6 +25,7 @@ val viewModelModule = module {
     viewModelOf(::OrdersViewModel)
     viewModelOf(::ReserveViewModel)
     viewModelOf(::SearchViewModel)
+    viewModelOf(::CategoryOffersViewModel)
 }
 
 

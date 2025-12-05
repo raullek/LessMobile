@@ -27,13 +27,20 @@ fun FilterCategoryItem(
     text: String,
     icon: ImageVector?=null,
     iconTint: Color = LessTheme.colors.textIconsBrand,
+    isSelected: Boolean = false,
     onItemClick: (String) -> Unit) {
     val roundedShape = RoundedCornerShape(LessTheme.radius.small)
+    
+    val backgroundColor = if (isSelected) {
+        LessTheme.colors.elementsSecondaryBrand
+    } else {
+        LessTheme.colors.backgroundPrimary
+    }
     
     Box(
         modifier = modifier
             .clip(roundedShape)
-            .background(LessTheme.colors.backgroundPrimary)
+            .background(backgroundColor)
             .clickable(
                 onClick = { onItemClick(text) }
             )
