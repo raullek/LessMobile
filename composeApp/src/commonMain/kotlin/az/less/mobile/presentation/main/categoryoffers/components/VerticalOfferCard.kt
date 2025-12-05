@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.main.search.components
+package az.less.mobile.presentation.main.categoryoffers.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -22,10 +23,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.presentation.main.search.models.SearchOffer
+import az.less.mobile.presentation.main.offers.models.OfferItem
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.compose_multiplatform
 import lessmobile.composeapp.generated.resources.test_merchant_logo
@@ -33,13 +35,12 @@ import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
 
 /**
- * Search offer card component for Search screen
- * Displays a merchant offer with image, price, pickup time, rating, and distance
- * Similar styling to FavoriteItemCard from Saved screen
+ * Vertical offer card component for Category Offers screen
+ * Similar to FavoriteItemCard but for OfferItem
  */
 @Composable
-fun SearchOfferCard(
-    offer: SearchOffer,
+fun VerticalOfferCard(
+    item: OfferItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -57,11 +58,11 @@ fun SearchOfferCard(
             .clickable { onClick() }
             .padding(LessTheme.spacing.xxxSmall)
     ) {
-        // Image - 2dp from top and right, no bottom rounded corners
+        // Image
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp) // Specific height from design
+                .height(140.dp)
                 .clip(RoundedCornerShape(
                     topStart = LessTheme.radius.small,
                     topEnd = LessTheme.radius.small,
@@ -71,7 +72,7 @@ fun SearchOfferCard(
         ) {
             Image(
                 painter = painterResource(Res.drawable.test_offer_item_image),
-                contentDescription = offer.title,
+                contentDescription = item.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -90,27 +91,52 @@ fun SearchOfferCard(
                     .fillMaxWidth()
                     .padding(end = LessTheme.size.large + LessTheme.spacing.xxSmall) // Make room for merchant logo
             ) {
-                // Price
+                // Pricing
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = offer.price,
-                        style = LessTheme.typography.body16Semibold,
-                        color = LessTheme.colors.textIconsBrand
-                    )
-                    Text(
-                        text = " ₼",
-                        style = LessTheme.typography.body14Medium,
-                        color = LessTheme.colors.textIconsBrand
-                    )
+                    // Original Price (gray with strikethrough)
+                    if (item.originalPrice != item.currentPrice) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = item.originalPrice,
+                                style = LessTheme.typography.caption12Semibold,
+                                color = LessTheme.colors.textIconsGrey,
+                                textDecoration = TextDecoration.LineThrough
+                            )
+                            Text(
+                                text = " ₼",
+                                style = LessTheme.typography.caption10Regular,
+                                color = LessTheme.colors.textIconsGrey
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(LessTheme.spacing.xxSmall))
+                    }
+                    
+                    // Current Price (brand color)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = item.currentPrice,
+                            style = LessTheme.typography.body16Semibold,
+                            color = LessTheme.colors.textIconsBrand
+                        )
+                        Text(
+                            text = " ₼",
+                            style = LessTheme.typography.body14Medium,
+                            color = LessTheme.colors.textIconsBrand
+                        )
+                    }
                 }
                 
                 Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
                 
                 // Title
                 Text(
-                    text = offer.title,
+                    text = item.title,
                     style = LessTheme.typography.body16Semibold,
                     color = LessTheme.colors.textIconsBlack,
                     maxLines = 1,
@@ -118,7 +144,7 @@ fun SearchOfferCard(
                 )
             }
             
-            // Merchant Logo - positioned at top right, aligned with price level
+            // Restaurant Logo - positioned at top right
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -129,7 +155,7 @@ fun SearchOfferCard(
             ) {
                 Image(
                     painter = painterResource(Res.drawable.test_merchant_logo),
-                    contentDescription = "Merchant Logo",
+                    contentDescription = "Restaurant Logo",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(LessTheme.size.large)
                 )
@@ -143,9 +169,18 @@ fun SearchOfferCard(
         ) {
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
             
+            // Restaurant Name
+            Text(
+                text = item.restaurantName,
+                style = LessTheme.typography.body14Semibold,
+                color = LessTheme.colors.textIconsBrand
+            )
+            
+            Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
+            
             // Pickup time
             Text(
-                text = offer.pickupTime,
+                text = item.pickupTime,
                 style = LessTheme.typography.body14Medium,
                 color = LessTheme.colors.textIconsGrey,
                 maxLines = 1,
@@ -173,7 +208,7 @@ fun SearchOfferCard(
                     )
                     
                     Text(
-                        text = "${offer.rating} (${offer.reviewCount})",
+                        text = item.rating.toString(),
                         style = LessTheme.typography.body14Semibold,
                         color = LessTheme.colors.textIconsBlack
                     )
@@ -188,7 +223,7 @@ fun SearchOfferCard(
                 
                 // Distance
                 Text(
-                    text = offer.distance,
+                    text = item.distance,
                     style = LessTheme.typography.body14Semibold,
                     color = LessTheme.colors.textIconsBlack
                 )
@@ -198,5 +233,4 @@ fun SearchOfferCard(
         }
     }
 }
-
 

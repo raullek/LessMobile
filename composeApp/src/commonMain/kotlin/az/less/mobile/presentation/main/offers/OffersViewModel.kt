@@ -44,6 +44,7 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
             is OffersIntent.OnCategorySelected -> handleCategorySelected(intent.categoryId)
             is OffersIntent.OnFilterSegmentSelected -> handleFilterSegmentSelected(intent.segmentId)
             is OffersIntent.OnOfferItemClicked -> handleOfferItemClicked(intent.offerId)
+            is OffersIntent.OnSeeAllClicked -> handleSeeAllClicked(intent.sectionId)
         }
     }
     
@@ -78,13 +79,13 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
     }
     
     private fun handleFilterSegmentSelected(segmentId: String) = intent {
-        reduce {
-            state.copy(
-                selectedFilterSegmentId = if (state.selectedFilterSegmentId == segmentId) null else segmentId
-            )
-        }
-        // In real app, load filtered items based on selected filter segment
-        // You can use state.selectedFilterSegmentId to determine which filter is active
+        // Navigate to CategoryOffersScreen
+        postSideEffect(OffersSideEffect.NavigateToCategoryOffers)
+    }
+    
+    private fun handleSeeAllClicked(sectionId: String) = intent {
+        // Navigate to CategoryOffersScreen
+        postSideEffect(OffersSideEffect.NavigateToCategoryOffers)
     }
     
     private fun handleOfferItemClicked(offerId: String) = intent {

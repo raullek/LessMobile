@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.main.more.paymentmethods
+package az.less.mobile.presentation.account.paymentmethods
 
 data class PaymentMethod(
     val id: String,

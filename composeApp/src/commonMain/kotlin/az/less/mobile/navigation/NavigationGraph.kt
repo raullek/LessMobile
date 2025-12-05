@@ -35,7 +35,8 @@ fun AppNavigation() {
             modifier = Modifier.fillMaxSize()
         ) {
 //            authorizationGraph(navController)
-            homeGraph(navController)
+            mainGraph(navController)
+            moreGraph(navController)
             reserveGraph(navController)
         }
         

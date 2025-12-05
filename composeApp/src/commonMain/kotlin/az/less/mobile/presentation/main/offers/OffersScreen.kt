@@ -1,6 +1,7 @@
 package az.less.mobile.presentation.main.offers
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
+import az.less.mobile.navigation.HomeScreens
 import az.less.mobile.navigation.ReserveScreens
 import az.less.mobile.presentation.main.offers.components.CategoryCard
 import az.less.mobile.presentation.main.offers.components.FilterCategoryItem
@@ -74,21 +76,29 @@ fun OffersScreen(
         when (sideEffect) {
             is OffersSideEffect.NavigateToOfferDetail -> {
                 // Handle navigation to offer detail
-                // navController.navigate("offer_detail/${sideEffect.offerId}")
+                navController.navigate("offer_detail/${sideEffect.offerId}")
             }
+
             is OffersSideEffect.NavigateToSearch -> {
                 // Handle navigation to search screen
                 navController.navigate("search")
             }
+
+            is OffersSideEffect.NavigateToCategoryOffers -> {
+                navController.navigate(HomeScreens.CategoryOffers.route)
+            }
+
             is OffersSideEffect.NavigateToReserve -> {
                 isReserveBottomSheetVisible = true
                 scope.launch {
                     reserveSheetState.expand()
                 }
             }
+
             is OffersSideEffect.ShowError -> {
                 // Show error snackbar
             }
+            // }
         }
     }
 
@@ -262,7 +272,10 @@ fun OffersScreenContent(
 
                             if (section.showSeeAll) {
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable {
+                                        onIntent(OffersIntent.OnSeeAllClicked(section.id))
+                                    }
                                 ) {
                                     Text(
                                         text = "See all",

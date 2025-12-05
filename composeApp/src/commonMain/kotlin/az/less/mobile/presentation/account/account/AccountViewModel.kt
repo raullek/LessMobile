@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.main.more.account
+package az.less.mobile.presentation.account.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

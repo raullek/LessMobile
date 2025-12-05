@@ -29,6 +29,7 @@ sealed interface OffersSideEffect {
     data class NavigateToOfferDetail(val offerId: String) : OffersSideEffect
     data object NavigateToSearch : OffersSideEffect
     data object NavigateToReserve : OffersSideEffect
+    data object NavigateToCategoryOffers : OffersSideEffect
 }
 
 /**
@@ -40,5 +41,6 @@ sealed interface OffersIntent {
     data class OnCategorySelected(val categoryId: String) : OffersIntent
     data class OnFilterSegmentSelected(val segmentId: String) : OffersIntent
     data class OnOfferItemClicked(val offerId: String) : OffersIntent
+    data class OnSeeAllClicked(val sectionId: String) : OffersIntent
 }
 

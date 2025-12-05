@@ -12,3 +12,4 @@ data class SearchOffer(
     val distance: String // e.g. "1.2 km away"
 )
 
+

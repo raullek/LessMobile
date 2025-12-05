@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
@@ -33,14 +34,15 @@ fun DsToolBar(
     modifier: Modifier = Modifier,
     onBackClick: (() -> Unit)? = null,
     backIcon: Painter = painterResource(Res.drawable.ic_back_24dp),
-    actions: @Composable (() -> Unit)? = null
+    actions: @Composable (() -> Unit)? = null,
+    backgroundColor: Color = LessTheme.colors.backgroundPrimary
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.statusBars)
             .height(56.dp)
-            .background(LessTheme.colors.backgroundPrimary),
+            .background(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
         if (onBackClick != null) {

@@ -26,7 +26,7 @@ import az.less.designsystem.components.DsListBottomSheet
 import az.less.designsystem.components.DsSectionHeader
 import az.less.designsystem.components.DsTextBottomSheet
 import az.less.designsystem.components.ListBottomSheetItem
-import az.less.mobile.navigation.HomeScreens
+import az.less.mobile.navigation.MoreScreens
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import org.jetbrains.compose.resources.painterResource
@@ -55,10 +55,10 @@ fun MoreScreen(
                 // navController.navigate("login")
             }
             is MoreSideEffect.NavigateToAccount -> {
-                navController.navigate(HomeScreens.Account.route)
+                navController.navigate(MoreScreens.Account.route)
             }
             is MoreSideEffect.NavigateToPaymentMethods -> {
-                navController.navigate(HomeScreens.PaymentMethods.route)
+                navController.navigate(MoreScreens.PaymentMethods.route)
             }
             is MoreSideEffect.NavigateToVoucher -> {
                 // navController.navigate("voucher")
@@ -255,7 +255,7 @@ fun MoreScreenContent(
         
         // Bottom spacing
         item {
-            Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+            Spacer(modifier = Modifier.height(LessTheme.spacing.xxLarge))
         }
     }
 }

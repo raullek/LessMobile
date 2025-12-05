@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.main.more.paymentmethods
+package az.less.mobile.presentation.account.paymentmethods
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,7 +32,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.DsConfirmationBottomSheet
 import az.less.designsystem.components.DsSectionHeader
 import az.less.designsystem.components.DsToolBar
-import az.less.mobile.navigation.HomeScreens
+import az.less.mobile.navigation.MoreScreens
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
@@ -58,7 +58,7 @@ fun PaymentMethodsScreen(
                 navController.popBackStack()
             }
             is PaymentMethodsSideEffect.NavigateToAddCard -> {
-                navController.navigate(HomeScreens.AddNewCard.route)
+                navController.navigate(MoreScreens.AddNewCard.route)
             }
             is PaymentMethodsSideEffect.NavigateToApplePay -> {
                 // TODO: Navigate to Apple Pay setup
