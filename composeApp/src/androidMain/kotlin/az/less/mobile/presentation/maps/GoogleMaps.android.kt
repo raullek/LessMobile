@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.test_merchant_logo
 import org.jetbrains.compose.resources.painterResource
@@ -184,11 +185,12 @@ actual fun GoogleMaps(
                                 true
                             }
                         ) {
-                            // Custom marker content using local merchant logo
+                            // Custom marker content with downloaded icon from URL
                             // Read isSelected directly from marker to ensure recomposition
                             val isSelected = marker.isSelected
                             val slotCount = marker.itemsCount
                             CustomMerchantMarker(
+                                iconUrl = marker.iconUrl,
                                 title = marker.title,
                                 snippet = marker.snippet,
                                 isSelected = isSelected,
@@ -218,6 +220,7 @@ actual fun GoogleMaps(
  * Uses MarkerComposable to display custom Compose UI as marker
  * Based on: https://stackoverflow.com/questions/79020838/how-to-create-custom-google-maps-marker-icon-in-compose
  * 
+ * @param iconUrl URL of the merchant logo to download
  * @param title Optional title text to display
  * @param snippet Optional snippet text to display
  * @param isSelected Whether this marker is currently selected
@@ -225,6 +228,7 @@ actual fun GoogleMaps(
  */
 @Composable
 private fun CustomMerchantMarker(
+    iconUrl: String? = null,
     title: String? = null,
     snippet: String? = null,
     isSelected: Boolean = false,
@@ -238,26 +242,51 @@ private fun CustomMerchantMarker(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(markerSize)
     ) {
-        // Merchant logo from local Compose resource
-        Image(
-            painter = painterResource(Res.drawable.test_merchant_logo),
-            contentDescription = title ?: "Merchant marker",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(markerSize)
-                .clip(shape)
-                .then(
-                    if (isSelected) {
-                        Modifier.border(
-                            width = 2.dp,
-                            color = LessTheme.colors.textIconsBrand,
-                            shape = shape
-                        )
-                    } else {
-                        Modifier
-                    }
-                )
-        )
+        // Merchant logo - download from URL or use placeholder
+        if (iconUrl != null) {
+            AsyncImage(
+                model = iconUrl,
+                contentDescription = title ?: "Merchant marker",
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(Res.drawable.test_merchant_logo),
+                error = painterResource(Res.drawable.test_merchant_logo),
+                modifier = Modifier
+                    .size(markerSize)
+                    .clip(shape)
+                    .then(
+                        if (isSelected) {
+                            Modifier.border(
+                                width = 2.dp,
+                                color = LessTheme.colors.textIconsBrand,
+                                shape = shape
+                            )
+                        } else {
+                            Modifier
+                        }
+                    )
+            )
+        } else {
+            // Fallback to local placeholder
+            Image(
+                painter = painterResource(Res.drawable.test_merchant_logo),
+                contentDescription = title ?: "Merchant marker",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(markerSize)
+                    .clip(shape)
+                    .then(
+                        if (isSelected) {
+                            Modifier.border(
+                                width = 2.dp,
+                                color = LessTheme.colors.textIconsBrand,
+                                shape = shape
+                            )
+                        } else {
+                            Modifier
+                        }
+                    )
+            )
+        }
         
         // Slot count badge in top-right corner (based on Figma design)
         if (slotCount > 1) {

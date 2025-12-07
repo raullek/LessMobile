@@ -34,9 +34,9 @@ fun NavGraphBuilder.reserveGraph(
             navArgument("pickupTime") { type = NavType.StringType }
         )
     ) { backStackEntry ->
-        val orderNumber = backStackEntry.arguments?.getString("orderNumber") ?: ""
-        val venueName = backStackEntry.arguments?.getString("venueName") ?: ""
-        val pickupTime = backStackEntry.arguments?.getString("pickupTime") ?: ""
+        val orderNumber =  ""
+        val venueName =  ""
+        val pickupTime =  ""
         
         OrderAcceptedScreen(
             navController = navController,
