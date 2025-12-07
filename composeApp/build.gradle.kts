@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.cocoapods)
 }
 
 kotlin {
@@ -25,28 +24,6 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-        }
-    }
-
-    cocoapods {
-        summary = "Common library for the application"
-        homepage = "https://github.com/raullek/LessMobile"
-        version = "1.0"
-        ios.deploymentTarget = "15.4"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-
-        pod("GoogleMaps") {
-            version = libs.versions.pods.google.maps.get()
-            extraOpts += listOf("-compiler-option","-fmodules")
-        }
-        pod("Google-Maps-iOS-Utils"){
-            moduleName = "GoogleMapsUtils"
-            version = libs.versions.pods.google.ios.maps.utils.get()
-            extraOpts += listOf("-compiler-option","-fmodules")
         }
     }
     
