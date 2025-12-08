@@ -31,6 +31,7 @@ google-MapsAndroidComposeVersion = "3.1.0"
 
 pods-google-maps = "9.1.1"
 pods-google-ios-maps-utils = "6.0.0"
+inputmask = "0.0.7"
 
 [libraries]
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
@@ -82,6 +83,10 @@ google-maps-android = { module = "com.google.android.gms:play-services-maps", ve
 google-maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "googleMapsCompose" }
 google-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 google-maps-android-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "google-MapsAndroidComposeVersion" }
+
+# Input Mask for Compose Multiplatform
+inputmask-core = { module = "io.github.skeptick.inputmask:inputmask-core", version.ref = "inputmask" }
+inputmask-compose = { module = "io.github.skeptick.inputmask:inputmask-compose", version.ref = "inputmask" }
 
 
 [plugins]

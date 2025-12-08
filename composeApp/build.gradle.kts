@@ -77,6 +77,10 @@ kotlin {
             implementation(libs.androidx.datastore)
             // The Preferences DataStore library
             implementation(libs.androidx.datastore.preferences)
+            
+            // Input Mask for Compose Multiplatform
+            implementation(libs.inputmask.core)
+            implementation(libs.inputmask.compose)
         }
 
         iosMain.dependencies {
