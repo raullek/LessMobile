@@ -10,6 +10,8 @@ import az.less.mobile.presentation.main.offers.OffersViewModel
 import az.less.mobile.presentation.main.orders.OrdersViewModel
 import az.less.mobile.presentation.main.saved.SavedViewModel
 import az.less.mobile.presentation.main.search.SearchViewModel
+import az.less.mobile.presentation.onboarding.loginemail.LoginEmailViewModel
+import az.less.mobile.presentation.onboarding.otp.LoginCodeViewModel
 import az.less.mobile.presentation.reserve.ReserveViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -25,6 +27,8 @@ val viewModelModule = module {
     viewModelOf(::OrdersViewModel)
     viewModelOf(::ReserveViewModel)
     viewModelOf(::SearchViewModel)
+    viewModelOf(::LoginEmailViewModel)
+    viewModelOf(::LoginCodeViewModel)
     viewModelOf(::CategoryOffersViewModel)
 }
 

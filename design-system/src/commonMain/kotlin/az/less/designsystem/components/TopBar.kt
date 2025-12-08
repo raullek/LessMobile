@@ -48,8 +48,7 @@ fun DsToolBar(
         if (onBackClick != null) {
             IconButton(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = LessTheme.spacing.medium),
+                    .align(Alignment.CenterStart),
                 onClick = onBackClick
             ) {
                 Icon(

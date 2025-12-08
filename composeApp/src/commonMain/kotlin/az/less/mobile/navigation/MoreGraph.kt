@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 import az.less.mobile.presentation.account.account.AccountScreen
 import az.less.mobile.presentation.account.paymentmethods.PaymentMethodsScreen
 import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardScreen
+import az.less.mobile.presentation.onboarding.loginemail.LoginEmailScreen
+import az.less.mobile.presentation.onboarding.otp.LoginCodeScreen
 
 /**
  * More flow screens
@@ -14,6 +16,8 @@ sealed class MoreScreens(val route: String) {
     data object Account : MoreScreens("account")
     data object PaymentMethods : MoreScreens("paymentMethods")
     data object AddNewCard : MoreScreens("addNewCard")
+    data object LoginEmail : MoreScreens("loginEmail")
+    data object LoginCode : MoreScreens("loginCode")
 }
 
 /**
@@ -31,6 +35,12 @@ fun NavGraphBuilder.moreGraph(
     }
     composable(MoreScreens.AddNewCard.route) {
         AddNewCardScreen(navController = navController)
+    }
+    composable(MoreScreens.LoginEmail.route) {
+        LoginEmailScreen(navController = navController)
+    }
+    composable(MoreScreens.LoginCode.route) {
+        LoginCodeScreen(navController = navController)
     }
 }
 
