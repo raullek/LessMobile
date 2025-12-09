@@ -79,7 +79,7 @@ fun MoreScreen(
                 // Handled via state (showTermsBottomSheet)
             }
             is MoreSideEffect.NavigateToHowToUse -> {
-                navController.navigate(MoreScreens.LoginEmail.route)
+                navController.navigate(MoreScreens.Welcome.route)
             }
             is MoreSideEffect.ShowError -> {
                 // Show error snackbar or dialog
