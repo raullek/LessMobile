@@ -35,7 +35,8 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
-            
+            implementation(libs.androidx.core.splashscreen)
+
             // Google Maps for Android
             implementation(libs.google.maps.android)
             implementation(libs.google.maps.compose)
