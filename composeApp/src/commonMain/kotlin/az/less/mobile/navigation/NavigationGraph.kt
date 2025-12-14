@@ -8,14 +8,40 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.presentation.main.AppBottomNavigation
+import az.less.mobile.presentation.client.AppClientBottomNavigation
+import az.less.mobile.presentation.merchant.AppMerchantBottomNavigation
+
+
+const val ROOT_CLIENT = "rootClientNavigation"
+const val ROOT_MERCHANT = "rootMerchantNavigation"
+
+
 
 @Composable
-fun AppNavigation() {
+fun AppRootNavigation() {
+    val navController = rememberNavController()
+
+    val startFlow = if (true) ROOT_CLIENT else ROOT_MERCHANT
+
+    NavHost(
+        navController = navController,
+        startDestination = startFlow
+    ) {
+        clientGraph(navController)
+        merchantGraph(navController)
+    }
+
+}
+
+@Composable
+fun AppClientRootScreen(rootNavController: NavController) {
     val navController = rememberNavController()
     var showBottomBar = rememberSaveable { mutableStateOf(false) }
 
@@ -34,24 +60,66 @@ fun AppNavigation() {
             startDestination = HomeScreens.Offers.route,
             modifier = Modifier.fillMaxSize()
         ) {
-//            authorizationGraph(navController)
-            mainGraph(navController)
-            moreGraph(navController)
-            reserveGraph(navController)
+            mainGraph(rootNavController = rootNavController, navController = navController)
+            moreGraph(rootNavController = rootNavController,navController = navController)
         }
         
         // Bottom Navigation Bar - positioned at bottom
         if (showBottomBar.value) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxSize()
-            ) {
-                AppBottomNavigation(
+                AppClientBottomNavigation(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     navController = navController
                 )
             }
+    }
+}
+
+@Composable
+fun AppMerchantRootScreen(rootNavController: NavController) {
+    val navController = rememberNavController()
+    var showBottomBar = rememberSaveable { mutableStateOf(false) }
+
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
+    showBottomBar.value = merchantHomeRoutes.contains(currentRoute)
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LessTheme.colors.backgroundSecond)
+    ) {
+        // Navigation content
+        NavHost(
+            navController = navController,
+            startDestination = MerchantScreens.Orders.route,
+            modifier = Modifier.fillMaxSize()
+        ) {
+         //   clientGraph(navController)
+            merchantGraph(rootNavController = rootNavController, navController = navController)
         }
+
+        // Bottom Navigation Bar - positioned at bottom
+        if (showBottomBar.value) {
+            AppMerchantBottomNavigation(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                navController = navController
+            )
+        }
+    }
+}
+
+fun NavGraphBuilder.clientGraph(
+    navController: NavController
+){
+    composable (ROOT_CLIENT){
+        AppClientRootScreen(navController)
+    }
+}
+
+fun NavGraphBuilder.merchantGraph(
+    navController: NavController
+){
+    composable (ROOT_MERCHANT){
+        AppMerchantRootScreen(navController)
     }
 }
