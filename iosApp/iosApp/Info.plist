@@ -4,11 +4,11 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	
-	<!-- Edge-to-edge configuration -->
+	<key>INIntentsSupported</key>
+	<array>
+		<string>Intent</string>
+	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIStatusBarStyle</key>
-	<string>UIStatusBarStyleLightContent</string>
 </dict>
 </plist>
