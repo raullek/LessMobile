@@ -150,7 +150,7 @@ actual fun GoogleMaps(
     val uiSettings = MapUiSettings(
         zoomControlsEnabled = isZoomControlsVisible,
         compassEnabled = isCompassVisible,
-        myLocationButtonEnabled = isTrackingEnabled,
+        myLocationButtonEnabled = false,
         mapToolbarEnabled = isMapOptionSwitchesVisible
     )
 

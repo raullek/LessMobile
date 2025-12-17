@@ -59,6 +59,10 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
 
+            // Sandwich - API Response Handling
+            implementation(libs.sandwich.core)
+            implementation(libs.sandwich.ktor)
+
             implementation(libs.coil.network.ktor)
             implementation(libs.coil.compose)
 
@@ -82,6 +86,9 @@ kotlin {
             // Input Mask for Compose Multiplatform
             implementation(libs.inputmask.core)
             implementation(libs.inputmask.compose)
+            
+            // Compose Shimmer - Shimmer Effect
+            implementation(libs.compose.shimmer)
         }
 
         iosMain.dependencies {
