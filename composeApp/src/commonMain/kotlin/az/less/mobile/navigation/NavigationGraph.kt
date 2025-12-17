@@ -37,7 +37,6 @@ fun AppRootNavigation() {
         clientGraph(navController)
         merchantGraph(navController)
     }
-
 }
 
 @Composable
@@ -63,7 +62,7 @@ fun AppClientRootScreen(rootNavController: NavController) {
             mainGraph(rootNavController = rootNavController, navController = navController)
             moreGraph(rootNavController = rootNavController,navController = navController)
         }
-        
+
         // Bottom Navigation Bar - positioned at bottom
         if (showBottomBar.value) {
                 AppClientBottomNavigation(

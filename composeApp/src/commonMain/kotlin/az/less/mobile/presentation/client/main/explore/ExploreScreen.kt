@@ -1,5 +1,6 @@
 package az.less.mobile.presentation.client.main.explore
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -7,10 +8,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -89,7 +92,14 @@ fun ExploreScreenContent(
 ) {
     var locationPermissionGranted by remember { mutableStateOf(false) }
     var locationPermissionDenied by remember { mutableStateOf(false) }
-    
+    var shouldRenderMap by remember { mutableStateOf(false) }
+
+    // Delay map rendering to allow tab animation to complete
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(1000)
+        shouldRenderMap = true
+    }
+
     // Filter bottom sheet state
     val filterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
@@ -133,28 +143,45 @@ fun ExploreScreenContent(
     ) {
         // Map is full screen
         Box(modifier = modifier.fillMaxSize()) {
-            // Google Maps - full screen
-            GoogleMaps(
-                modifier = Modifier.fillMaxSize(),
-                shouldSetInitialCameraPosition = CameraPosition(
-                    target = LatLong(40.4093, 49.8671), // Center on Baku
-                    zoom = 13f
-                ),
-                mapType = MapType.NORMAL,
-                isZoomControlsVisible = false,
-                isCompassVisible = true,
-                isTrackingEnabled = locationPermissionGranted,
-                markers = state.markers, // Pass markers from state
-                onMarkerInfoClick = { marker ->
-                    // Extract venue ID from marker tag if available
-                    val venueId = marker.tag as? String ?: marker.id
-                    onIntent(ExploreIntent.OnMapMarkerClicked(venueId))
-                },
-                onMapClick = { latLong ->
-                    onIntent(ExploreIntent.OnMapClick(latLong))
-                },
-                onFindMeButtonClick = null // Remove recenter location button
-            )
+            // Google Maps - render after delay to avoid blocking tab switch
+            if (shouldRenderMap) {
+                GoogleMaps(
+                    modifier = Modifier.fillMaxSize(),
+                    shouldSetInitialCameraPosition = CameraPosition(
+                        target = LatLong(40.4093, 49.8671), // Center on Baku
+                        zoom = 13f
+                    ),
+                    mapType = MapType.NORMAL,
+                    isZoomControlsVisible = false,
+                    isCompassVisible = true,
+                    isTrackingEnabled = locationPermissionGranted,
+                    markers = state.markers, // Pass markers from state
+                    onMarkerInfoClick = { marker ->
+                        // Extract venue ID from marker tag if available
+                        val venueId = marker.tag as? String ?: marker.id
+                        onIntent(ExploreIntent.OnMapMarkerClicked(venueId))
+                    },
+                    onMapClick = { latLong ->
+                        onIntent(ExploreIntent.OnMapClick(latLong))
+                    },
+                    onFindMeButtonClick = null // Remove recenter location button
+                )
+            }
+
+            // Loading overlay while map initializes
+            if (!shouldRenderMap) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(LessTheme.colors.backgroundPrimary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        color = LessTheme.colors.textIconsBrand
+                    )
+                }
+            }
 
             // Top filter buttons bar - horizontally scrollable
             LazyRow(

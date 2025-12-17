@@ -25,7 +25,7 @@ coil = "3.3.0"
 navigationCompose = "2.9.1"
 material3Android = "1.3.2"
 googleMaps = "19.0.0"
-googleMapsCompose = "6.2.1"
+googleMapsCompose = "6.12.2"
 playServicesLocation = "21.3.0"
 google-MapsAndroidComposeVersion = "3.1.0"
 core-splashscreen="1.0.1"
@@ -33,6 +33,8 @@ core-splashscreen="1.0.1"
 pods-google-maps = "9.1.1"
 pods-google-ios-maps-utils = "6.0.0"
 inputmask = "0.0.7"
+sandwich = "2.1.3"
+compose-shimmer = "1.3.3"
 
 [libraries]
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
@@ -89,6 +91,13 @@ google-maps-android-compose-utils = { module = "com.google.maps.android:maps-com
 # Input Mask for Compose Multiplatform
 inputmask-core = { module = "io.github.skeptick.inputmask:inputmask-core", version.ref = "inputmask" }
 inputmask-compose = { module = "io.github.skeptick.inputmask:inputmask-compose", version.ref = "inputmask" }
+
+# Sandwich - API Response Handling
+sandwich-core = { module = "com.github.skydoves:sandwich", version.ref = "sandwich" }
+sandwich-ktor = { module = "com.github.skydoves:sandwich-ktor", version.ref = "sandwich" }
+
+# Compose Shimmer - Shimmer Effect for Compose
+compose-shimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.ref = "compose-shimmer" }
 
 
 [plugins]
