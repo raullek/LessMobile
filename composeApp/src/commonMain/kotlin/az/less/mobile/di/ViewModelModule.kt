@@ -2,11 +2,14 @@ package az.less.mobile.di
 
 import az.less.mobile.presentation.client.main.categoryoffers.CategoryOffersViewModel
 import az.less.mobile.presentation.client.main.explore.ExploreViewModel
+import az.less.mobile.presentation.client.main.merchant.MerchantProfileViewModel
 import az.less.mobile.presentation.client.account.account.AccountViewModel
 import az.less.mobile.presentation.client.account.paymentmethods.PaymentMethodsViewModel
 import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardViewModel
 import az.less.mobile.presentation.client.main.more.root.MoreViewModel
 import az.less.mobile.presentation.merchant.more.MerchMoreViewModel
+import az.less.mobile.presentation.merchant.places.MerchPlacesViewModel
+import az.less.mobile.presentation.merchant.places.edit.EditMerchantProfileViewModel
 import az.less.mobile.presentation.client.main.offers.OffersViewModel
 import az.less.mobile.presentation.client.main.orders.OrdersViewModel
 import az.less.mobile.presentation.client.main.saved.SavedViewModel
@@ -20,6 +23,8 @@ import org.koin.dsl.module
 val viewModelModule = module {
     viewModelOf(::MoreViewModel)
     viewModelOf(::MerchMoreViewModel)
+    viewModelOf(::MerchPlacesViewModel)
+    viewModelOf(::EditMerchantProfileViewModel)
     viewModelOf(::AccountViewModel)
     viewModelOf(::PaymentMethodsViewModel)
     viewModelOf(::AddNewCardViewModel)
@@ -32,6 +37,7 @@ val viewModelModule = module {
     viewModelOf(::LoginEmailViewModel)
     viewModelOf(::LoginCodeViewModel)
     viewModelOf(::CategoryOffersViewModel)
+    viewModelOf(::MerchantProfileViewModel)
 }
 
 

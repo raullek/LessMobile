@@ -173,7 +173,9 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
     }
 
     private fun handleSeeMoreDealsClicked() = intent {
-        // Navigate to see more deals
+        // Navigate to merchant screen with the current merchant ID
+        // Using a mock merchant ID for now - in real app, this would come from the offer/venue data
+        postSideEffect(ReserveSideEffect.NavigateToMerchant("merchant_1"))
     }
 }
 

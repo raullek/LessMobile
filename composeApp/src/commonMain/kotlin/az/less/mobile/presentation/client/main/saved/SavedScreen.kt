@@ -101,6 +101,10 @@ fun SavedScreen(
                     pickupTime = orderInfo.pickupTime
                 )
             )
+        },
+        onNavigateToMerchant = { merchantId ->
+            // Navigate to Merchant screen
+            navController.navigate(HomeScreens.Merchant.createRoute(merchantId))
         }
     )
 }

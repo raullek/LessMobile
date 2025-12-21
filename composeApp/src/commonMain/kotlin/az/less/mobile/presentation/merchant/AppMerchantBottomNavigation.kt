@@ -33,9 +33,9 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.MerchantScreens
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
+import lessmobile.composeapp.generated.resources.ic_more_24dp
 import lessmobile.composeapp.generated.resources.ic_offers_24dp
 import lessmobile.composeapp.generated.resources.ic_orders_24dp
-import lessmobile.composeapp.generated.resources.ic_saved_24dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -151,7 +151,7 @@ private val bottomNavItems = listOf(
         MerchantScreens.History.route
     ),
     BottomNavItemData(
-        Res.drawable.ic_saved_24dp,
+        Res.drawable.ic_more_24dp,
         "More",
         MerchantScreens.More.route
     )

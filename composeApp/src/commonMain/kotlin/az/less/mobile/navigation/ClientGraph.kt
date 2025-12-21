@@ -9,6 +9,7 @@ import az.less.mobile.presentation.client.account.account.AccountScreen
 import az.less.mobile.presentation.client.account.paymentmethods.PaymentMethodsScreen
 import az.less.mobile.presentation.client.main.categoryoffers.CategoryOffersScreen
 import az.less.mobile.presentation.client.main.explore.ExploreScreen
+import az.less.mobile.presentation.client.main.merchant.MerchantProfileScreen
 import az.less.mobile.presentation.client.main.more.root.MoreScreen
 import az.less.mobile.presentation.client.main.offers.OffersScreen
 import az.less.mobile.presentation.client.main.orders.OrdersScreen
@@ -32,6 +33,11 @@ sealed class HomeScreens(val route: String) {
     data object More : HomeScreens("more")
     data object Search : HomeScreens("search")
     data object CategoryOffers : HomeScreens("category_offers")
+    data object Merchant : HomeScreens("merchant/{merchantId}") {
+        fun createRoute(merchantId: String): String {
+            return "merchant/$merchantId"
+        }
+    }
 
     /**
      * Reserve Flow
@@ -79,6 +85,12 @@ fun NavGraphBuilder.mainGraph(
     }
     composable(HomeScreens.CategoryOffers.route) {
         CategoryOffersScreen(navController = navController)
+    }
+    composable(
+        route = HomeScreens.Merchant.route,
+        arguments = listOf(navArgument("merchantId") { type = NavType.StringType })
+    ) {
+        MerchantProfileScreen(navController = navController)
     }
     composable(
         route = HomeScreens.OrderAccepted.route,
