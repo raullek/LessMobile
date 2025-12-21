@@ -68,6 +68,7 @@ fun ReserveScreen(
     sheetState: SheetState,
     onDismiss: () -> Unit,
     onOrderPlaced: (OrderAccepted) -> Unit = {},
+    onNavigateToMerchant: (String) -> Unit = {},
     viewModel: ReserveViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
@@ -100,6 +101,11 @@ fun ReserveScreen(
             is ReserveSideEffect.OrderPlaced -> {
                 // Handle order placed - navigate to order accepted screen
                 onOrderPlaced(sideEffect.orderInfo)
+                onDismiss()
+            }
+            is ReserveSideEffect.NavigateToMerchant -> {
+                // Navigate to merchant screen
+                onNavigateToMerchant(sideEffect.merchantId)
                 onDismiss()
             }
         }

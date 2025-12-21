@@ -26,6 +26,7 @@ import az.less.designsystem.components.DsListBottomSheet
 import az.less.designsystem.components.DsSectionHeader
 import az.less.designsystem.components.DsTextBottomSheet
 import az.less.designsystem.components.ListBottomSheetItem
+import az.less.mobile.navigation.MerchantScreens
 import az.less.mobile.presentation.merchant.more.components.MerchMoreHeader
 import az.less.mobile.presentation.merchant.more.model.MerchCellId
 import az.less.mobile.presentation.merchant.more.model.MerchMoreCellType
@@ -52,7 +53,7 @@ fun MerchMoreScreen(
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is MerchMoreSideEffect.NavigateToPlaces -> {
-                // TODO: navController.navigate(MerchantScreens.Places.route)
+                navController.navigate(MerchantScreens.Places.route)
             }
             is MerchMoreSideEffect.Logout -> {
                 // TODO: Handle logout - clear session and navigate to login

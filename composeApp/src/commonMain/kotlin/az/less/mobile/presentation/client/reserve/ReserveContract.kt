@@ -30,6 +30,7 @@ sealed interface ReserveSideEffect {
     data object NavigateToAddressSelection : ReserveSideEffect
     data class ShowError(val message: String) : ReserveSideEffect
     data class OrderPlaced(val orderInfo: OrderAccepted) : ReserveSideEffect
+    data class NavigateToMerchant(val merchantId: String) : ReserveSideEffect
 }
 
 /**
