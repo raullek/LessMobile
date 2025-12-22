@@ -7,6 +7,8 @@ import az.less.mobile.presentation.client.account.account.AccountViewModel
 import az.less.mobile.presentation.client.account.paymentmethods.PaymentMethodsViewModel
 import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardViewModel
 import az.less.mobile.presentation.client.main.more.root.MoreViewModel
+import az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.BranchUsersViewModel
+import az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.addbranchuser.AddBranchUserViewModel
 import az.less.mobile.presentation.merchant.more.MerchMoreViewModel
 import az.less.mobile.presentation.merchant.places.MerchPlacesViewModel
 import az.less.mobile.presentation.merchant.places.edit.EditMerchantProfileViewModel
@@ -25,6 +27,8 @@ val viewModelModule = module {
     viewModelOf(::MerchMoreViewModel)
     viewModelOf(::MerchPlacesViewModel)
     viewModelOf(::EditMerchantProfileViewModel)
+    viewModelOf(::BranchUsersViewModel)
+    viewModelOf(::AddBranchUserViewModel)
     viewModelOf(::AccountViewModel)
     viewModelOf(::PaymentMethodsViewModel)
     viewModelOf(::AddNewCardViewModel)
