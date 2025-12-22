@@ -26,6 +26,7 @@ import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.CellType
 import az.less.designsystem.components.DsCell
+import az.less.mobile.navigation.MerchantScreens
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileHeroSection
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileInfoSection
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileContactSection
@@ -69,7 +70,7 @@ fun EditMerchantProfileScreen(
                 // Show error snackbar
             }
             is EditMerchantProfileSideEffect.BranchCreated -> {
-                navController.popBackStack()
+                navController.navigate(MerchantScreens.BranchVerification.route)
             }
             is EditMerchantProfileSideEffect.BranchUpdated -> {
                 navController.popBackStack()
