@@ -14,7 +14,11 @@ data class EditMerchantProfileState(
     val defaultBoxDescription: String = "",
     val lotsImageUrl: String? = null,
     val manageFromEmail: Boolean = false,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    // Edit Merch Details Bottom Sheet state
+    val isEditMerchDetailsBottomSheetVisible: Boolean = false,
+    // Edit Phone Number Bottom Sheet state
+    val isEditPhoneNumberBottomSheetVisible: Boolean = false
 )
 
 /**
@@ -48,5 +52,13 @@ sealed interface EditMerchantProfileIntent {
     data class OnDefaultBoxDescriptionChanged(val description: String) : EditMerchantProfileIntent
     data class OnManageFromEmailToggled(val enabled: Boolean) : EditMerchantProfileIntent
     data object OnCreateBranchClick : EditMerchantProfileIntent
+    // Edit Merch Details Bottom Sheet
+    data object OnEditMerchDetailsClick : EditMerchantProfileIntent
+    data object OnEditMerchDetailsBottomSheetDismiss : EditMerchantProfileIntent
+    data class OnEditMerchDetailsSave(val title: String, val description: String) : EditMerchantProfileIntent
+    // Edit Phone Number Bottom Sheet
+    data object OnEditPhoneNumberClick : EditMerchantProfileIntent
+    data object OnEditPhoneNumberBottomSheetDismiss : EditMerchantProfileIntent
+    data class OnEditPhoneNumberSave(val phoneNumber: String) : EditMerchantProfileIntent
 }
 

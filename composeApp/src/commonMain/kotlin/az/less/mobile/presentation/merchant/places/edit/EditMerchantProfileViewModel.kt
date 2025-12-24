@@ -58,6 +58,12 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
             is EditMerchantProfileIntent.OnDefaultBoxDescriptionChanged -> handleDefaultBoxDescriptionChanged(intent.description)
             is EditMerchantProfileIntent.OnManageFromEmailToggled -> handleManageFromEmailToggled(intent.enabled)
             is EditMerchantProfileIntent.OnCreateBranchClick -> handleCreateBranchClick()
+            is EditMerchantProfileIntent.OnEditMerchDetailsClick -> handleEditMerchDetailsClick()
+            is EditMerchantProfileIntent.OnEditMerchDetailsBottomSheetDismiss -> handleEditMerchDetailsBottomSheetDismiss()
+            is EditMerchantProfileIntent.OnEditMerchDetailsSave -> handleEditMerchDetailsSave(intent.title, intent.description)
+            is EditMerchantProfileIntent.OnEditPhoneNumberClick -> handleEditPhoneNumberClick()
+            is EditMerchantProfileIntent.OnEditPhoneNumberBottomSheetDismiss -> handleEditPhoneNumberBottomSheetDismiss()
+            is EditMerchantProfileIntent.OnEditPhoneNumberSave -> handleEditPhoneNumberSave(intent.phoneNumber)
         }
     }
 
@@ -78,7 +84,7 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
     }
 
     private fun handlePhoneEditClick() = intent {
-        // TODO: Open phone edit dialog or navigate to edit screen
+        reduce { state.copy(isEditPhoneNumberBottomSheetVisible = true) }
     }
 
     private fun handleLocationEditClick() = intent {
@@ -124,6 +130,41 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
             postSideEffect(EditMerchantProfileSideEffect.BranchCreated)
         } else {
             postSideEffect(EditMerchantProfileSideEffect.BranchUpdated)
+        }
+    }
+
+    private fun handleEditMerchDetailsClick() = intent {
+        reduce { state.copy(isEditMerchDetailsBottomSheetVisible = true) }
+    }
+
+    private fun handleEditMerchDetailsBottomSheetDismiss() = intent {
+        reduce { state.copy(isEditMerchDetailsBottomSheetVisible = false) }
+    }
+
+    private fun handleEditMerchDetailsSave(title: String, description: String) = intent {
+        reduce {
+            state.copy(
+                venueName = title,
+                description = description,
+                isEditMerchDetailsBottomSheetVisible = false
+            )
+        }
+    }
+
+    private fun handleEditPhoneNumberClick() = intent {
+        reduce { state.copy(isEditPhoneNumberBottomSheetVisible = true) }
+    }
+
+    private fun handleEditPhoneNumberBottomSheetDismiss() = intent {
+        reduce { state.copy(isEditPhoneNumberBottomSheetVisible = false) }
+    }
+
+    private fun handleEditPhoneNumberSave(phoneNumber: String) = intent {
+        reduce {
+            state.copy(
+                phoneNumber = phoneNumber,
+                isEditPhoneNumberBottomSheetVisible = false
+            )
         }
     }
 }

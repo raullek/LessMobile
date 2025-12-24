@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,9 +29,11 @@ import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.CellType
 import az.less.designsystem.components.DsCell
 import az.less.mobile.navigation.MerchantScreens
+import az.less.mobile.presentation.merchant.places.edit.components.EditMerchDetailsBottomSheet
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileHeroSection
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileInfoSection
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileContactSection
+import az.less.mobile.presentation.merchant.places.edit.components.EditPhoneNumberBottomSheet
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -89,12 +93,17 @@ fun EditMerchantProfileScreen(
  * Stateless EditMerchantProfileScreen UI implementation
  * Based on MerchantProfileScreen structure with edit icons
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditMerchantProfileScreenContent(
     state: EditMerchantProfileState,
     onIntent: (EditMerchantProfileIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Bottom sheet states
+    val editMerchDetailsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val editPhoneNumberSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
@@ -120,8 +129,8 @@ fun EditMerchantProfileScreenContent(
                 EditMerchantProfileInfoSection(
                     venueName = state.venueName,
                     description = state.description,
-                    onNameEditClick = { onIntent(EditMerchantProfileIntent.OnNameEditClick) },
-                    onDescriptionChanged = { onIntent(EditMerchantProfileIntent.OnDescriptionChanged(it)) }
+                    onNameEditClick = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsClick) },
+                    onDescriptionChanged = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsClick) }
                 )
             }
 
@@ -169,5 +178,28 @@ fun EditMerchantProfileScreenContent(
             )
         }
     }
+
+    // Edit Merch Details Bottom Sheet
+    EditMerchDetailsBottomSheet(
+        isVisible = state.isEditMerchDetailsBottomSheetVisible,
+        sheetState = editMerchDetailsSheetState,
+        initialTitle = state.venueName,
+        initialDescription = state.description,
+        onSave = { title, description ->
+            onIntent(EditMerchantProfileIntent.OnEditMerchDetailsSave(title, description))
+        },
+        onDismiss = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsBottomSheetDismiss) }
+    )
+
+    // Edit Phone Number Bottom Sheet
+    EditPhoneNumberBottomSheet(
+        isVisible = state.isEditPhoneNumberBottomSheetVisible,
+        sheetState = editPhoneNumberSheetState,
+        initialPhoneNumber = state.phoneNumber,
+        onSave = { phoneNumber ->
+            onIntent(EditMerchantProfileIntent.OnEditPhoneNumberSave(phoneNumber))
+        },
+        onDismiss = { onIntent(EditMerchantProfileIntent.OnEditPhoneNumberBottomSheetDismiss) }
+    )
 }
 

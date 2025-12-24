@@ -1,9 +1,9 @@
-package az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.addbranchuser
+package az.less.mobile.presentation.merchant.places.edit.branchusers.addbranchuser
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.BranchUser
+import az.less.mobile.presentation.merchant.places.edit.branchusers.BranchUser
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
