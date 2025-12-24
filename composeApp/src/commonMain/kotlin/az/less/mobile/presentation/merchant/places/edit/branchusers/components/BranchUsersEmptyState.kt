@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.components
+package az.less.mobile.presentation.merchant.places.edit.branchusers.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

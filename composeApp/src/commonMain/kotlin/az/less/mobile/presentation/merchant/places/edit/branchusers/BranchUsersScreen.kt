@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.merchant.editmerchantprofile.branchusers
+package az.less.mobile.presentation.merchant.places.edit.branchusers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,8 +28,8 @@ import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.DsToolBar
 import az.less.mobile.navigation.MerchantScreens
-import az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.components.BranchUsersEmptyState
-import az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.components.UserCell
+import az.less.mobile.presentation.merchant.places.edit.branchusers.components.BranchUsersEmptyState
+import az.less.mobile.presentation.merchant.places.edit.branchusers.components.UserCell
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect

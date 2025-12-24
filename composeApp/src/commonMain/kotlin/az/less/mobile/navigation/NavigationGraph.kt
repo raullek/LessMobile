@@ -28,7 +28,7 @@ const val ROOT_MERCHANT = "rootMerchantNavigation"
 fun AppRootNavigation() {
     val navController = rememberNavController()
 
-    val startFlow = if (true) ROOT_CLIENT else ROOT_MERCHANT
+    val startFlow = if (false) ROOT_CLIENT else ROOT_MERCHANT
 
     NavHost(
         navController = navController,

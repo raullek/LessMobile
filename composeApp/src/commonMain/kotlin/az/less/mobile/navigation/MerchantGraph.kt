@@ -7,14 +7,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.savedstate.read
 import az.less.mobile.presentation.merchant.add.MerchAddScreen
-import az.less.mobile.presentation.merchant.editmerchantprofile.BranchVerificationScreen
-import az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.BranchUsersScreen
-import az.less.mobile.presentation.merchant.editmerchantprofile.branchusers.addbranchuser.AddBranchUserScreen
-import az.less.mobile.presentation.merchant.history.MerchHistoryScreen
+import az.less.mobile.presentation.merchant.history.IncomeHistoryScreen
 import az.less.mobile.presentation.merchant.more.MerchMoreScreen
 import az.less.mobile.presentation.merchant.orders.MerchOrdersScreen
 import az.less.mobile.presentation.merchant.places.MerchPlacesScreen
+import az.less.mobile.presentation.merchant.places.edit.BranchVerificationScreen
 import az.less.mobile.presentation.merchant.places.edit.EditMerchantProfileScreen
+import az.less.mobile.presentation.merchant.places.edit.branchusers.BranchUsersScreen
+import az.less.mobile.presentation.merchant.places.edit.branchusers.addbranchuser.AddBranchUserScreen
 
 /**
  * Merchant flow screens
@@ -62,7 +62,7 @@ fun NavGraphBuilder.merchantGraph(
             MerchAddScreen(navController = navController)
         }
         composable(MerchantScreens.History.route) {
-            MerchHistoryScreen(navController = navController)
+            IncomeHistoryScreen(navController = navController)
         }
         composable(MerchantScreens.Places.route) {
             MerchPlacesScreen(navController = navController)

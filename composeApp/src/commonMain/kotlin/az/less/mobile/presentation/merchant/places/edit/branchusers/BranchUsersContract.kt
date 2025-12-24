@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.merchant.editmerchantprofile.branchusers
+package az.less.mobile.presentation.merchant.places.edit.branchusers
 
 /**
  * User model for Branch Users screen
