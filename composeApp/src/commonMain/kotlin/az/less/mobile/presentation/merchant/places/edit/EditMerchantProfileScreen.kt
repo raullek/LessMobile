@@ -55,6 +55,24 @@ fun EditMerchantProfileScreen(
         viewModel.initialize(branchId)
     }
 
+    // Listen for location selection result from SelectBranchLocationOnMapScreen
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    LaunchedEffect(savedStateHandle) {
+        savedStateHandle?.getStateFlow<Double?>("selected_latitude", null)?.collect { latitude ->
+            val longitude = savedStateHandle.get<Double>("selected_longitude")
+            val address = savedStateHandle.get<String>("selected_address")
+            if (latitude != null && longitude != null && address != null) {
+                viewModel.onIntent(
+                    EditMerchantProfileIntent.OnLocationSelected(latitude, longitude, address)
+                )
+                // Clear the saved state after handling
+                savedStateHandle.remove<Double>("selected_latitude")
+                savedStateHandle.remove<Double>("selected_longitude")
+                savedStateHandle.remove<String>("selected_address")
+            }
+        }
+    }
+
     // Collect side effects for navigation
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -69,6 +87,14 @@ fun EditMerchantProfileScreen(
             }
             is EditMerchantProfileSideEffect.NavigateToLotsPicker -> {
                 // TODO: Open lots image picker
+            }
+            is EditMerchantProfileSideEffect.NavigateToLocationPicker -> {
+                navController.navigate(
+                    MerchantScreens.SelectBranchLocation.createRoute(
+                        latitude = sideEffect.latitude,
+                        longitude = sideEffect.longitude
+                    )
+                )
             }
             is EditMerchantProfileSideEffect.ShowError -> {
                 // Show error snackbar

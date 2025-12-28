@@ -143,7 +143,7 @@ private val bottomNavItems = listOf(
     BottomNavItemData(
         Res.drawable.ic_explore_24dp,
         "Add",
-        MerchantScreens.Add.route
+        MerchantScreens.AddLot.route
     ),
     BottomNavItemData(
         Res.drawable.ic_orders_24dp,
