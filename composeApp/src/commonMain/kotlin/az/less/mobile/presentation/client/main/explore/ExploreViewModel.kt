@@ -44,7 +44,6 @@ class ExploreViewModel : ViewModel(), ContainerHost<ExploreState, ExploreSideEff
             is ExploreIntent.OnFilterItemClicked -> handleFilterItemClicked(intent.filterId)
             is ExploreIntent.OnMapMarkerClicked -> handleMapMarkerClicked(intent.venueId)
             is ExploreIntent.OnLocationPermissionChanged -> handleLocationPermissionChanged(intent.granted)
-            is ExploreIntent.OnMapClick -> handleMapClick(intent.latLong)
             is ExploreIntent.OnVenueItemClicked -> handleVenueItemClicked(intent.venueId)
             is ExploreIntent.OnFilterSheetDismissed -> handleFilterSheetDismissed()
             is ExploreIntent.OnFilterOptionClicked -> handleFilterOptionClicked(intent.categoryId, intent.optionId)

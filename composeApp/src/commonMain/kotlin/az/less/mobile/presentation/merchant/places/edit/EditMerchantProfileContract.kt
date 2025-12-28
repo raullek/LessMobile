@@ -11,6 +11,8 @@ data class EditMerchantProfileState(
     val description: String = "",
     val phoneNumber: String = "",
     val location: String = "",
+    val locationLatitude: Double? = null,
+    val locationLongitude: Double? = null,
     val defaultBoxDescription: String = "",
     val lotsImageUrl: String? = null,
     val manageFromEmail: Boolean = false,
@@ -29,6 +31,7 @@ sealed interface EditMerchantProfileSideEffect {
     data object NavigateToImagePicker : EditMerchantProfileSideEffect
     data object NavigateToLogoPicker : EditMerchantProfileSideEffect
     data object NavigateToLotsPicker : EditMerchantProfileSideEffect
+    data class NavigateToLocationPicker(val latitude: Double?, val longitude: Double?) : EditMerchantProfileSideEffect
     data class ShowError(val message: String) : EditMerchantProfileSideEffect
     data object BranchCreated : EditMerchantProfileSideEffect
     data object BranchUpdated : EditMerchantProfileSideEffect
@@ -49,6 +52,7 @@ sealed interface EditMerchantProfileIntent {
     data class OnDescriptionChanged(val description: String) : EditMerchantProfileIntent
     data class OnPhoneNumberChanged(val phone: String) : EditMerchantProfileIntent
     data class OnLocationChanged(val location: String) : EditMerchantProfileIntent
+    data class OnLocationSelected(val latitude: Double, val longitude: Double, val address: String) : EditMerchantProfileIntent
     data class OnDefaultBoxDescriptionChanged(val description: String) : EditMerchantProfileIntent
     data class OnManageFromEmailToggled(val enabled: Boolean) : EditMerchantProfileIntent
     data object OnCreateBranchClick : EditMerchantProfileIntent

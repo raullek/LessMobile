@@ -53,8 +53,6 @@ sealed interface ExploreIntent {
         ExploreIntent
     data class OnLocationPermissionChanged(val granted: Boolean) :
         ExploreIntent
-    data class OnMapClick(val latLong: az.less.mobile.presentation.maps.models.LatLong) :
-        ExploreIntent
     data class OnVenueItemClicked(val venueId: String) :
         ExploreIntent
     data object OnFilterSheetDismissed :

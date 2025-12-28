@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command:*)",
+      "mcp__figma__get_design_context",
+      "mcp__figma__get_screenshot",
+      "mcp__figma__get_metadata",
+      "WebFetch(domain:medium.com)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:compass.jordond.dev)",
+      "WebFetch(domain:docs.compass.jordond.dev)",
+      "WebFetch(domain:proandroiddev.com)",
+      "WebFetch(domain:insert-koin.io)"
+    ]
+  }
+}

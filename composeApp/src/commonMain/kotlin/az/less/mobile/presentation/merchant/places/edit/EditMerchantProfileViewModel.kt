@@ -55,6 +55,7 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
             is EditMerchantProfileIntent.OnDescriptionChanged -> handleDescriptionChanged(intent.description)
             is EditMerchantProfileIntent.OnPhoneNumberChanged -> handlePhoneNumberChanged(intent.phone)
             is EditMerchantProfileIntent.OnLocationChanged -> handleLocationChanged(intent.location)
+            is EditMerchantProfileIntent.OnLocationSelected -> handleLocationSelected(intent.latitude, intent.longitude, intent.address)
             is EditMerchantProfileIntent.OnDefaultBoxDescriptionChanged -> handleDefaultBoxDescriptionChanged(intent.description)
             is EditMerchantProfileIntent.OnManageFromEmailToggled -> handleManageFromEmailToggled(intent.enabled)
             is EditMerchantProfileIntent.OnCreateBranchClick -> handleCreateBranchClick()
@@ -88,7 +89,22 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
     }
 
     private fun handleLocationEditClick() = intent {
-        // TODO: Open location picker or navigate to edit screen
+        postSideEffect(
+            EditMerchantProfileSideEffect.NavigateToLocationPicker(
+                latitude = state.locationLatitude,
+                longitude = state.locationLongitude
+            )
+        )
+    }
+
+    private fun handleLocationSelected(latitude: Double, longitude: Double, address: String) = intent {
+        reduce {
+            state.copy(
+                location = address,
+                locationLatitude = latitude,
+                locationLongitude = longitude
+            )
+        }
     }
 
     private fun handleLotsEditClick() = intent {

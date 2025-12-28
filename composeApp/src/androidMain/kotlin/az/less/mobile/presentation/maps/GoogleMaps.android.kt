@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.test_merchant_logo
 import org.jetbrains.compose.resources.painterResource
 import az.less.mobile.presentation.maps.models.CameraLocationBounds
@@ -172,12 +173,17 @@ actual fun GoogleMaps(
             markers?.forEach { marker ->
                 if (marker.isVisible) {
                     // Use key to ensure proper recomposition when marker properties change
-                    key("${marker.id}_${marker.isSelected}") {
+                    key("${marker.id}_${marker.isSelected}_${marker.position}") {
                         val markerState = rememberMarkerState(
                             key = marker.id,
                             position = LatLng(marker.position.latitude, marker.position.longitude)
                         )
-                        
+
+                        // Update marker position when it changes
+                        LaunchedEffect(marker.position) {
+                            markerState.position = LatLng(marker.position.latitude, marker.position.longitude)
+                        }
+
                         MarkerComposable(
                             state = markerState,
                             onClick = {
@@ -185,17 +191,22 @@ actual fun GoogleMaps(
                                 true
                             }
                         ) {
-                            // Custom marker content with downloaded icon from URL
-                            // Read isSelected directly from marker to ensure recomposition
-                            val isSelected = marker.isSelected
-                            val slotCount = marker.itemsCount
-                            CustomMerchantMarker(
-                                iconUrl = marker.iconUrl,
-                                title = marker.title,
-                                snippet = marker.snippet,
-                                isSelected = isSelected,
-                                slotCount = slotCount
-                            )
+                            // Check if it's a location pin marker
+                            if (marker.tag == "location_pin") {
+                                LocationPinMarker()
+                            } else {
+                                // Custom marker content with downloaded icon from URL
+                                // Read isSelected directly from marker to ensure recomposition
+                                val isSelected = marker.isSelected
+                                val slotCount = marker.itemsCount
+                                CustomMerchantMarker(
+                                    iconUrl = marker.iconUrl,
+                                    title = marker.title,
+                                    snippet = marker.snippet,
+                                    isSelected = isSelected,
+                                    slotCount = slotCount
+                                )
+                            }
                         }
                     }
                 }
@@ -310,3 +321,17 @@ private fun CustomMerchantMarker(
         }
     }
 }
+
+/**
+ * Location pin marker for selecting a location on the map
+ * Uses ic_explore_24dp icon with primary brand tint
+ */
+@Composable
+private fun LocationPinMarker() {
+        Icon(
+            painter = painterResource(Res.drawable.ic_explore_24dp),
+            contentDescription = "Selected location",
+            tint = LessTheme.colors.elementsPrimaryBrand,
+            modifier = Modifier.size(24.dp)
+        )
+    }

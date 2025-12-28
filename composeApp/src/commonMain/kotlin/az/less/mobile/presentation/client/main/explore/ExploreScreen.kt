@@ -161,9 +161,6 @@ fun ExploreScreenContent(
                         val venueId = marker.tag as? String ?: marker.id
                         onIntent(ExploreIntent.OnMapMarkerClicked(venueId))
                     },
-                    onMapClick = { latLong ->
-                        onIntent(ExploreIntent.OnMapClick(latLong))
-                    },
                     onFindMeButtonClick = null // Remove recenter location button
                 )
             }
