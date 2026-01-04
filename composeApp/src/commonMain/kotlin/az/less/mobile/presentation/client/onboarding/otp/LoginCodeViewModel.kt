@@ -2,14 +2,19 @@ package az.less.mobile.presentation.client.onboarding.otp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.data.model.User
+import az.less.mobile.data.repository.UserRepository
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
+import kotlin.random.Random
 
 /**
  * ViewModel for Login Code Screen using Orbit MVI
  */
-class LoginCodeViewModel : ViewModel(), ContainerHost<LoginCodeState, LoginCodeSideEffect> {
+class LoginCodeViewModel(
+    private val userRepository: UserRepository
+) : ViewModel(), ContainerHost<LoginCodeState, LoginCodeSideEffect> {
 
     override val container: Container<LoginCodeState, LoginCodeSideEffect> =
         viewModelScope.container(LoginCodeState())
@@ -62,24 +67,39 @@ class LoginCodeViewModel : ViewModel(), ContainerHost<LoginCodeState, LoginCodeS
             state.copy(isLoading = true, codeError = null)
         }
 
-        // TODO: Call API to verify code
-        // Simulate API call - on error, clear code and show error
-        // For now, simulate verification failure for testing
+        // Mock API verification - only "111111" is valid
+        if (state.code != VALID_CODE) {
+            reduce {
+                state.copy(
+                    isLoading = false,
+                    codeError = "Invalid code. Please try again.",
+                    code = "" // Clear input on error
+                )
+            }
+            return@intent
+        }
+
+        // Create mock user and save to DataStore
+        val mockUser = User(
+            id = "user_${Random.nextInt(100000, 999999)}",
+            name = "Maqa",
+            email = state.email.ifEmpty { "maqa@gmail.com" },
+            avatarUrl = null,
+            co2Saved = "60 kg",
+            moneySaved = "$120"
+        )
+
+        userRepository.saveUser(mockUser)
+
         reduce {
             state.copy(isLoading = false)
         }
-        
-        // Simulate error for testing - remove this when real API is implemented
-        // Uncomment below to test error state:
-        // reduce {
-        //     state.copy(
-        //         codeError = "Invalid code. Please try again.",
-        //         code = "" // Clear input on error
-        //     )
-        // }
-        // return@intent
-        
+
         postSideEffect(LoginCodeSideEffect.NavigateNext)
+    }
+
+    companion object {
+        private const val VALID_CODE = "111111"
     }
 
     private fun handleResendCodeClicked() = intent {

@@ -44,10 +44,14 @@ import az.less.designsystem.components.DsButton
 import az.less.mobile.presentation.client.reserve.components.SelectPaymentMethodBottomSheet
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
 import kotlinx.coroutines.launch
+import az.less.mobile.presentation.client.reserve.components.LotSizeInfoBottomSheet
+import az.less.mobile.presentation.client.reserve.components.SelectVoucherBottomSheet
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_down24dp
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
+import lessmobile.composeapp.generated.resources.ic_gift_24dp
+import lessmobile.composeapp.generated.resources.ic_info_24dp
 import lessmobile.composeapp.generated.resources.ic_minus_24dp
 import lessmobile.composeapp.generated.resources.ic_plus_24dp
 import lessmobile.composeapp.generated.resources.test_merchant_logo
@@ -77,6 +81,16 @@ fun ReserveScreen(
     // Payment method selection bottom sheet state
     var isPaymentBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     val paymentSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    // Lot size info bottom sheet state
+    val lotSizeInfoSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    // Voucher selection bottom sheet state
+    val voucherSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
     
@@ -178,6 +192,29 @@ fun ReserveScreen(
             }
         }
     )
+
+    // Lot Size Info Bottom Sheet
+    LotSizeInfoBottomSheet(
+        isVisible = state.isLotSizeInfoVisible,
+        sheetState = lotSizeInfoSheetState,
+        lotSizeInfoList = state.lotSizeInfoList,
+        onDismiss = {
+            viewModel.onIntent(ReserveIntent.OnLotInfoDismissed)
+        }
+    )
+
+    // Select Voucher Bottom Sheet
+    SelectVoucherBottomSheet(
+        isVisible = state.isVoucherBottomSheetVisible,
+        sheetState = voucherSheetState,
+        vouchers = state.availableVouchers,
+        onVoucherSelected = { voucher ->
+            viewModel.onIntent(ReserveIntent.OnVoucherSelected(voucher))
+        },
+        onDismiss = {
+            viewModel.onIntent(ReserveIntent.OnVoucherBottomSheetDismissed)
+        }
+    )
 }
 
 /**
@@ -205,16 +242,35 @@ private fun ReserveScreenContent(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Text(
-                text = state.venueName,
-                style = LessTheme.typography.body16Semibold,
-                color = LessTheme.colors.textIconsBlack
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = state.lotName,
+                    style = LessTheme.typography.body16Semibold,
+                    color = LessTheme.colors.textIconsBlack
+                )
+                Spacer(modifier = Modifier.width(LessTheme.spacing.xSmall))
+                Icon(
+                    painter = painterResource(Res.drawable.ic_info_24dp),
+                    contentDescription = "Lot size info",
+                    tint = LessTheme.colors.textIconsBrand,
+                    modifier = Modifier
+                        .size(LessTheme.size.medium)
+                        .clickable { onIntent(ReserveIntent.OnLotInfoClicked) }
+                )
+            }
             Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
             Text(
                 text = state.pickupTime,
-                style = LessTheme.typography.body14Regular,
+                style = LessTheme.typography.body16Semibold,
                 color = LessTheme.colors.textIconsGrey
+            )
+            Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
+            Text(
+                text = state.lotDescription,
+                style = LessTheme.typography.body14Regular,
+                color = LessTheme.colors.textIconsBlack
             )
         }
         
@@ -355,6 +411,46 @@ private fun ReserveScreenContent(
         }
         
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onIntent(ReserveIntent.OnSelectVoucherClicked) },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Gift icon
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(RoundedCornerShape(LessTheme.radius.small))
+                    .background(LessTheme.colors.elementsSecondaryElement)
+            ){
+                Icon(
+                    painter = painterResource(Res.drawable.ic_gift_24dp),
+                    tint = LessTheme.colors.textIconsBrand,
+                    modifier = Modifier.fillMaxSize(),
+                    contentDescription = "")
+            }
+
+            Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = state.selectedVoucher?.name ?: "Select voucher",
+                    style = LessTheme.typography.body16Regular,
+                    color = LessTheme.colors.textIconsBlack
+                )
+            }
+
+            Icon(
+                imageVector = vectorResource(Res.drawable.ic_chevron_down24dp),
+                contentDescription = "Select voucher",
+                tint = LessTheme.colors.textIconsBrand,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(LessTheme.spacing.large))
         
         // Price breakdown
         Column(
@@ -431,9 +527,9 @@ private fun ReserveScreenContent(
         
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
         
-        // Place order button
+        // Reserve and pay button
         DsButton(
-            text = "Place order",
+            text = "Reserve and pay",
             onClick = { onIntent(ReserveIntent.OnPlaceOrderClicked) },
             modifier = Modifier
                 .fillMaxWidth(),

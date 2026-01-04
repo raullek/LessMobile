@@ -7,7 +7,7 @@ package az.less.mobile.presentation.client.main.offers.models
 data class OfferSection(
     val id: String,
     val title: String,
-    val items: List<az.less.mobile.presentation.client.main.offers.models.OfferItem>,
+    val items: List<OfferItem>,
     val showSeeAll: Boolean = true
 )
 

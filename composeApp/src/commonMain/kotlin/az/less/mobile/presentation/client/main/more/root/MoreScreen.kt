@@ -26,7 +26,6 @@ import az.less.designsystem.components.DsListBottomSheet
 import az.less.designsystem.components.DsSectionHeader
 import az.less.designsystem.components.DsTextBottomSheet
 import az.less.designsystem.components.ListBottomSheetItem
-import az.less.mobile.navigation.MerchantScreens
 import az.less.mobile.navigation.MoreScreens
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
@@ -53,8 +52,7 @@ fun MoreScreen(
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is MoreSideEffect.NavigateToLogin -> {
-                // Handle login navigation
-                // navController.navigate("login")
+                navController.navigate(MoreScreens.Welcome.route)
             }
             is MoreSideEffect.NavigateToAccount -> {
                 navController.navigate(MoreScreens.Account.route)
@@ -63,7 +61,7 @@ fun MoreScreen(
                 navController.navigate(MoreScreens.PaymentMethods.route)
             }
             is MoreSideEffect.NavigateToVoucher -> {
-                // navController.navigate("voucher")
+                navController.navigate(MoreScreens.Voucher.route)
             }
             is MoreSideEffect.NavigateToHistory -> {
                 navigateToMerchant.invoke()

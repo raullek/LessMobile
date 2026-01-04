@@ -16,6 +16,17 @@ object Typography {
         @Composable
         get() = FontFamily(Font(Res.font.SF_Pro))
 
+    // Display 48 - LH32
+    val display48Medium: TextStyle
+        @Composable
+        get() = TextStyle(
+            fontFamily = sfProFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 48.sp,
+            lineHeight = 32.sp,
+            letterSpacing = (-0.1).sp
+        )
+
     // Display 36 - LH32
     val display36Bold: TextStyle
         @Composable

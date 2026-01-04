@@ -3,6 +3,9 @@ package az.less.mobile.presentation.merchant.places.edit.selectlocation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.mobile.presentation.maps.models.LatLong
+import dev.jordond.compass.geocoder.Geocoder
+import dev.jordond.compass.geocoder.mobile
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -10,19 +13,22 @@ import org.orbitmvi.orbit.container
 /**
  * ViewModel for Select Branch Location on Map Screen using Orbit MVI
  */
-class SelectBranchLocationOnMapViewModel : ViewModel(), ContainerHost<SelectBranchLocationOnMapState, SelectBranchLocationOnMapSideEffect> {
+class SelectBranchLocationOnMapViewModel() : ViewModel(), ContainerHost<SelectBranchLocationOnMapState, SelectBranchLocationOnMapSideEffect> {
 
     override val container: Container<SelectBranchLocationOnMapState, SelectBranchLocationOnMapSideEffect> =
         viewModelScope.container(SelectBranchLocationOnMapState())
 
     // Default location: Baku, Azerbaijan
     private val defaultLocation = LatLong(40.4093, 49.8671)
+    private val geocoder: Geocoder = Geocoder.mobile()
 
-    fun initialize(initialLatitude: Double?, initialLongitude: Double?) = intent {
-        // Check if we have initial coordinates passed in
+    /**
+     * Initialize ViewModel with initial coordinates and address
+     */
+    fun initialize(initialLatitude: Double?, initialLongitude: Double?, initialAddress: String? = null) = intent {
         val hasInitialCoordinates = initialLatitude != null && initialLongitude != null
         val initialLocation = if (hasInitialCoordinates) {
-            LatLong(initialLatitude, initialLongitude)
+            LatLong(initialLatitude!!, initialLongitude!!)
         } else {
             defaultLocation
         }
@@ -32,6 +38,7 @@ class SelectBranchLocationOnMapViewModel : ViewModel(), ContainerHost<SelectBran
                 initialLocation = initialLocation,
                 // Only set selected location if coordinates were passed in
                 selectedLocation = if (hasInitialCoordinates) initialLocation else null,
+                selectedAddress = initialAddress ?: "",
                 isConfirmEnabled = hasInitialCoordinates
             )
         }
@@ -44,7 +51,7 @@ class SelectBranchLocationOnMapViewModel : ViewModel(), ContainerHost<SelectBran
         when (intent) {
             is SelectBranchLocationOnMapIntent.OnBackClick -> handleBackClick()
             is SelectBranchLocationOnMapIntent.OnMapClick -> handleMapClick(intent.latLong)
-            is SelectBranchLocationOnMapIntent.OnConfirmClick -> handleConfirmClick()
+              is SelectBranchLocationOnMapIntent.OnConfirmClick -> handleConfirmClick()
             is SelectBranchLocationOnMapIntent.OnMyLocationClick -> handleMyLocationClick()
             is SelectBranchLocationOnMapIntent.OnAddressCardClick -> handleAddressCardClick()
             is SelectBranchLocationOnMapIntent.OnAddressInputResult -> handleAddressInputResult(intent.address, intent.latitude, intent.longitude)
@@ -56,12 +63,17 @@ class SelectBranchLocationOnMapViewModel : ViewModel(), ContainerHost<SelectBran
     }
 
     private fun handleMapClick(latLong: LatLong) = intent {
-        reduce {
-            state.copy(
-                selectedLocation = latLong,
-                selectedAddress = formatAddress(latLong),
-                isConfirmEnabled = true
-            )
+        viewModelScope.launch {
+            val places = geocoder.places(latLong.latitude, latLong.longitude)
+            println(places)
+            reduce {
+                val adressName = "${places.getFirstOrNull()?.street}".ifEmpty {"${latLong.latitude}, ${latLong.longitude}"  }
+                state.copy(
+                    selectedLocation = latLong,
+                    selectedAddress = adressName,
+                    isConfirmEnabled = true
+                )
+            }
         }
     }
 
@@ -70,7 +82,7 @@ class SelectBranchLocationOnMapViewModel : ViewModel(), ContainerHost<SelectBran
         postSideEffect(
             SelectBranchLocationOnMapSideEffect.LocationSelected(
                 location = location,
-                address = state.selectedAddress.ifEmpty { formatAddress(location) }
+                address = state.selectedAddress.ifEmpty { "${location.latitude}, ${location.longitude}" }
             )
         )
     }
@@ -78,13 +90,13 @@ class SelectBranchLocationOnMapViewModel : ViewModel(), ContainerHost<SelectBran
     private fun handleMyLocationClick() = intent {
         // TODO: Implement user location tracking when permission is granted
         // For now, center on default location
-        reduce {
-            state.copy(
-                selectedLocation = defaultLocation,
-                selectedAddress = formatAddress(defaultLocation),
-                isConfirmEnabled = true
-            )
-        }
+//        reduce {
+//            state.copy(
+//                selectedLocation = defaultLocation,
+//                selectedAddress = formatAddress(defaultLocation),
+//                isConfirmEnabled = true
+//            )
+//        }
     }
 
     private fun handleAddressCardClick() = intent {
@@ -103,9 +115,4 @@ class SelectBranchLocationOnMapViewModel : ViewModel(), ContainerHost<SelectBran
         }
     }
 
-    private fun formatAddress(latLong: LatLong): String {
-        // TODO: Implement reverse geocoding to get actual address
-        // For now, return formatted coordinates
-        return "%.4f, %.4f".format(latLong.latitude, latLong.longitude)
-    }
 }

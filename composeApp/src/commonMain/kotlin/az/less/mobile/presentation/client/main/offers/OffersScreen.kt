@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.HomeScreens
+import az.less.mobile.presentation.client.main.offers.components.SpecialDiscountPager
 import az.less.mobile.presentation.client.reserve.ReserveScreen
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
@@ -209,7 +210,7 @@ fun OffersScreenContent(
             // Special Discounts Section with Horizontal Pager
             if (state.specialDiscounts.isNotEmpty()) {
                 item(key = "special_discounts") {
-                    _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.SpecialDiscountPager(
+                    SpecialDiscountPager(
                         items = state.specialDiscounts,
                         onItemClick = { item ->
                             onIntent(

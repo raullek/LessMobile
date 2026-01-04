@@ -15,6 +15,8 @@ class AccountViewModel : ViewModel(), ContainerHost<AccountState, AccountSideEff
         when (intent) {
             is AccountIntent.OnBackClicked -> handleBackClicked()
             is AccountIntent.OnEditPhotoClicked -> handleEditPhotoClicked()
+            is AccountIntent.OnProfilePhotoSelected -> handleProfilePhotoSelected(intent.bytes)
+            is AccountIntent.OnProfilePhotoPickerDismiss -> handleProfilePhotoPickerDismiss()
             is AccountIntent.OnFullNameChanged -> handleFullNameChanged(intent.fullName)
             is AccountIntent.OnPhoneChanged -> handlePhoneChanged(intent.phone)
             is AccountIntent.OnEmailChanged -> handleEmailChanged(intent.email)
@@ -35,6 +37,24 @@ class AccountViewModel : ViewModel(), ContainerHost<AccountState, AccountSideEff
     }
     
     private fun handleEditPhotoClicked() = intent {
+        reduce {
+            state.copy(showProfilePhotoPicker = true)
+        }
+    }
+
+    private fun handleProfilePhotoSelected(bytes: ByteArray) = intent {
+        reduce {
+            state.copy(
+                profilePhotoBytes = bytes,
+                showProfilePhotoPicker = false
+            )
+        }
+    }
+
+    private fun handleProfilePhotoPickerDismiss() = intent {
+        reduce {
+            state.copy(showProfilePhotoPicker = false)
+        }
     }
     
     private fun handleFullNameChanged(fullName: String) = intent {

@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.DsToolBar
-import az.less.mobile.navigation.MerchantScreens
+import az.less.mobile.navigation.MerchantRoute
 import az.less.mobile.presentation.merchant.places.edit.branchusers.components.BranchUsersEmptyState
 import az.less.mobile.presentation.merchant.places.edit.branchusers.components.UserCell
 import org.koin.compose.viewmodel.koinViewModel
@@ -53,13 +53,13 @@ fun BranchUsersScreen(
             }
             is BranchUsersSideEffect.NavigateToAddUser -> {
                 val userNumber = state.users.size + 1
-                navController.navigate(MerchantScreens.AddBranchUser.createRoute(userNumber))
+                navController.navigate(MerchantRoute.AddBranchUser(userNumber = userNumber))
             }
             is BranchUsersSideEffect.NavigateToEditUser -> {
                 navController.navigate(
-                    MerchantScreens.AddBranchUser.createEditRoute(
+                    MerchantRoute.AddBranchUser(
                         userNumber = sideEffect.userNumber,
-                        userJson = sideEffect.user.encode()
+                        user = sideEffect.user.encode()
                     )
                 )
             }

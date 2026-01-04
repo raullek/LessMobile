@@ -19,6 +19,7 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ill_branch_venue
 import lessmobile.composeapp.generated.resources.image_placeholder
 import org.jetbrains.compose.resources.painterResource
 
@@ -35,12 +36,13 @@ fun PlacesEmptyState(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = LessTheme.spacing.medium),
+        
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         // Placeholder Image
         Image(
-            painter = painterResource(Res.drawable.image_placeholder),
+            painter = painterResource(Res.drawable.ill_branch_venue),
             contentDescription = "No places",
             contentScale = ContentScale.Fit,
             modifier = Modifier.size(LessTheme.size.xxLarge)

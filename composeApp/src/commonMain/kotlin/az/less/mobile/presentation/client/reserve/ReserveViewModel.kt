@@ -2,9 +2,11 @@ package az.less.mobile.presentation.client.reserve
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.presentation.client.reserve.LotSizeInfo
 import az.less.mobile.presentation.client.reserve.models.CardType
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
 import az.less.mobile.presentation.client.reserve.models.PaymentCard
+import az.less.mobile.presentation.client.reserve.models.Voucher
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -34,6 +36,11 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
             is ReserveIntent.OnIncrementQuantity -> handleIncrementQuantity()
             is ReserveIntent.OnDecrementQuantity -> handleDecrementQuantity()
             is ReserveIntent.OnSeeMoreDealsClicked -> handleSeeMoreDealsClicked()
+            is ReserveIntent.OnLotInfoClicked -> handleLotInfoClicked()
+            is ReserveIntent.OnLotInfoDismissed -> handleLotInfoDismissed()
+            is ReserveIntent.OnSelectVoucherClicked -> handleSelectVoucherClicked()
+            is ReserveIntent.OnVoucherSelected -> handleVoucherSelected(intent.voucher)
+            is ReserveIntent.OnVoucherBottomSheetDismissed -> handleVoucherBottomSheetDismissed()
         }
     }
 
@@ -66,11 +73,37 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
         )
         
         val selectedCard = mockPaymentCards.firstOrNull { it.isSelected }
-        
+
+        // Mock lot size info data
+        val mockLotSizeInfo = listOf(
+            LotSizeInfo(name = "Small", description = "1-2 persons"),
+            LotSizeInfo(name = "Medium", description = "3-4 persons"),
+            LotSizeInfo(name = "Large", description = "5-6 persons")
+        )
+
+        // Mock vouchers data
+        val mockVouchers = listOf(
+            Voucher(
+                id = "voucher_1",
+                name = "2 AZN Voucher",
+                discountAmount = 2.0,
+                expiresInDays = 7,
+                isSelected = false
+            ),
+            Voucher(
+                id = "voucher_2",
+                name = "6 AZN Voucher",
+                discountAmount = 6.0,
+                expiresInDays = 7,
+                isSelected = false
+            )
+        )
+
         reduce {
             state.copy(
-                venueName = "Small Surprise Bag",
+                lotName = "Small Surprise Bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
+                lotDescription = "Indulge in rich Belgian flavors and smooth specialty coffee crafted with care.",
                 quantity = quantity,
                 itemsLeft = 8,
                 pricePerPiece = pricePerPiece,
@@ -84,7 +117,9 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
                         CardType.VISA -> "Visa •••• ${it.lastFourDigits}"
                         CardType.ADD_NEW -> ""
                     }
-                } ?: ""
+                } ?: "",
+                lotSizeInfoList = mockLotSizeInfo,
+                availableVouchers = mockVouchers
             )
         }
     }
@@ -109,7 +144,7 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
         // Create order info
         val orderInfo = OrderAccepted(
             orderNumber = orderNumber,
-            venueName = state.venueName,
+            venueName = state.lotName,
             pickupTime = state.pickupTime
         )
         
@@ -176,6 +211,35 @@ class ReserveViewModel : ViewModel(), ContainerHost<ReserveState, ReserveSideEff
         // Navigate to merchant screen with the current merchant ID
         // Using a mock merchant ID for now - in real app, this would come from the offer/venue data
         postSideEffect(ReserveSideEffect.NavigateToMerchant("merchant_1"))
+    }
+
+    private fun handleLotInfoClicked() = intent {
+        reduce { state.copy(isLotSizeInfoVisible = true) }
+    }
+
+    private fun handleLotInfoDismissed() = intent {
+        reduce { state.copy(isLotSizeInfoVisible = false) }
+    }
+
+    private fun handleSelectVoucherClicked() = intent {
+        reduce { state.copy(isVoucherBottomSheetVisible = true) }
+    }
+
+    private fun handleVoucherSelected(voucher: Voucher) = intent {
+        val updatedVouchers = state.availableVouchers.map {
+            it.copy(isSelected = it.id == voucher.id)
+        }
+        reduce {
+            state.copy(
+                selectedVoucher = voucher,
+                availableVouchers = updatedVouchers,
+                isVoucherBottomSheetVisible = false
+            )
+        }
+    }
+
+    private fun handleVoucherBottomSheetDismissed() = intent {
+        reduce { state.copy(isVoucherBottomSheetVisible = false) }
     }
 }
 

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.SegmentOption
 import az.less.designsystem.components.SegmentedButton
+import az.less.mobile.presentation.client.main.orders.components.OrderItem
 import az.less.mobile.presentation.client.reserve.ReserveInfoBottomSheet
 import az.less.mobile.presentation.client.reserve.models.ReserveInfo
 import kotlinx.coroutines.launch
@@ -187,14 +188,10 @@ fun OrdersScreenContent(
                 items = items,
                 key = { it.id }
             ) { item ->
-                _root_ide_package_.az.less.mobile.presentation.client.main.orders.components.OrderItem(
+                OrderItem(
                     item = item,
                     onClick = {
-                        onIntent(
-                            OrdersIntent.OnCartItemClicked(
-                                item.id
-                            )
-                        )
+                        onIntent(OrdersIntent.OnCartItemClicked(item.id))
                     },
                     modifier = Modifier.fillMaxWidth()
                 )

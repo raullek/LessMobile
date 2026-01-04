@@ -36,7 +36,6 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun InputAddressScreen(
     viewModel: InputAddressViewModel = koinViewModel(),
     navController: NavController,
-    onAddressSelected: (address: String, latitude: Double, longitude: Double) -> Unit
 ) {
     val state by viewModel.collectAsState()
 
@@ -46,11 +45,11 @@ fun InputAddressScreen(
                 navController.popBackStack()
             }
             is InputAddressSideEffect.AddressSelected -> {
-                onAddressSelected(
-                    sideEffect.address,
-                    sideEffect.latitude,
-                    sideEffect.longitude
-                )
+                navController.previousBackStackEntry?.savedStateHandle?.apply {
+                    set("input_latitude", sideEffect.latitude)
+                    set("input_longitude", sideEffect.longitude)
+                    set("input_address", sideEffect.address)
+                }
                 navController.popBackStack()
             }
             is InputAddressSideEffect.ShowError -> {}

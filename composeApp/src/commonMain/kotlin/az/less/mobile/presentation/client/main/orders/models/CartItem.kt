@@ -8,4 +8,6 @@ data class CartItem(
     val price: String,
     val quantity: Int = 1,
     val reserveNumber: String = "",
+    val isCompleted: Boolean = false,
+    val completedDate: String? = null
 )

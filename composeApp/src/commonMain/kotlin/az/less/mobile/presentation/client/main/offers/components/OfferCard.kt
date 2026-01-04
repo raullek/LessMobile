@@ -2,21 +2,22 @@ package az.less.mobile.presentation.client.main.offers.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,8 +31,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.compose_multiplatform
+import lessmobile.composeapp.generated.resources.ic_star_24dp
 import lessmobile.composeapp.generated.resources.test_merchant_logo
 import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
@@ -42,87 +44,143 @@ import org.jetbrains.compose.resources.painterResource
  */
 @Composable
 fun OfferCard(
-    offerItem: az.less.mobile.presentation.client.main.offers.models.OfferItem,
+    offerItem: OfferItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
-            .width(277.dp) // Specific card width from design
+            .width(277.dp)
             .shadow(
-                elevation = LessTheme.elevation.small,
-                shape = RoundedCornerShape(LessTheme.radius.medium),
-                ambientColor = Color.Black.copy(alpha = 0.05f),
-                spotColor = Color.Black.copy(alpha = 0.05f)
+                elevation = 16.dp,
+                spotColor = Color.Black.copy(alpha = 0.08f),
+                ambientColor = Color.Black.copy(alpha = 0.08f),
+                shape = RoundedCornerShape(LessTheme.radius.medium)
             )
             .clip(RoundedCornerShape(LessTheme.radius.medium))
-            .background(LessTheme.colors.elementsPrimaryElement)
+            .background(LessTheme.colors.backgroundPrimary)
             .clickable { onClick() }
-            .padding(LessTheme.spacing.xxxSmall)
     ) {
-        // Large Image with colored background
+        // Image section with badge and logo
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp) // Specific image height from design
-                .clip(RoundedCornerShape(
-                    topStart = LessTheme.spacing.small + LessTheme.spacing.xxxSmall, // 12 + 2 = 14dp
-                    topEnd = LessTheme.spacing.small + LessTheme.spacing.xxxSmall
-                ))
-                .background(Color(0xFFFFF2EB)), // Parse imageBgColor if needed
-            contentAlignment = Alignment.Center
+                .height(140.dp)
         ) {
-            Image(
-                painter = painterResource(Res.drawable.test_offer_item_image),
-                contentDescription = offerItem.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(width = 283.dp, height = 159.dp) // Specific image dimensions
-            )
+            // Main image
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(2.dp)
+                    .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                    .background(Color(0xFFFFF2EB))
+            ) {
+                if (offerItem.imageUrl != null) {
+                    AsyncImage(
+                        model = offerItem.imageUrl,
+                        contentDescription = offerItem.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(Res.drawable.test_offer_item_image),
+                        contentDescription = offerItem.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+
+            // "X left" badge - top left
+            if (offerItem.itemsLeft > 0) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 14.dp, top = 14.dp)
+                        .align(Alignment.TopStart)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.4f),
+                            shape = RoundedCornerShape(1000.dp)
+                        )
+                        .padding(horizontal = LessTheme.spacing.xSmall, vertical = LessTheme.spacing.xxSmall)
+                ) {
+                    Text(
+                        text = "${offerItem.itemsLeft} left",
+                        style = LessTheme.typography.caption12Semibold,
+                        color = LessTheme.colors.textIconsNested
+                    )
+                }
+            }
+
+            // Merchant logo - bottom right overlapping
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-12).dp, y = 20.dp)
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.5.dp))
+                    .background(LessTheme.colors.backgroundPrimary)
+                    .border(
+                        width = 2.dp,
+                        color = LessTheme.colors.backgroundPrimary,
+                        shape = RoundedCornerShape(12.5.dp)
+                    )
+            ) {
+                if (offerItem.restaurantLogoUrl != null) {
+                    AsyncImage(
+                        model = offerItem.restaurantLogoUrl,
+                        contentDescription = "${offerItem.restaurantName} logo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(Res.drawable.test_merchant_logo),
+                        contentDescription = "${offerItem.restaurantName} logo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
         }
-        
-        // Content Section
+
+        // Content section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(LessTheme.spacing.small)
+                .padding(horizontal = 12.dp)
+                .padding(top = 2.dp, bottom = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Title
-            Text(
-                text = offerItem.title,
-                style = LessTheme.typography.body16Semibold,
-                color = LessTheme.colors.textIconsBlack,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            
-            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-            
-            // Pricing Section
+            // Price row
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Original Price (gray with strikethrough)
+                // Original price (strikethrough)
                 Row(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = offerItem.originalPrice,
-                        style = LessTheme.typography.caption12Semibold,
-                        color = LessTheme.colors.textIconsGrey,
-                        textDecoration = TextDecoration.LineThrough
+                        style = LessTheme.typography.body14Semibold.copy(
+                            textDecoration = TextDecoration.LineThrough
+                        ),
+                        color = LessTheme.colors.textIconsGrey
                     )
                     Text(
-                        text = " ₼",
-                        style = LessTheme.typography.caption10Regular,
+                        text = "₼",
+                        style = LessTheme.typography.caption12Semibold.copy(
+                            textDecoration = TextDecoration.LineThrough
+                        ),
                         color = LessTheme.colors.textIconsGrey
                     )
                 }
-                
-                Spacer(modifier = Modifier.width(LessTheme.spacing.xxSmall))
-                
-                // Current Price (brand color)
+
+                // Discounted price
                 Row(
+                    horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -131,112 +189,113 @@ fun OfferCard(
                         color = LessTheme.colors.textIconsBrand
                     )
                     Text(
-                        text = " ₼",
-                        style = LessTheme.typography.body14Medium,
+                        text = "₼",
+                        style = LessTheme.typography.body14Semibold,
                         color = LessTheme.colors.textIconsBrand
                     )
                 }
-                
-                Spacer(modifier = Modifier.weight(1f))
-
             }
-            
-            Spacer(modifier = Modifier.height(LessTheme.spacing.medium + LessTheme.spacing.xxxSmall)) // 16 + 2 = 18dp
 
-            // Restaurant Logo
-            Box(
-                modifier = Modifier
-                    .size(LessTheme.size.large)
-                    .clip(RoundedCornerShape(LessTheme.radius.xSmall))
-                    .background(Color.White)
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.test_merchant_logo),
-                    contentDescription = "Restaurant Logo",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(LessTheme.size.large)
-                )
-            }
-            
-            // Restaurant Name (Brand colored)
+            // Title
             Text(
-                text = offerItem.restaurantName,
-                style = LessTheme.typography.body14Semibold,
-                color = LessTheme.colors.textIconsBrand
-            )
-            
-            Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall + LessTheme.spacing.xxxSmall)) // 4 + 2 = 6dp
-            
-            // Pickup Time
-            Text(
-                text = offerItem.pickupTime,
-                style = LessTheme.typography.body14Medium,
-                color = LessTheme.colors.textIconsGrey,
+                text = offerItem.title,
+                style = LessTheme.typography.body16Semibold,
+                color = LessTheme.colors.textIconsBlack,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            
-            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-            
+
             // Divider
-            Divider(
-                color = LessTheme.colors.borderPrimary,
+            HorizontalDivider(
+                color = LessTheme.colors.backgroundSecond,
                 thickness = 1.dp
             )
-            
-            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-            
-            // Rating and Distance Row
+
+            // Bag type, Category, and Pickup time
+            Column(
+                verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
+            ) {
+                // Bag type (green text)
+                Text(
+                    text = offerItem.bagType,
+                    style = LessTheme.typography.body14Medium,
+                    color = LessTheme.colors.textIconsBrand
+                )
+
+                // Category (black text)
+                Text(
+                    text = offerItem.category,
+                    style = LessTheme.typography.body14Medium,
+                    color = LessTheme.colors.textIconsBlack
+                )
+
+                // Pickup time (grey text)
+                Text(
+                    text = offerItem.pickupTime,
+                    style = LessTheme.typography.body14Medium,
+                    color = LessTheme.colors.textIconsGrey,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            // Divider
+            HorizontalDivider(
+                color = LessTheme.colors.backgroundSecond,
+                thickness = 1.dp
+            )
+
+            // Rating and distance row
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall + LessTheme.spacing.xxxSmall) // 4 + 2 = 6dp
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Rating
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
+                    horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Star icon with orange background
+                    // Star icon
                     Box(
                         modifier = Modifier
-                            .size(LessTheme.size.small)
-                            .clip(RoundedCornerShape(LessTheme.radius.xSmall))
-                            .background(LessTheme.colors.textIconsWarning)
-                            .padding(LessTheme.spacing.xxxSmall),
+                            .size(20.dp)
+                            .background(
+                                color = LessTheme.colors.textIconsBrand,
+                                shape = RoundedCornerShape(LessTheme.spacing.xSmall)
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.compose_multiplatform),
+                        Image(
+                            painter = painterResource(Res.drawable.ic_star_24dp),
                             contentDescription = "Rating",
-                            tint = Color.White,
-                            modifier = Modifier.size(LessTheme.size.xSmall)
+                            modifier = Modifier.size(16.dp)
                         )
                     }
-                    
+
                     Text(
                         text = offerItem.rating.toString(),
-                        style = LessTheme.typography.body14Semibold,
+                        style = LessTheme.typography.body14Medium,
                         color = LessTheme.colors.textIconsBlack
                     )
                 }
-                
-                // Dot Separator
+
+                // Dot separator
                 Box(
                     modifier = Modifier
-                        .size(3.dp) // Specific dot size
-                        .clip(CircleShape)
-                        .background(LessTheme.colors.textIconsBlack)
+                        .size(3.dp)
+                        .background(
+                            color = LessTheme.colors.textIconsBlack,
+                            shape = CircleShape
+                        )
                 )
-                
+
                 // Distance
                 Text(
                     text = offerItem.distance,
-                    style = LessTheme.typography.body14Semibold,
+                    style = LessTheme.typography.body14Medium,
                     color = LessTheme.colors.textIconsBlack
                 )
             }
         }
     }
 }
-

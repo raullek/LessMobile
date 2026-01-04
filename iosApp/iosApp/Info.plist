@@ -14,5 +14,9 @@
 	<string>We need your location to show nearby places and provide address suggestions.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need your location to show nearby places and provide address suggestions.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is needed to take photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access is needed to select images.</string>
 </dict>
 </plist>

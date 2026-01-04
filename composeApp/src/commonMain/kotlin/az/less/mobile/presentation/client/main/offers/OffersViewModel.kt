@@ -201,34 +201,43 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
                 id = "1",
                 title = "Belgian Coffee",
                 imageBgColor = "#fff2eb",
-                originalPrice = "12.99",
+                originalPrice = "22.99",
                 currentPrice = "12.99",
-                restaurantName = "Small Surprise Bag",
+                bagType = "Small Bag",
+                category = "Snacks and Drinks",
+                restaurantName = "Belgian Chocolate & Coffee",
                 pickupTime = "Pick up from 17:00 to 23:00",
                 rating = 4.9f,
-                distance = "1.2 km"
+                distance = "1.2 km",
+                itemsLeft = 12
             ),
             OfferItem(
                 id = "2",
-                title = "Belgian Coffee",
+                title = "Belgian Chocolate",
                 imageBgColor = "#fff2eb",
-                originalPrice = "12.99",
-                currentPrice = "12.99",
-                restaurantName = "Small Surprise Bag",
+                originalPrice = "18.99",
+                currentPrice = "10.99",
+                bagType = "Medium Bag",
+                category = "Desserts",
+                restaurantName = "Belgian Chocolate & Coffee",
                 pickupTime = "Pick up from 17:00 to 23:00",
                 rating = 4.9f,
-                distance = "1.2 km"
+                distance = "1.2 km",
+                itemsLeft = 5
             ),
             OfferItem(
                 id = "3",
-                title = "Belgian Coffee",
+                title = "Surprise Mix",
                 imageBgColor = "#fff2eb",
-                originalPrice = "12.99",
-                currentPrice = "12.99",
-                restaurantName = "Small Surprise Bag",
+                originalPrice = "25.99",
+                currentPrice = "15.99",
+                bagType = "Large Bag",
+                category = "Mixed",
+                restaurantName = "Belgian Chocolate & Coffee",
                 pickupTime = "Pick up from 17:00 to 23:00",
                 rating = 4.9f,
-                distance = "1.2 km"
+                distance = "1.2 km",
+                itemsLeft = 3
             )
         )
         

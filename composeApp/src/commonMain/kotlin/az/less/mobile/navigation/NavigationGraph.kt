@@ -28,7 +28,7 @@ const val ROOT_MERCHANT = "rootMerchantNavigation"
 fun AppRootNavigation() {
     val navController = rememberNavController()
 
-    val startFlow = if (false) ROOT_CLIENT else ROOT_MERCHANT
+    val startFlow = if (true) ROOT_CLIENT else ROOT_MERCHANT
 
     NavHost(
         navController = navController,
@@ -80,7 +80,7 @@ fun AppMerchantRootScreen(rootNavController: NavController) {
 
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
-    showBottomBar.value = merchantHomeRoutes.contains(currentRoute)
+    showBottomBar.value = merchantHomeRoutes.any { currentRoute?.contains(it.simpleName ?: "") == true }
 
     Box(
         modifier = Modifier
@@ -90,7 +90,7 @@ fun AppMerchantRootScreen(rootNavController: NavController) {
         // Navigation content
         NavHost(
             navController = navController,
-            startDestination = MerchantScreens.Orders.route,
+            startDestination = MerchantRoute.Orders,
             modifier = Modifier.fillMaxSize()
         ) {
          //   clientGraph(navController)

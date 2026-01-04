@@ -16,8 +16,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
@@ -38,8 +42,18 @@ fun SearchInputBar(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
     onMapClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    autoFocus: Boolean = true
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    // Request focus when composable is first launched
+    LaunchedEffect(Unit) {
+        if (autoFocus) {
+            focusRequester.requestFocus()
+        }
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth(),
@@ -49,6 +63,10 @@ fun SearchInputBar(
         TextField(
             value = searchQuery,
             onValueChange = onSearchQueryChanged,
+            modifier = Modifier
+                .weight(1f)
+                .size(LessTheme.size.xxLarge)
+                .focusRequester(focusRequester),
             placeholder = {
                 Text(
                     text = "Search...",
@@ -78,8 +96,7 @@ fun SearchInputBar(
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
                 cursorColor = LessTheme.colors.textIconsBlack
-            ),
-            modifier = Modifier.weight(1f).size(LessTheme.size.xxLarge)
+            )
         )
         
         Spacer(modifier = Modifier.width(LessTheme.spacing.xxSmall + LessTheme.spacing.xxxSmall)) // 6dp

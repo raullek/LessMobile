@@ -11,7 +11,8 @@
       "WebFetch(domain:compass.jordond.dev)",
       "WebFetch(domain:docs.compass.jordond.dev)",
       "WebFetch(domain:proandroiddev.com)",
-      "WebFetch(domain:insert-koin.io)"
+      "WebFetch(domain:insert-koin.io)",
+      "WebFetch(domain:pl-coding.com)"
     ]
   }
 }

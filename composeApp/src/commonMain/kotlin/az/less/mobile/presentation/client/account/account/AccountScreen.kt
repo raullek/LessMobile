@@ -5,11 +5,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -17,12 +21,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
+import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
+import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
+import kotlinx.coroutines.launch
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
@@ -70,11 +80,33 @@ fun AccountScreenContent(
 ) {
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(state.showGenderBottomSheet) {
         if (state.showGenderBottomSheet) {
             focusManager.clearFocus()
         }
+    }
+
+    // Profile Photo Picker
+    if (state.showProfilePhotoPicker) {
+        GalleryPickerLauncher(
+            onPhotosSelected = { photos ->
+                photos.firstOrNull()?.let { photo ->
+                    coroutineScope.launch {
+                        val bytes = photo.loadBytes()
+                        if (bytes != null) {
+                            onIntent(AccountIntent.OnProfilePhotoSelected(bytes))
+                        } else {
+                            onIntent(AccountIntent.OnProfilePhotoPickerDismiss)
+                        }
+                    }
+                } ?: onIntent(AccountIntent.OnProfilePhotoPickerDismiss)
+            },
+            onError = { onIntent(AccountIntent.OnProfilePhotoPickerDismiss) },
+            onDismiss = { onIntent(AccountIntent.OnProfilePhotoPickerDismiss) },
+            allowMultiple = false
+        )
     }
 
     Scaffold(
@@ -86,16 +118,18 @@ fun AccountScreenContent(
         },
         containerColor = LessTheme.colors.backgroundPrimary
     ) { innerPadding ->
-
         Column(
             modifier = modifier
                 .fillMaxWidth()
                 .verticalScroll(scrollState)
-                .imePadding()
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.navigationBars)
                 .padding(innerPadding)
                 .padding(
-                    horizontal = LessTheme.spacing.medium,
-                    vertical = LessTheme.spacing.large
+                    start = LessTheme.spacing.medium,
+                    end = LessTheme.spacing.medium,
+                    top = LessTheme.spacing.small,
+                    bottom = LessTheme.spacing.large
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -111,13 +145,24 @@ fun AccountScreenContent(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(Res.drawable.test_merchant_logo),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(96.dp)
-                        .clip( RoundedCornerShape(16.dp))
-                )
+                if (state.profilePhotoBytes != null) {
+                    AsyncImage(
+                        model = state.profilePhotoBytes,
+                        contentDescription = "Profile photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(96.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(Res.drawable.test_merchant_logo),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(96.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.small))

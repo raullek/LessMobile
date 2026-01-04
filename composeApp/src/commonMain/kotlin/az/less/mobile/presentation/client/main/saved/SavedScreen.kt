@@ -1,36 +1,27 @@
 package az.less.mobile.presentation.client.main.saved
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
+import az.less.designsystem.components.DsToolBar
 import az.less.mobile.navigation.HomeScreens
-import az.less.mobile.presentation.client.reserve.ReserveScreen
-import kotlinx.coroutines.launch
+import az.less.mobile.presentation.client.main.saved.components.SavedEmptyState
+import az.less.mobile.presentation.client.main.saved.components.SavedMerchantCard
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -39,73 +30,32 @@ import org.orbitmvi.orbit.compose.collectSideEffect
  * Stateful SavedScreen that connects to ViewModel
  * This is the entry point used by navigation
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SavedScreen(
     viewModel: SavedViewModel = koinViewModel(),
     navController: NavController
 ) {
     val state by viewModel.collectAsState()
-    val scope = rememberCoroutineScope()
-    
-    // Reserve bottom sheet state
-    var isReserveBottomSheetVisible by remember { mutableStateOf(false) }
-    val reserveSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
-    
+
     // Collect side effects for navigation
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is SavedSideEffect.NavigateToReserve -> {
-                // Open reserve bottom sheet
-                isReserveBottomSheetVisible = true
-                scope.launch {
-                    reserveSheetState.expand()
-                }
+            is SavedSideEffect.NavigateToMerchantDetail -> {
+                navController.navigate(HomeScreens.Merchant.createRoute(sideEffect.merchantId))
             }
             is SavedSideEffect.NavigateToExplore -> {
-                // Handle navigation to explore/offers tab
-                // navController.navigate("offers")
+                navController.navigate(HomeScreens.Explore.route)
             }
             is SavedSideEffect.ShowError -> {
                 // Show error snackbar
             }
         }
     }
-    
+
     // Render the stateless UI
     SavedScreenContent(
         state = state,
         onIntent = viewModel::onIntent
-    )
-    
-    // Reserve Bottom Sheet
-    ReserveScreen(
-        isVisible = isReserveBottomSheetVisible,
-        sheetState = reserveSheetState,
-        viewModel = koinViewModel(),
-        onDismiss = {
-            scope.launch {
-                reserveSheetState.hide()
-            }.invokeOnCompletion {
-                isReserveBottomSheetVisible = false
-            }
-        },
-        onOrderPlaced = { orderInfo ->
-            // Navigate to Order Accepted screen
-            navController.navigate(
-                HomeScreens.OrderAccepted.createRoute(
-                    orderNumber = orderInfo.orderNumber,
-                    venueName = orderInfo.venueName,
-                    pickupTime = orderInfo.pickupTime
-                )
-            )
-        },
-        onNavigateToMerchant = { merchantId ->
-            // Navigate to Merchant screen
-            navController.navigate(HomeScreens.Merchant.createRoute(merchantId))
-        }
     )
 }
 
@@ -119,67 +69,53 @@ fun SavedScreenContent(
     onIntent: (SavedIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(LessTheme.colors.backgroundSecond)
-            .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(bottom = LessTheme.size.large) // Space for bottom nav bar
     ) {
+        // Fixed Toolbar with title
+        DsToolBar(
+            title = "Favourites",
+            backgroundColor = LessTheme.colors.backgroundSecond
+        )
+
         if (state.isEmpty) {
             // Empty State
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = LessTheme.spacing.medium),
                 contentAlignment = Alignment.Center
             ) {
-                _root_ide_package_.az.less.mobile.presentation.client.main.saved.components.SavedEmptyState(
+                SavedEmptyState(
                     onExploreNewVenuesClick = {
                         onIntent(SavedIntent.OnExploreNewVenuesClicked)
                     }
                 )
             }
         } else {
-            // List of Favorites
+            // List of Saved Merchants
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    horizontal = LessTheme.spacing.medium,
-                    vertical = LessTheme.spacing.medium
-                )
+                    horizontal = LessTheme.spacing.medium
+                ),
+                verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
             ) {
-                // Title
-                item(key = "title") {
-                    Text(
-                        text = "Favourites",
-                        style = LessTheme.typography.body16Semibold,
-                        color = LessTheme.colors.textIconsBlack,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                
-                item(key = "title_spacing") {
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-                }
-                
-                // Favorite Items
+                // Saved Merchants
                 items(
-                    items = state.favoriteItems,
-                    key = { item -> item.id }
-                ) { item ->
-                    _root_ide_package_.az.less.mobile.presentation.client.main.saved.components.FavoriteItemCard(
-                        item = item,
+                    items = state.savedMerchants,
+                    key = { merchant -> merchant.id }
+                ) { merchant ->
+                    SavedMerchantCard(
+                        merchant = merchant,
                         onClick = {
-                            onIntent(
-                                SavedIntent.OnItemClicked(
-                                    item.id
-                                )
-                            )
+                            onIntent(SavedIntent.OnMerchantClicked(merchant.id))
                         }
                     )
-                    
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
                 }
             }
         }

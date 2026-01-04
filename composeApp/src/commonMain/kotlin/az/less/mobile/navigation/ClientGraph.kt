@@ -20,6 +20,7 @@ import az.less.mobile.presentation.client.onboarding.otp.LoginCodeScreen
 import az.less.mobile.presentation.client.onboarding.welcome.WelcomeScreen
 import az.less.mobile.presentation.client.reserve.OrderAcceptedScreen
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
+import az.less.mobile.presentation.client.main.voucher.VoucherScreen
 import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardScreen
 
 
@@ -56,9 +57,14 @@ sealed class MoreScreens(val route: String) {
     data object Account : MoreScreens("account")
     data object PaymentMethods : MoreScreens("paymentMethods")
     data object AddNewCard : MoreScreens("addNewCard")
+    data object Voucher : MoreScreens("voucher")
     data object Welcome : MoreScreens("welcome")
     data object LoginEmail : MoreScreens("loginEmail")
-    data object LoginCode : MoreScreens("loginCode")
+    data object LoginCode : MoreScreens("loginCode/{email}") {
+        fun createRoute(email: String): String {
+            return "loginCode/$email"
+        }
+    }
 }
 
 fun NavGraphBuilder.mainGraph(
@@ -100,9 +106,9 @@ fun NavGraphBuilder.mainGraph(
             navArgument("pickupTime") { type = NavType.StringType }
         )
     ) { backStackEntry ->
-        val orderNumber =  ""
-        val venueName = ""
-        val pickupTime = ""
+        val orderNumber = backStackEntry.arguments?.getString("orderNumber") ?: ""
+        val venueName = backStackEntry.arguments?.getString("venueName") ?: ""
+        val pickupTime = backStackEntry.arguments?.getString("pickupTime") ?: ""
 
         OrderAcceptedScreen(
             navController = navController,
@@ -129,14 +135,24 @@ fun NavGraphBuilder.moreGraph(
     composable(MoreScreens.AddNewCard.route) {
         AddNewCardScreen(navController = navController)
     }
+    composable(MoreScreens.Voucher.route) {
+        VoucherScreen(navController = navController)
+    }
     composable(MoreScreens.Welcome.route) {
         WelcomeScreen(navController = navController)
     }
     composable(MoreScreens.LoginEmail.route) {
         LoginEmailScreen(navController = navController)
     }
-    composable(MoreScreens.LoginCode.route) {
-        LoginCodeScreen(navController = navController)
+    composable(
+        route = MoreScreens.LoginCode.route,
+        arguments = listOf(navArgument("email") { type = NavType.StringType })
+    ) { backStackEntry ->
+        val email = backStackEntry.arguments?.getString("email") ?: ""
+        LoginCodeScreen(
+            navController = navController,
+            email = email
+        )
     }
 }
 

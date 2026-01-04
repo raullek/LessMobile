@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
 import lessmobile.composeapp.generated.resources.ic_edit_24dp
@@ -36,11 +38,17 @@ import org.jetbrains.compose.resources.painterResource
 fun EditMerchantProfileHeroSection(
     venueImageUrl: String?,
     logoUrl: String?,
+    venueImageBytes: ByteArray?,
+    logoImageBytes: ByteArray?,
     onBackClick: () -> Unit,
     onVenueImageEditClick: () -> Unit,
     onLogoEditClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Remember keys for forcing recomposition when bytes change
+    val venueImageKey = remember(venueImageBytes) { venueImageBytes?.size ?: 0 }
+    val logoImageKey = remember(logoImageBytes) { logoImageBytes?.size ?: 0 }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -53,21 +61,38 @@ fun EditMerchantProfileHeroSection(
                 .height(200.dp)
                 .background(LessTheme.colors.elementsThirdElement)
         ) {
-            if (venueImageUrl != null) {
-                Image(
-                    painter = painterResource(Res.drawable.image_placeholder),
-                    contentDescription = "Venue image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            } else {
-                // Show placeholder text when no image
-                Image(
-                    painter = painterResource(Res.drawable.image_placeholder),
-                    contentDescription = "Venue image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+            when {
+                venueImageBytes != null -> {
+                    // Display selected image from gallery
+                    AsyncImage(
+                        model = venueImageBytes,
+                        contentDescription = "Venue image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = painterResource(Res.drawable.image_placeholder),
+                        error = painterResource(Res.drawable.image_placeholder)
+                    )
+                }
+                venueImageUrl != null -> {
+                    // Display image from URL
+                    AsyncImage(
+                        model = venueImageUrl,
+                        contentDescription = "Venue image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = painterResource(Res.drawable.image_placeholder),
+                        error = painterResource(Res.drawable.image_placeholder)
+                    )
+                }
+                else -> {
+                    // Show placeholder when no image
+                    Image(
+                        painter = painterResource(Res.drawable.image_placeholder),
+                        contentDescription = "Venue image placeholder",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
 
             // Edit icon overlay for venue image
@@ -119,25 +144,44 @@ fun EditMerchantProfileHeroSection(
                 .background(LessTheme.colors.backgroundPrimary),
             contentAlignment = Alignment.Center
         ) {
-            if (logoUrl != null) {
-                Image(
-                    painter = painterResource(Res.drawable.test_merchant_logo),
-                    contentDescription = "Logo",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(76.dp)
-                        .clip(RoundedCornerShape(LessTheme.radius.medium))
-                )
-            } else {
-                // Show placeholder text when no logo
-                Image(
-                    painter = painterResource(Res.drawable.image_placeholder),
-                    contentDescription = "Logo",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(76.dp)
-                        .clip(RoundedCornerShape(LessTheme.radius.medium))
-                )
+            when {
+                logoImageBytes != null -> {
+                    // Display selected logo from gallery
+                    AsyncImage(
+                        model = logoImageBytes,
+                        contentDescription = "Logo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(76.dp)
+                            .clip(RoundedCornerShape(LessTheme.radius.medium)),
+                        placeholder = painterResource(Res.drawable.image_placeholder),
+                        error = painterResource(Res.drawable.image_placeholder)
+                    )
+                }
+                logoUrl != null -> {
+                    // Display logo from URL
+                    AsyncImage(
+                        model = logoUrl,
+                        contentDescription = "Logo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(76.dp)
+                            .clip(RoundedCornerShape(LessTheme.radius.medium)),
+                        placeholder = painterResource(Res.drawable.test_merchant_logo),
+                        error = painterResource(Res.drawable.test_merchant_logo)
+                    )
+                }
+                else -> {
+                    // Show placeholder when no logo
+                    Image(
+                        painter = painterResource(Res.drawable.image_placeholder),
+                        contentDescription = "Logo placeholder",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .size(76.dp)
+                            .clip(RoundedCornerShape(LessTheme.radius.medium))
+                    )
+                }
             }
 
             // Edit icon overlay for logo

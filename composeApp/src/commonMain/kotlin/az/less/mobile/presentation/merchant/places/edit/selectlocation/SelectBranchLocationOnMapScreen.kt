@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.navigation.MerchantScreens
+import az.less.mobile.navigation.MerchantRoute
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
@@ -54,15 +54,15 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun SelectBranchLocationOnMapScreen(
     initialLatitude: Double? = null,
     initialLongitude: Double? = null,
+    initialAddress: String? = null,
     viewModel: SelectBranchLocationOnMapViewModel = koinViewModel(),
     navController: NavController,
-    onLocationSelected: (latitude: Double, longitude: Double, address: String) -> Unit
 ) {
     val state by viewModel.collectAsState()
 
-    // Initialize with coordinates
-    LaunchedEffect(Unit) {
-        viewModel.initialize(initialLatitude, initialLongitude)
+    // Initialize with coordinates and address - key on params to reinitialize when they change
+    LaunchedEffect(initialLatitude, initialLongitude, initialAddress) {
+        viewModel.initialize(initialLatitude, initialLongitude, initialAddress)
     }
 
     // Observe address input from InputAddressScreen via Navigation's SavedStateHandle
@@ -76,10 +76,6 @@ fun SelectBranchLocationOnMapScreen(
                     viewModel.onIntent(
                         SelectBranchLocationOnMapIntent.OnAddressInputResult(address, latitude, longitude)
                     )
-                    // Clear saved state after handling
-                    savedStateHandle.remove<String>("input_address")
-                    savedStateHandle.remove<Double>("input_latitude")
-                    savedStateHandle.remove<Double>("input_longitude")
                 }
             }
         }
@@ -91,15 +87,15 @@ fun SelectBranchLocationOnMapScreen(
                 navController.popBackStack()
             }
             is SelectBranchLocationOnMapSideEffect.LocationSelected -> {
-                onLocationSelected(
-                    sideEffect.location.latitude,
-                    sideEffect.location.longitude,
-                    sideEffect.address
-                )
+                navController.previousBackStackEntry?.savedStateHandle?.apply {
+                    set("selected_latitude", sideEffect.location.latitude)
+                    set("selected_longitude", sideEffect.location.longitude)
+                    set("selected_address", sideEffect.address)
+                }
                 navController.popBackStack()
             }
             is SelectBranchLocationOnMapSideEffect.NavigateToInputAddress -> {
-                navController.navigate(MerchantScreens.InputAddress.route)
+                navController.navigate(MerchantRoute.InputAddress)
             }
         }
     }
