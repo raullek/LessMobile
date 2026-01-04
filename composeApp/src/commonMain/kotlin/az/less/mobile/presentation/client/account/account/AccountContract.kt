@@ -11,7 +11,9 @@ data class AccountState(
     val showGenderBottomSheet: Boolean = false,
     val genderList: List<String> = listOf("Male", "Female", "Don't want to specify"),
     val phoneNumberError: String? = null,
-    val emailError: String? = null
+    val emailError: String? = null,
+    val showProfilePhotoPicker: Boolean = false,
+    val profilePhotoBytes: ByteArray? = null
 )
 
 interface AccountSideEffect {
@@ -22,6 +24,8 @@ interface AccountSideEffect {
 sealed interface AccountIntent {
     data object OnBackClicked : AccountIntent
     data object OnEditPhotoClicked : AccountIntent
+    data class OnProfilePhotoSelected(val bytes: ByteArray) : AccountIntent
+    data object OnProfilePhotoPickerDismiss : AccountIntent
     data class OnFullNameChanged(val fullName: String) : AccountIntent
     data class OnPhoneChanged(val phone: String) : AccountIntent
     data class OnEmailChanged(val email: String) : AccountIntent

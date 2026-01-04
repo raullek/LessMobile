@@ -1,18 +1,10 @@
 package az.less.mobile.di
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import okio.Path.Companion.toPath
+import az.less.mobile.data.repository.UserRepository
+import az.less.mobile.preferences.createPlatformDataStore
 import org.koin.dsl.module
 
 val cacheModule = module {
-    single { createDataStore { dataStoreFileName }}
+    single { createPlatformDataStore() }
+    single { UserRepository(get()) }
 }
-
-fun createDataStore(producePath: () -> String): DataStore<Preferences> =
-    PreferenceDataStoreFactory.createWithPath(
-        produceFile = { producePath().toPath() }
-    )
-
-internal const val dataStoreFileName = "dice.preferences_pb"

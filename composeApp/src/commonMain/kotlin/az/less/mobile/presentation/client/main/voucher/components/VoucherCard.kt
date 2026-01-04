@@ -1,0 +1,277 @@
+package az.less.mobile.presentation.client.main.voucher.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import az.less.designsystem.base.LessTheme
+import az.less.mobile.presentation.client.main.voucher.models.Voucher
+
+/**
+ * Custom shape for voucher card with serrated/zigzag edges on top and bottom
+ */
+class VoucherTicketShape(
+    private val teethHeight: Dp = 8.dp,
+    private val teethWidth: Dp = 12.dp,
+    private val cornerRadius: Dp = 16.dp
+) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val teethHeightPx = with(density) { teethHeight.toPx() }
+        val teethWidthPx = with(density) { teethWidth.toPx() }
+        val cornerRadiusPx = with(density) { cornerRadius.toPx() }
+
+        val path = Path().apply {
+            // Start from top-left corner (after corner radius)
+            moveTo(cornerRadiusPx, 0f)
+
+            // Top serrated edge
+            var x = cornerRadiusPx
+            var goingDown = true
+            while (x < size.width - cornerRadiusPx) {
+                val nextX = minOf(x + teethWidthPx / 2, size.width - cornerRadiusPx)
+                val y = if (goingDown) teethHeightPx else 0f
+                lineTo(nextX, y)
+                x = nextX
+                goingDown = !goingDown
+            }
+
+            // Top-right corner
+            lineTo(size.width - cornerRadiusPx, 0f)
+            arcTo(
+                rect = Rect(
+                    size.width - cornerRadiusPx * 2,
+                    0f,
+                    size.width,
+                    cornerRadiusPx * 2
+                ),
+                startAngleDegrees = 270f,
+                sweepAngleDegrees = 90f,
+                forceMoveTo = false
+            )
+
+            // Right edge
+            lineTo(size.width, size.height - cornerRadiusPx)
+
+            // Bottom-right corner
+            arcTo(
+                rect = Rect(
+                    size.width - cornerRadiusPx * 2,
+                    size.height - cornerRadiusPx * 2,
+                    size.width,
+                    size.height
+                ),
+                startAngleDegrees = 0f,
+                sweepAngleDegrees = 90f,
+                forceMoveTo = false
+            )
+
+            // Bottom serrated edge (right to left)
+            x = size.width - cornerRadiusPx
+            goingDown = true
+            while (x > cornerRadiusPx) {
+                val nextX = maxOf(x - teethWidthPx / 2, cornerRadiusPx)
+                val y = if (goingDown) size.height - teethHeightPx else size.height
+                lineTo(nextX, y)
+                x = nextX
+                goingDown = !goingDown
+            }
+
+            // Bottom-left corner
+            lineTo(cornerRadiusPx, size.height)
+            arcTo(
+                rect = Rect(
+                    0f,
+                    size.height - cornerRadiusPx * 2,
+                    cornerRadiusPx * 2,
+                    size.height
+                ),
+                startAngleDegrees = 90f,
+                sweepAngleDegrees = 90f,
+                forceMoveTo = false
+            )
+
+            // Left edge
+            lineTo(0f, cornerRadiusPx)
+
+            // Top-left corner
+            arcTo(
+                rect = Rect(
+                    0f,
+                    0f,
+                    cornerRadiusPx * 2,
+                    cornerRadiusPx * 2
+                ),
+                startAngleDegrees = 180f,
+                sweepAngleDegrees = 90f,
+                forceMoveTo = false
+            )
+
+            close()
+        }
+
+        return Outline.Generic(path)
+    }
+}
+
+/**
+ * Voucher card component matching Figma design
+ * Displays voucher info with title, amount, expiry date, and loyalty code
+ * Features serrated/zigzag edges on top and bottom like a ticket
+ */
+@Composable
+fun VoucherCard(
+    voucher: Voucher,
+    modifier: Modifier = Modifier
+) {
+    val dashedLineColor = LessTheme.colors.textIconsBrand
+    val backgroundColor = LessTheme.colors.backgroundPrimary
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(VoucherTicketShape())
+            .background(backgroundColor)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = LessTheme.spacing.medium)
+                .padding(top = LessTheme.spacing.large, bottom = LessTheme.spacing.large)
+        ) {
+            // Title
+            Text(
+                text = voucher.title,
+                style = LessTheme.typography.body16Semibold,
+                color = LessTheme.colors.textIconsBlack
+            )
+
+            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
+
+            // Voucher amount row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Vaucher amount:",
+                    style = LessTheme.typography.body14Medium,
+                    color = LessTheme.colors.textIconsGrey
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = voucher.amount,
+                        style = LessTheme.typography.body14Semibold,
+                        color = LessTheme.colors.textIconsBlack
+                    )
+                    Text(
+                        text = "₼",
+                        style = LessTheme.typography.body14Semibold,
+                        color = LessTheme.colors.textIconsBlack
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
+
+            // Expiry date row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Expare day:",
+                    style = LessTheme.typography.body14Medium,
+                    color = LessTheme.colors.textIconsGrey
+                )
+                Text(
+                    text = voucher.expiryDate,
+                    style = LessTheme.typography.body14Semibold,
+                    color = LessTheme.colors.textIconsBlack
+                )
+            }
+
+            Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
+
+            // Dashed separator line
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .drawBehind {
+                        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f), 0f)
+                        drawLine(
+                            color = dashedLineColor,
+                            start = Offset(0f, 0f),
+                            end = Offset(size.width, 0f),
+                            strokeWidth = 2f,
+                            pathEffect = pathEffect
+                        )
+                    }
+            )
+
+            Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
+
+            // Loyalty Code section
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(LessTheme.radius.small))
+                    .border(
+                        width = 1.dp,
+                        color = LessTheme.colors.backgroundSecond,
+                        shape = RoundedCornerShape(LessTheme.radius.small)
+                    )
+                    .padding(vertical = LessTheme.spacing.small),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Loyalty Code",
+                    style = LessTheme.typography.caption12Medium,
+                    color = LessTheme.colors.textIconsGrey
+                )
+                Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
+                Text(
+                    text = voucher.loyaltyCode,
+                    style = LessTheme.typography.body16Semibold,
+                    color = LessTheme.colors.textIconsBlack
+                )
+            }
+        }
+    }
+}

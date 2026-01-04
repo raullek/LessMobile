@@ -2,7 +2,6 @@ package az.less.mobile.presentation.merchant.places.edit
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,15 +23,19 @@ import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
-import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.CellType
+import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsCell
-import az.less.mobile.navigation.MerchantScreens
+import az.less.mobile.navigation.MerchantRoute
+import az.less.mobile.presentation.merchant.places.edit.components.EditBranchAdditionalSections
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchDetailsBottomSheet
+import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileContactSection
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileHeroSection
 import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileInfoSection
-import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantProfileContactSection
 import az.less.mobile.presentation.merchant.places.edit.components.EditPhoneNumberBottomSheet
+import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
+import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -90,9 +92,10 @@ fun EditMerchantProfileScreen(
             }
             is EditMerchantProfileSideEffect.NavigateToLocationPicker -> {
                 navController.navigate(
-                    MerchantScreens.SelectBranchLocation.createRoute(
+                    MerchantRoute.SelectBranchLocation(
                         latitude = sideEffect.latitude,
-                        longitude = sideEffect.longitude
+                        longitude = sideEffect.longitude,
+                        address = sideEffect.address
                     )
                 )
             }
@@ -100,7 +103,7 @@ fun EditMerchantProfileScreen(
                 // Show error snackbar
             }
             is EditMerchantProfileSideEffect.BranchCreated -> {
-                navController.navigate(MerchantScreens.BranchVerification.route)
+                navController.navigate(MerchantRoute.BranchVerification)
             }
             is EditMerchantProfileSideEffect.BranchUpdated -> {
                 navController.popBackStack()
@@ -129,6 +132,76 @@ fun EditMerchantProfileScreenContent(
     // Bottom sheet states
     val editMerchDetailsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val editPhoneNumberSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+
+    // Venue Image Picker
+    Box {
+        if (state.showVenueImagePicker) {
+            GalleryPickerLauncher(
+                onPhotosSelected = { photos ->
+                    photos.firstOrNull()?.let { photo ->
+                        coroutineScope.launch {
+                            val bytes = photo.loadBytes()
+                            if (bytes != null) {
+                                onIntent(EditMerchantProfileIntent.OnVenueImageSelected(bytes))
+                            } else {
+                                onIntent(EditMerchantProfileIntent.OnVenueImagePickerDismiss)
+                            }
+                        }
+                    } ?: onIntent(EditMerchantProfileIntent.OnVenueImagePickerDismiss)
+                },
+                onError = { onIntent(EditMerchantProfileIntent.OnVenueImagePickerDismiss) },
+                onDismiss = { onIntent(EditMerchantProfileIntent.OnVenueImagePickerDismiss) },
+                allowMultiple = false
+            )
+        }
+    }
+
+    // Logo Picker
+    Box {
+        if (state.showLogoPicker) {
+            GalleryPickerLauncher(
+                onPhotosSelected = { photos ->
+                    photos.firstOrNull()?.let { photo ->
+                        coroutineScope.launch {
+                            val bytes = photo.loadBytes()
+                            if (bytes != null) {
+                                onIntent(EditMerchantProfileIntent.OnLogoSelected(bytes))
+                            } else {
+                                onIntent(EditMerchantProfileIntent.OnLogoPickerDismiss)
+                            }
+                        }
+                    } ?: onIntent(EditMerchantProfileIntent.OnLogoPickerDismiss)
+                },
+                onError = { onIntent(EditMerchantProfileIntent.OnLogoPickerDismiss) },
+                onDismiss = { onIntent(EditMerchantProfileIntent.OnLogoPickerDismiss) },
+                allowMultiple = false
+            )
+        }
+    }
+
+    // Lots Image Picker
+    Box {
+        if (state.showLotsImagePicker) {
+            GalleryPickerLauncher(
+                onPhotosSelected = { photos ->
+                    photos.firstOrNull()?.let { photo ->
+                        coroutineScope.launch {
+                            val bytes = photo.loadBytes()
+                            if (bytes != null) {
+                                onIntent(EditMerchantProfileIntent.OnLotsImageSelected(bytes))
+                            } else {
+                                onIntent(EditMerchantProfileIntent.OnLotsImagePickerDismiss)
+                            }
+                        }
+                    } ?: onIntent(EditMerchantProfileIntent.OnLotsImagePickerDismiss)
+                },
+                onError = { onIntent(EditMerchantProfileIntent.OnLotsImagePickerDismiss) },
+                onDismiss = { onIntent(EditMerchantProfileIntent.OnLotsImagePickerDismiss) },
+                allowMultiple = false
+            )
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -144,6 +217,8 @@ fun EditMerchantProfileScreenContent(
                 EditMerchantProfileHeroSection(
                     venueImageUrl = state.venueImageUrl,
                     logoUrl = state.logoUrl,
+                    venueImageBytes = state.venueImageBytes,
+                    logoImageBytes = state.logoImageBytes,
                     onBackClick = { onIntent(EditMerchantProfileIntent.OnBackClick) },
                     onVenueImageEditClick = { onIntent(EditMerchantProfileIntent.OnVenueImageEditClick) },
                     onLogoEditClick = { onIntent(EditMerchantProfileIntent.OnLogoEditClick) }
@@ -167,6 +242,17 @@ fun EditMerchantProfileScreenContent(
                     location = state.location,
                     onPhoneEditClick = { onIntent(EditMerchantProfileIntent.OnPhoneEditClick) },
                     onLocationEditClick = { onIntent(EditMerchantProfileIntent.OnLocationEditClick) }
+                )
+            }
+
+            // Default Box Description and Add for Lots Sections
+            item(key = "additional_sections") {
+                EditBranchAdditionalSections(
+                    defaultBoxDescription = state.defaultBoxDescription,
+                    lotsImageUrl = state.lotsImageUrl,
+                    lotsImageBytes = state.lotsImageBytes,
+                    onDefaultBoxDescriptionChanged = { onIntent(EditMerchantProfileIntent.OnDefaultBoxDescriptionChanged(it)) },
+                    onLotsEditClick = { onIntent(EditMerchantProfileIntent.OnLotsEditClick) }
                 )
             }
 

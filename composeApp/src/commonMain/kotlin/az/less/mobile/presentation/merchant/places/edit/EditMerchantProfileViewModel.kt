@@ -65,6 +65,12 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
             is EditMerchantProfileIntent.OnEditPhoneNumberClick -> handleEditPhoneNumberClick()
             is EditMerchantProfileIntent.OnEditPhoneNumberBottomSheetDismiss -> handleEditPhoneNumberBottomSheetDismiss()
             is EditMerchantProfileIntent.OnEditPhoneNumberSave -> handleEditPhoneNumberSave(intent.phoneNumber)
+            is EditMerchantProfileIntent.OnVenueImageSelected -> handleVenueImageSelected(intent.imageBytes)
+            is EditMerchantProfileIntent.OnLogoSelected -> handleLogoSelected(intent.imageBytes)
+            is EditMerchantProfileIntent.OnLotsImageSelected -> handleLotsImageSelected(intent.imageBytes)
+            is EditMerchantProfileIntent.OnVenueImagePickerDismiss -> handleVenueImagePickerDismiss()
+            is EditMerchantProfileIntent.OnLogoPickerDismiss -> handleLogoPickerDismiss()
+            is EditMerchantProfileIntent.OnLotsImagePickerDismiss -> handleLotsImagePickerDismiss()
         }
     }
 
@@ -73,11 +79,27 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
     }
 
     private fun handleVenueImageEditClick() = intent {
-        postSideEffect(EditMerchantProfileSideEffect.NavigateToImagePicker)
+        reduce { state.copy(showVenueImagePicker = true) }
     }
 
     private fun handleLogoEditClick() = intent {
-        postSideEffect(EditMerchantProfileSideEffect.NavigateToLogoPicker)
+        reduce { state.copy(showLogoPicker = true) }
+    }
+
+    private fun handleVenueImageSelected(imageBytes: ByteArray) = intent {
+        reduce { state.copy(venueImageBytes = imageBytes, showVenueImagePicker = false) }
+    }
+
+    private fun handleLogoSelected(imageBytes: ByteArray) = intent {
+        reduce { state.copy(logoImageBytes = imageBytes, showLogoPicker = false) }
+    }
+
+    private fun handleVenueImagePickerDismiss() = intent {
+        reduce { state.copy(showVenueImagePicker = false) }
+    }
+
+    private fun handleLogoPickerDismiss() = intent {
+        reduce { state.copy(showLogoPicker = false) }
     }
 
     private fun handleNameEditClick() = intent {
@@ -92,7 +114,8 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
         postSideEffect(
             EditMerchantProfileSideEffect.NavigateToLocationPicker(
                 latitude = state.locationLatitude,
-                longitude = state.locationLongitude
+                longitude = state.locationLongitude,
+                address = state.location
             )
         )
     }
@@ -108,7 +131,15 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
     }
 
     private fun handleLotsEditClick() = intent {
-        postSideEffect(EditMerchantProfileSideEffect.NavigateToLotsPicker)
+        reduce { state.copy(showLotsImagePicker = true) }
+    }
+
+    private fun handleLotsImageSelected(imageBytes: ByteArray) = intent {
+        reduce { state.copy(lotsImageBytes = imageBytes, showLotsImagePicker = false) }
+    }
+
+    private fun handleLotsImagePickerDismiss() = intent {
+        reduce { state.copy(showLotsImagePicker = false) }
     }
 
     private fun handleVenueNameChanged(name: String) = intent {

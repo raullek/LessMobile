@@ -7,6 +7,8 @@ data class EditMerchantProfileState(
     val branchId: String? = null, // null for new branch, non-null for editing
     val venueImageUrl: String? = null,
     val logoUrl: String? = null,
+    val venueImageBytes: ByteArray? = null, // Selected venue image bytes
+    val logoImageBytes: ByteArray? = null, // Selected logo image bytes
     val venueName: String = "",
     val description: String = "",
     val phoneNumber: String = "",
@@ -15,13 +17,84 @@ data class EditMerchantProfileState(
     val locationLongitude: Double? = null,
     val defaultBoxDescription: String = "",
     val lotsImageUrl: String? = null,
+    val lotsImageBytes: ByteArray? = null, // Selected lots image bytes
     val manageFromEmail: Boolean = false,
     val isLoading: Boolean = false,
     // Edit Merch Details Bottom Sheet state
     val isEditMerchDetailsBottomSheetVisible: Boolean = false,
     // Edit Phone Number Bottom Sheet state
-    val isEditPhoneNumberBottomSheetVisible: Boolean = false
-)
+    val isEditPhoneNumberBottomSheetVisible: Boolean = false,
+    // Image Picker state
+    val showVenueImagePicker: Boolean = false,
+    val showLogoPicker: Boolean = false,
+    val showLotsImagePicker: Boolean = false
+
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as EditMerchantProfileState
+
+        if (branchId != other.branchId) return false
+        if (venueImageUrl != other.venueImageUrl) return false
+        if (logoUrl != other.logoUrl) return false
+        if (venueImageBytes != null) {
+            if (other.venueImageBytes == null) return false
+            if (!venueImageBytes.contentEquals(other.venueImageBytes)) return false
+        } else if (other.venueImageBytes != null) return false
+        if (logoImageBytes != null) {
+            if (other.logoImageBytes == null) return false
+            if (!logoImageBytes.contentEquals(other.logoImageBytes)) return false
+        } else if (other.logoImageBytes != null) return false
+        if (venueName != other.venueName) return false
+        if (description != other.description) return false
+        if (phoneNumber != other.phoneNumber) return false
+        if (location != other.location) return false
+        if (locationLatitude != other.locationLatitude) return false
+        if (locationLongitude != other.locationLongitude) return false
+        if (defaultBoxDescription != other.defaultBoxDescription) return false
+        if (lotsImageUrl != other.lotsImageUrl) return false
+        if (lotsImageBytes != null) {
+            if (other.lotsImageBytes == null) return false
+            if (!lotsImageBytes.contentEquals(other.lotsImageBytes)) return false
+        } else if (other.lotsImageBytes != null) return false
+        if (manageFromEmail != other.manageFromEmail) return false
+        if (isLoading != other.isLoading) return false
+        if (isEditMerchDetailsBottomSheetVisible != other.isEditMerchDetailsBottomSheetVisible) return false
+        if (isEditPhoneNumberBottomSheetVisible != other.isEditPhoneNumberBottomSheetVisible) return false
+        if (showVenueImagePicker != other.showVenueImagePicker) return false
+        if (showLogoPicker != other.showLogoPicker) return false
+        if (showLotsImagePicker != other.showLotsImagePicker) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = branchId?.hashCode() ?: 0
+        result = 31 * result + (venueImageUrl?.hashCode() ?: 0)
+        result = 31 * result + (logoUrl?.hashCode() ?: 0)
+        result = 31 * result + (venueImageBytes?.contentHashCode() ?: 0)
+        result = 31 * result + (logoImageBytes?.contentHashCode() ?: 0)
+        result = 31 * result + venueName.hashCode()
+        result = 31 * result + description.hashCode()
+        result = 31 * result + phoneNumber.hashCode()
+        result = 31 * result + location.hashCode()
+        result = 31 * result + (locationLatitude?.hashCode() ?: 0)
+        result = 31 * result + (locationLongitude?.hashCode() ?: 0)
+        result = 31 * result + defaultBoxDescription.hashCode()
+        result = 31 * result + (lotsImageUrl?.hashCode() ?: 0)
+        result = 31 * result + (lotsImageBytes?.contentHashCode() ?: 0)
+        result = 31 * result + manageFromEmail.hashCode()
+        result = 31 * result + isLoading.hashCode()
+        result = 31 * result + isEditMerchDetailsBottomSheetVisible.hashCode()
+        result = 31 * result + isEditPhoneNumberBottomSheetVisible.hashCode()
+        result = 31 * result + showVenueImagePicker.hashCode()
+        result = 31 * result + showLogoPicker.hashCode()
+        result = 31 * result + showLotsImagePicker.hashCode()
+        return result
+    }
+}
 
 /**
  * Side Effects for navigation and one-time events
@@ -31,7 +104,7 @@ sealed interface EditMerchantProfileSideEffect {
     data object NavigateToImagePicker : EditMerchantProfileSideEffect
     data object NavigateToLogoPicker : EditMerchantProfileSideEffect
     data object NavigateToLotsPicker : EditMerchantProfileSideEffect
-    data class NavigateToLocationPicker(val latitude: Double?, val longitude: Double?) : EditMerchantProfileSideEffect
+    data class NavigateToLocationPicker(val latitude: Double?, val longitude: Double?, val address: String?) : EditMerchantProfileSideEffect
     data class ShowError(val message: String) : EditMerchantProfileSideEffect
     data object BranchCreated : EditMerchantProfileSideEffect
     data object BranchUpdated : EditMerchantProfileSideEffect
@@ -64,5 +137,12 @@ sealed interface EditMerchantProfileIntent {
     data object OnEditPhoneNumberClick : EditMerchantProfileIntent
     data object OnEditPhoneNumberBottomSheetDismiss : EditMerchantProfileIntent
     data class OnEditPhoneNumberSave(val phoneNumber: String) : EditMerchantProfileIntent
+    // Image Picker
+    data class OnVenueImageSelected(val imageBytes: ByteArray) : EditMerchantProfileIntent
+    data class OnLogoSelected(val imageBytes: ByteArray) : EditMerchantProfileIntent
+    data class OnLotsImageSelected(val imageBytes: ByteArray) : EditMerchantProfileIntent
+    data object OnVenueImagePickerDismiss : EditMerchantProfileIntent
+    data object OnLogoPickerDismiss : EditMerchantProfileIntent
+    data object OnLotsImagePickerDismiss : EditMerchantProfileIntent
 }
 

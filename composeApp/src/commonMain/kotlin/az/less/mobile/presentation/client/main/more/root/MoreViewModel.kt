@@ -2,10 +2,13 @@ package az.less.mobile.presentation.client.main.more.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.data.repository.UserRepository
 import az.less.mobile.presentation.client.main.more.root.models.CellId
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellModel
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellType
 import az.less.mobile.presentation.client.main.more.root.models.MoreSection
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_account_24dp
 import lessmobile.composeapp.generated.resources.ic_bubble_question_24dp
@@ -22,16 +25,51 @@ import org.orbitmvi.orbit.container
 /**
  * ViewModel for More Screen using Orbit MVI
  */
-class MoreViewModel : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
+class MoreViewModel(
+    private val userRepository: UserRepository
+) : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
 
     override val container: Container<MoreState, MoreSideEffect> =
         viewModelScope.container(MoreState())
 
     init {
-        // Initialize with non-authenticated sections
-        intent {
-            reduce {
-                state.copy(sections = buildNonAuthSections(state.notificationEnabled))
+        observeUserState()
+    }
+
+    private fun observeUserState() {
+        viewModelScope.launch {
+            userRepository.currentUser.collectLatest { user ->
+                intent {
+                    if (user != null) {
+                        reduce {
+                            state.copy(
+                                isLoggedIn = true,
+                                userName = user.name,
+                                userEmail = user.email,
+                                userAvatarUrl = user.avatarUrl,
+                                co2Saved = user.co2Saved,
+                                moneySaved = user.moneySaved,
+                                ecoHeroTitle = "Eco-hero",
+                                ecoHeroDescription = "You saved 2 meals!",
+                                sections = buildAuthSections(state.notificationEnabled)
+                            )
+                        }
+                    } else {
+                        reduce {
+                            state.copy(
+                                isLoggedIn = false,
+                                userName = null,
+                                userEmail = null,
+                                userAvatarUrl = null,
+                                co2Saved = null,
+                                moneySaved = null,
+                                ecoHeroTitle = null,
+                                ecoHeroDescription = null,
+                                sections = buildNonAuthSections(state.notificationEnabled)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -52,39 +90,14 @@ class MoreViewModel : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
     }
 
     private fun handleLoginClicked() = intent {
-        // For now, just simulate login
-        // In real app, navigate to login screen and handle authentication
+        // Navigate to onboarding/login flow
         postSideEffect(MoreSideEffect.NavigateToLogin)
-
-        // Mock login success - in real app this would come from auth repository
-        reduce {
-            state.copy(
-                isLoggedIn = true,
-                userName = "Maqa",
-                userEmail = "Maqa@gmail.com",
-                co2Saved = "60 kg",
-                moneySaved = "$120",
-                ecoHeroTitle = "Эко-герой",
-                ecoHeroDescription = "Вы спасли 2 приёмов пищи!",
-                sections = buildAuthSections(state.notificationEnabled)
-            )
-        }
     }
 
     private fun handleLogoutClicked() = intent {
-        reduce {
-            state.copy(
-                isLoggedIn = false,
-                userName = null,
-                userEmail = null,
-                userAvatarUrl = null,
-                co2Saved = null,
-                moneySaved = null,
-                ecoHeroTitle = null,
-                ecoHeroDescription = null,
-                sections = buildNonAuthSections(state.notificationEnabled)
-            )
-        }
+        // Clear user data from DataStore
+        userRepository.clearUser()
+        // State will be updated automatically via observeUserState()
     }
 
     private fun handleCellClick(cellId: CellId) = intent {

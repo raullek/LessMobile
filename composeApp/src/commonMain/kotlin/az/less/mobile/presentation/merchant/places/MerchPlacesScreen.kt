@@ -27,7 +27,7 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsToolBar
-import az.less.mobile.navigation.MerchantScreens
+import az.less.mobile.navigation.MerchantRoute
 import az.less.mobile.presentation.merchant.places.components.BranchCard
 import az.less.mobile.presentation.merchant.places.components.PlacesEmptyState
 import org.koin.compose.viewmodel.koinViewModel
@@ -52,10 +52,10 @@ fun MerchPlacesScreen(
                 navController.popBackStack()
             }
             is MerchPlacesSideEffect.NavigateToEditBranch -> {
-                navController.navigate(MerchantScreens.EditMerchantProfile.createRoute(sideEffect.branchId))
+                navController.navigate(MerchantRoute.EditProfile(branchId = sideEffect.branchId))
             }
             is MerchPlacesSideEffect.NavigateToAddBranch -> {
-                navController.navigate(MerchantScreens.AddBranch.route)
+                navController.navigate(MerchantRoute.EditProfile())
             }
             is MerchPlacesSideEffect.ShowError -> {
                 // Show error snackbar or dialog

@@ -38,8 +38,9 @@ fun LoginCodeScreen(
             }
 
             is LoginCodeSideEffect.NavigateNext -> {
-                // TODO: Navigate to next screen (e.g., password screen or home)
-                // navController.navigate("home")
+                // Navigate back to More screen after successful login
+                // Pop back to the root of the flow (More screen)
+                navController.popBackStack("more", inclusive = false)
             }
 
             is LoginCodeSideEffect.ShowError -> {

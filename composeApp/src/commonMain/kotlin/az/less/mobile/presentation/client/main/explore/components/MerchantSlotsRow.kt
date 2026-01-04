@@ -59,22 +59,24 @@ fun MerchantSlotsRow(
                 "Pick up from ${slot.pickupTime}"
             }
             
-            val offerItem =
-                _root_ide_package_.az.less.mobile.presentation.client.main.offers.models.OfferItem(
-                    id = slot.id,
-                    title = slot.title,
-                    imageUrl = slot.imageUrl,
-                    imageBgColor = "#fff2eb",
-                    originalPrice = "", // No original price for slots
-                    currentPrice = slot.price,
-                    restaurantName = merchantName,
-                    restaurantLogoUrl = null,
-                    pickupTime = formattedPickupTime,
-                    rating = 4.5f, // Default rating (can be enhanced later)
-                    distance = "" // Distance not available for slots
-                )
+            val offerItem = OfferItem(
+                id = slot.id,
+                title = slot.title,
+                imageUrl = slot.imageUrl,
+                imageBgColor = "#fff2eb",
+                originalPrice = "", // No original price for slots
+                currentPrice = slot.price,
+                bagType = "Surprise Bag",
+                category = "Mixed",
+                restaurantName = merchantName,
+                restaurantLogoUrl = null,
+                pickupTime = formattedPickupTime,
+                rating = 4.5f, // Default rating (can be enhanced later)
+                distance = "", // Distance not available for slots
+                itemsLeft = 0
+            )
 
-            _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.OfferCard(
+            OfferCard(
                 offerItem = offerItem,
                 onClick = { onSlotClick(slot.id) }
             )

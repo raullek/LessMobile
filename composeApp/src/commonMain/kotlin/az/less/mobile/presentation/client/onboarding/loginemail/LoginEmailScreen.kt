@@ -39,7 +39,7 @@ fun LoginEmailScreen(
             }
 
             is LoginEmailSideEffect.NavigateNext -> {
-                navController.navigate(MoreScreens.LoginCode.route)
+                navController.navigate(MoreScreens.LoginCode.createRoute(state.email))
             }
 
             is LoginEmailSideEffect.ShowError -> {

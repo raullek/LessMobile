@@ -2,10 +2,8 @@ package az.less.mobile.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import androidx.savedstate.read
+import androidx.navigation.toRoute
 import az.less.mobile.presentation.merchant.add.addlot.AddLotScreen
 import az.less.mobile.presentation.merchant.history.IncomeHistoryScreen
 import az.less.mobile.presentation.merchant.more.MerchMoreScreen
@@ -17,162 +15,143 @@ import az.less.mobile.presentation.merchant.places.edit.branchusers.BranchUsersS
 import az.less.mobile.presentation.merchant.places.edit.branchusers.addbranchuser.AddBranchUserScreen
 import az.less.mobile.presentation.merchant.places.edit.selectlocation.InputAddressScreen
 import az.less.mobile.presentation.merchant.places.edit.selectlocation.SelectBranchLocationOnMapScreen
+import kotlinx.serialization.Serializable
+import kotlin.reflect.KClass
 
 /**
- * Merchant flow screens
+ * Merchant flow screens - Type-safe navigation routes
  */
+sealed interface MerchantRoute {
 
-sealed class MerchantScreens(val route: String) {
-    data object More : MerchantScreens("merchantMore")
-    data object Orders : MerchantScreens("merchantOrders")
-    data object AddLot : MerchantScreens("merchantAddLot")
-    data object History : MerchantScreens("merchantHistory")
-    data object Places : MerchantScreens("merchantPlaces")
-    data object AddBranch : MerchantScreens("merchantAddBranch")
-    data class EditMerchantProfile(val branchId: String) : MerchantScreens("merchantEditMerchantProfile/{branchId}") {
-        companion object {
-            fun createRoute(branchId: String?) = if (branchId != null) "merchantEditMerchantProfile/$branchId" else "merchantAddBranch"
-        }
-    }
-    data object BranchVerification : MerchantScreens("branchVerification")
-    data object BranchUsers : MerchantScreens("branchUsers")
-    data object AddBranchUser : MerchantScreens("addBranchUser/{userNumber}?user={user}") {
-        /** Create route for adding new user */
-        fun createRoute(userNumber: Int) = "addBranchUser/$userNumber"
-        /** Create route for editing existing user with serialized user data */
-        fun createEditRoute(userNumber: Int, userJson: String) = "addBranchUser/$userNumber?user=$userJson"
-    }
-    data object SelectBranchLocation : MerchantScreens("selectBranchLocation?lat={lat}&lng={lng}") {
-        fun createRoute(latitude: Double? = null, longitude: Double? = null): String {
-            return if (latitude != null && longitude != null) {
-                "selectBranchLocation?lat=$latitude&lng=$longitude"
-            } else {
-                "selectBranchLocation"
-            }
-        }
-    }
-    data object InputAddress : MerchantScreens("inputAddress")
+    // Bottom navigation routes
+    @Serializable
+    data object More : MerchantRoute
+
+    @Serializable
+    data object Orders : MerchantRoute
+
+    @Serializable
+    data object AddLot : MerchantRoute
+
+    @Serializable
+    data object History : MerchantRoute
+
+    // Places flow
+    @Serializable
+    data object Places : MerchantRoute
+
+    @Serializable
+    data class EditProfile(val branchId: String? = null) : MerchantRoute
+
+    @Serializable
+    data object BranchVerification : MerchantRoute
+
+    @Serializable
+    data object BranchUsers : MerchantRoute
+
+    @Serializable
+    data class AddBranchUser(
+        val userNumber: Int,
+        val user: String? = null
+    ) : MerchantRoute
+
+    // Location selection flow
+    @Serializable
+    data class SelectBranchLocation(
+        val latitude: Double? = null,
+        val longitude: Double? = null,
+        val address: String? = null
+    ) : MerchantRoute
+
+    @Serializable
+    data object InputAddress : MerchantRoute
 }
 
 /**
  * Merchant navigation graph
- * Contains all merchant-related screens (MerchMore, etc.)
+ * Contains all merchant-related screens
  */
 fun NavGraphBuilder.merchantGraph(
     rootNavController: NavController,
     navController: NavController
 ) {
-        composable(MerchantScreens.More.route) {
-            MerchMoreScreen(navController = navController, navigateToClientFlow = {
+    // Bottom navigation screens
+    composable<MerchantRoute.More> {
+        MerchMoreScreen(
+            navController = navController,
+            navigateToClientFlow = {
                 rootNavController.navigate(ROOT_CLIENT)
-            })
-        }
-        composable(MerchantScreens.Orders.route) {
-            MerchOrdersScreen(navController = navController)
-        }
-        composable(MerchantScreens.AddLot.route) {
-            AddLotScreen(navController = navController)
-        }
-        composable(MerchantScreens.History.route) {
-            IncomeHistoryScreen(navController = navController)
-        }
-        composable(MerchantScreens.Places.route) {
-            MerchPlacesScreen(navController = navController)
-        }
-        composable(MerchantScreens.AddBranch.route) {
-            EditMerchantProfileScreen(
-                branchId = null,
-                navController = navController
-            )
-        }
-        composable(
-            route = "merchantEditMerchantProfile/{branchId}",
-            arguments = listOf(
-                navArgument("branchId") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val branchId = backStackEntry.arguments?.read { getString("branchId") }
-            EditMerchantProfileScreen(
-                branchId = branchId,
-                navController = navController
-            )
-        }
-        composable(MerchantScreens.BranchVerification.route) {
-            BranchVerificationScreen(
-                navController = navController,
-                onAddUsersClicked = {
-                    navController.navigate(MerchantScreens.BranchUsers.route)
-                },
-                onHomeClicked = {
-                    navController.popBackStack(MerchantScreens.More.route, inclusive = false)
-                }
-            )
-        }
-        composable(MerchantScreens.BranchUsers.route) {
-            BranchUsersScreen(navController = navController)
-        }
-        composable(
-            route = MerchantScreens.AddBranchUser.route,
-            arguments = listOf(
-                navArgument("userNumber") { type = NavType.IntType },
-                navArgument("user") {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) {
-            AddBranchUserScreen(navController = navController)
-        }
-        composable(
-            route = MerchantScreens.SelectBranchLocation.route,
-            arguments = listOf(
-                navArgument("lat") {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                },
-                navArgument("lng") {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) { backStackEntry ->
-            val latString = backStackEntry.arguments?.getString("lat")
-            val lngString = backStackEntry.arguments?.getString("lng")
-            val latitude = latString?.toDoubleOrNull()
-            val longitude = lngString?.toDoubleOrNull()
+            }
+        )
+    }
 
-            SelectBranchLocationOnMapScreen(
-                initialLatitude = latitude,
-                initialLongitude = longitude,
-                navController = navController,
-                onLocationSelected = { lat, lng, address ->
-                    // Pass result back to previous screen via SavedStateHandle
-                    navController.previousBackStackEntry?.savedStateHandle?.set("selected_latitude", lat)
-                    navController.previousBackStackEntry?.savedStateHandle?.set("selected_longitude", lng)
-                    navController.previousBackStackEntry?.savedStateHandle?.set("selected_address", address)
-                }
-            )
-        }
-        composable(MerchantScreens.InputAddress.route) {
-            InputAddressScreen(
-                navController = navController,
-                onAddressSelected = { address, lat, lng ->
-                    // Pass result back to SelectBranchLocation screen via SavedStateHandle
-                    navController.previousBackStackEntry?.savedStateHandle?.set("input_address", address)
-                    navController.previousBackStackEntry?.savedStateHandle?.set("input_latitude", lat)
-                    navController.previousBackStackEntry?.savedStateHandle?.set("input_longitude", lng)
-                }
-            )
-        }
+    composable<MerchantRoute.Orders> {
+        MerchOrdersScreen(navController = navController)
+    }
+
+    composable<MerchantRoute.AddLot> {
+        AddLotScreen(navController = navController)
+    }
+
+    composable<MerchantRoute.History> {
+        IncomeHistoryScreen(navController = navController)
+    }
+
+    // Places flow screens
+    composable<MerchantRoute.Places> {
+        MerchPlacesScreen(navController = navController)
+    }
+
+    composable<MerchantRoute.EditProfile> { backStackEntry ->
+        val args = backStackEntry.toRoute<MerchantRoute.EditProfile>()
+        EditMerchantProfileScreen(
+            branchId = args.branchId,
+            navController = navController
+        )
+    }
+
+    composable<MerchantRoute.BranchVerification> {
+        BranchVerificationScreen(
+            navController = navController,
+            onAddUsersClicked = {
+                navController.navigate(MerchantRoute.BranchUsers)
+            },
+            onHomeClicked = {
+                navController.popBackStack<MerchantRoute.More>(inclusive = false)
+            }
+        )
+    }
+
+    composable<MerchantRoute.BranchUsers> {
+        BranchUsersScreen(navController = navController)
+    }
+
+    composable<MerchantRoute.AddBranchUser> {
+        AddBranchUserScreen(navController = navController)
+    }
+
+    // Location selection flow screens
+    composable<MerchantRoute.SelectBranchLocation> { backStackEntry ->
+        val args = backStackEntry.toRoute<MerchantRoute.SelectBranchLocation>()
+        SelectBranchLocationOnMapScreen(
+            initialLatitude = args.latitude,
+            initialLongitude = args.longitude,
+            initialAddress = args.address,
+            navController = navController,
+        )
+    }
+
+    composable<MerchantRoute.InputAddress> {
+        InputAddressScreen(navController = navController)
+    }
 }
 
-
-val merchantHomeRoutes = listOf(
-    MerchantScreens.More.route,
-    MerchantScreens.Orders.route,
-    MerchantScreens.AddLot.route,
-    MerchantScreens.History.route,
+/**
+ * Home routes for bottom navigation visibility check
+ */
+val merchantHomeRoutes: List<KClass<out MerchantRoute>> = listOf(
+    MerchantRoute.More::class,
+    MerchantRoute.Orders::class,
+    MerchantRoute.AddLot::class,
+    MerchantRoute.History::class,
 )

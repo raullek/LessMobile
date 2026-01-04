@@ -77,12 +77,16 @@ fun AppClientBottomNavigation(
                     isSelected = isSelected,
                     onClick = {
                         if (currentRoute != item.route) {
+                            val isLeavingExplore = currentRoute == HomeScreens.Explore.route
+                            val isGoingToExplore = item.route == HomeScreens.Explore.route
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    // Don't save Explore's state when leaving it
+                                    saveState = !isLeavingExplore
                                 }
                                 launchSingleTop = true
-                                restoreState = true
+                                // Don't restore Explore's state when going to it
+                                restoreState = !isGoingToExplore
                             }
                         }
                     }

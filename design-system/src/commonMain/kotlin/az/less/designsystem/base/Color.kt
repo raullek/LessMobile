@@ -100,7 +100,7 @@ object LightColors {
     val BackgroundSecond = Color(0xFFF5F7F7)
     val BackgroundBrand = Color(0xFFFCFFF9)
     val ElementsPrimaryElement = Color(0xFFFFFFFF)
-    val ElementsSecondaryElement = Color(0xFFF4F7F6)
+    val ElementsSecondaryElement = Color(0xFFF2F2F2)
     val ElementsPrimaryBrand = Color(0xFF31BC5C)
     val ElementsSecondaryBrand = Color(0xFFE0FCC0)
     val ElementPressedPrimaryBrand = Color(0xFF2D7043)
@@ -110,6 +110,7 @@ object LightColors {
     val TextIconsWarning = Color(0xFFFF8E1C)
     val TextIconsInfo = Color(0xFF337DB6)
     val SurfaceError = Color(0xFFFFF4F4)
+    val SurfaceSuccess = Color(0xFFF4FFF7)
     val SurfaceWhite = Color(0xFFFFFFFF)
     val SurfaceInfo = Color(0xFFF4FDFF)
     val ElementsThirdElement = Color(0xFFC6CAC7)
@@ -143,6 +144,7 @@ object DarkColors {
     val TextIconsWarning = Color(0xFFFF8E1C)
     val TextIconsInfo = Color(0xFF337DB6)
     val SurfaceError = Color(0xFF281010)
+    val SurfaceSuccess = Color(0xFF082F12)
     val SurfaceWhite = Color(0xFF171A1C)
     val SurfaceInfo = Color(0xFF102228)
     val ElementsThirdElement = Color(0xFF343B37)
@@ -175,6 +177,7 @@ data class ColorTokens(
     val textIconsWarning: Color,
     val textIconsInfo: Color,
     val surfaceError: Color,
+    val surfaceSuccess: Color,
     val surfaceWhite: Color,
     val surfaceInfo: Color,
     val elementsThirdElement: Color,
@@ -205,6 +208,7 @@ val LightPalette = ColorTokens(
     textIconsWarning = LightColors.TextIconsWarning,
     textIconsInfo = LightColors.TextIconsInfo,
     surfaceError = LightColors.SurfaceError,
+    surfaceSuccess = LightColors.SurfaceSuccess,
     surfaceWhite = LightColors.SurfaceWhite,
     surfaceInfo = LightColors.SurfaceInfo,
     elementsThirdElement = LightColors.ElementsThirdElement,
@@ -235,6 +239,7 @@ val DarkPalette = ColorTokens(
     textIconsWarning = DarkColors.TextIconsWarning,
     textIconsInfo = DarkColors.TextIconsInfo,
     surfaceError = DarkColors.SurfaceError,
+    surfaceSuccess = DarkColors.SurfaceSuccess,
     surfaceWhite = DarkColors.SurfaceWhite,
     surfaceInfo = DarkColors.SurfaceInfo,
     elementsThirdElement = DarkColors.ElementsThirdElement,

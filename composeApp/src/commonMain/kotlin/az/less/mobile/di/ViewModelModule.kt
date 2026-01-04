@@ -10,6 +10,7 @@ import az.less.mobile.presentation.client.main.offers.OffersViewModel
 import az.less.mobile.presentation.client.main.orders.OrdersViewModel
 import az.less.mobile.presentation.client.main.saved.SavedViewModel
 import az.less.mobile.presentation.client.main.search.SearchViewModel
+import az.less.mobile.presentation.client.main.voucher.VoucherViewModel
 import az.less.mobile.presentation.client.onboarding.loginemail.LoginEmailViewModel
 import az.less.mobile.presentation.client.onboarding.otp.LoginCodeViewModel
 import az.less.mobile.presentation.client.reserve.ReserveViewModel
@@ -52,6 +53,7 @@ val viewModelModule = module {
     viewModelOf(::LoginCodeViewModel)
     viewModelOf(::CategoryOffersViewModel)
     viewModelOf(::MerchantProfileViewModel)
+    viewModelOf(::VoucherViewModel)
 }
 
 

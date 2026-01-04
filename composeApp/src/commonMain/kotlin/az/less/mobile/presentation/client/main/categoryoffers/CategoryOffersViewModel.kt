@@ -133,10 +133,13 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 imageBgColor = "#fff2eb",
                 originalPrice = "15.99",
                 currentPrice = "12.99",
+                bagType = "Small Bag",
+                category = "Burgers",
                 restaurantName = "Burger House",
                 pickupTime = "Pick up from 17:00 to 23:00",
                 rating = 4.8f,
-                distance = "0.8 km"
+                distance = "0.8 km",
+                itemsLeft = 8
             ),
             OfferItem(
                 id = "2",
@@ -144,10 +147,13 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 imageBgColor = "#fff2eb",
                 originalPrice = "18.99",
                 currentPrice = "14.99",
+                bagType = "Medium Bag",
+                category = "Burgers",
                 restaurantName = "Burger King",
                 pickupTime = "Pick up from 18:00 to 22:00",
                 rating = 4.6f,
-                distance = "1.2 km"
+                distance = "1.2 km",
+                itemsLeft = 5
             ),
             OfferItem(
                 id = "3",
@@ -155,10 +161,13 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 imageBgColor = "#fff2eb",
                 originalPrice = "13.99",
                 currentPrice = "10.99",
+                bagType = "Small Bag",
+                category = "Vegetarian",
                 restaurantName = "Green Burger",
                 pickupTime = "Pick up from 16:00 to 21:00",
                 rating = 4.9f,
-                distance = "2.1 km"
+                distance = "2.1 km",
+                itemsLeft = 12
             ),
             OfferItem(
                 id = "4",
@@ -166,10 +175,13 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 imageBgColor = "#fff2eb",
                 originalPrice = "19.99",
                 currentPrice = "16.99",
+                bagType = "Large Bag",
+                category = "Burgers",
                 restaurantName = "BBQ Place",
                 pickupTime = "Pick up from 17:30 to 23:30",
                 rating = 4.7f,
-                distance = "1.5 km"
+                distance = "1.5 km",
+                itemsLeft = 3
             ),
             OfferItem(
                 id = "5",
@@ -177,10 +189,13 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 imageBgColor = "#fff2eb",
                 originalPrice = "22.99",
                 currentPrice = "18.99",
+                bagType = "Large Bag",
+                category = "Burgers",
                 restaurantName = "Mega Burger",
                 pickupTime = "Pick up from 19:00 to 23:00",
                 rating = 4.5f,
-                distance = "0.9 km"
+                distance = "0.9 km",
+                itemsLeft = 6
             )
         )
     }

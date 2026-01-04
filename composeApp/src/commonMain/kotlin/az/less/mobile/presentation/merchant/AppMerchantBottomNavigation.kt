@@ -30,14 +30,15 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.navigation.MerchantScreens
+import az.less.mobile.navigation.MerchantRoute
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.ic_explore_24dp
+import lessmobile.composeapp.generated.resources.ic_history_24dp
 import lessmobile.composeapp.generated.resources.ic_more_24dp
-import lessmobile.composeapp.generated.resources.ic_offers_24dp
 import lessmobile.composeapp.generated.resources.ic_orders_24dp
+import lessmobile.composeapp.generated.resources.ic_plus_square_24dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import kotlin.reflect.KClass
 
 @Composable
 fun AppMerchantBottomNavigation(
@@ -69,13 +70,13 @@ fun AppMerchantBottomNavigation(
             verticalAlignment = Alignment.CenterVertically
         ) {
             bottomNavItems.forEach { item ->
-                val isSelected = currentRoute == item.route
+                val isSelected = currentRoute?.contains(item.routeClass.simpleName ?: "") == true
                 BottomNavItem(
                     modifier = Modifier.weight(1f),
                     item = item,
                     isSelected = isSelected,
                     onClick = {
-                        if (currentRoute != item.route) {
+                        if (!isSelected) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
@@ -131,28 +132,33 @@ private fun BottomNavItem(
 private data class BottomNavItemData(
     val icon: DrawableResource,
     val label: String,
-    val route: String
+    val route: Any,
+    val routeClass: KClass<*>
 )
 
 private val bottomNavItems = listOf(
     BottomNavItemData(
-        Res.drawable.ic_offers_24dp,
-        "Orders",
-        MerchantScreens.Orders.route
+        icon = Res.drawable.ic_orders_24dp,
+        label = "Orders",
+        route = MerchantRoute.Orders,
+        routeClass = MerchantRoute.Orders::class
     ),
     BottomNavItemData(
-        Res.drawable.ic_explore_24dp,
-        "Add",
-        MerchantScreens.AddLot.route
+        icon = Res.drawable.ic_plus_square_24dp,
+        label = "Add",
+        route = MerchantRoute.AddLot,
+        routeClass = MerchantRoute.AddLot::class
     ),
     BottomNavItemData(
-        Res.drawable.ic_orders_24dp,
-        "History",
-        MerchantScreens.History.route
+        icon = Res.drawable.ic_history_24dp,
+        label = "History",
+        route = MerchantRoute.History,
+        routeClass = MerchantRoute.History::class
     ),
     BottomNavItemData(
-        Res.drawable.ic_more_24dp,
-        "More",
-        MerchantScreens.More.route
+        icon = Res.drawable.ic_more_24dp,
+        label = "More",
+        route = MerchantRoute.More,
+        routeClass = MerchantRoute.More::class
     )
 )

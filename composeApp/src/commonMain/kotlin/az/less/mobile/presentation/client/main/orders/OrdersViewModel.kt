@@ -34,7 +34,8 @@ class OrdersViewModel : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect
     private fun loadCartItems() = intent {
        reduce {
            state.copy(
-                cartItems = getMockCartItems()
+                cartItems = getMockCartItems(),
+                historyItems = getMockHistoryItems()
             )
         }
     }
@@ -80,59 +81,49 @@ class OrdersViewModel : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect
         return listOf(
             CartItem(
                 id = "1",
-                title = "Mixed donut bag",
+                title = "Small Surprise Bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
                 price = "12.99",
-                reserveNumber = "123456"
+                reserveNumber = "234529"
             ),
             CartItem(
                 id = "2",
                 title = "Mixed donut bag",
+                pickupTime = "Pick up from 14:00 to 18:00",
+                price = "8.50",
+                reserveNumber = "234530"
+            )
+        )
+    }
+
+    private fun getMockHistoryItems(): List<CartItem> {
+        return listOf(
+            CartItem(
+                id = "h1",
+                title = "Small Surprise Bag",
                 pickupTime = "Pick up from 17:00 to 23:00",
                 price = "12.99",
-                reserveNumber = "123456"
+                reserveNumber = "234529",
+                isCompleted = true,
+                completedDate = "12 November"
             ),
             CartItem(
-                id = "3",
+                id = "h2",
                 title = "Mixed donut bag",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99",
-                reserveNumber = "123456"
+                pickupTime = "Pick up from 14:00 to 18:00",
+                price = "8.50",
+                reserveNumber = "234528",
+                isCompleted = true,
+                completedDate = "10 November"
             ),
             CartItem(
-                id = "4",
-                title = "Mixed donut bag",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99",
-                reserveNumber = "123456"
-            ),
-            CartItem(
-                id = "5",
-                title = "Mixed donut bag",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99",
-                reserveNumber = "123456"
-            ),
-            CartItem(
-                id = "6",
-                title = "Mixed donut bag",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99",
-                reserveNumber = "123456"
-            ),
-            CartItem(
-                id = "7",
-                title = "Mixed donut bag",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99",
-                reserveNumber = "123456"
-            ),
-            CartItem(
-                id = "8",
-                title = "Mixed donut bag",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99",
-                reserveNumber = "123456"
+                id = "h3",
+                title = "Coffee & Pastry Set",
+                pickupTime = "Pick up from 09:00 to 12:00",
+                price = "15.00",
+                reserveNumber = "234527",
+                isCompleted = true,
+                completedDate = "5 November"
             )
         )
     }

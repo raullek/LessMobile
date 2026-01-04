@@ -49,7 +49,7 @@ fun ExploreScreen(
     viewModel: ExploreViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
-    
+
     // Collect side effects for navigation
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
