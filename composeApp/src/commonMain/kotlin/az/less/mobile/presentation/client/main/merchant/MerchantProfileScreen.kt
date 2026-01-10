@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -32,6 +33,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
+import az.less.designsystem.components.ButtonSize
+import az.less.designsystem.components.ButtonVariant
+import az.less.designsystem.components.DsButton
 import az.less.mobile.navigation.HomeScreens
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileContactSection
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileHeroSection
@@ -44,6 +48,7 @@ import az.less.mobile.presentation.maps.models.CameraPosition
 import az.less.mobile.presentation.maps.models.LatLong
 import az.less.mobile.presentation.maps.models.MapType
 import az.less.mobile.presentation.maps.models.Marker
+import az.less.mobile.utils.shareContent
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
@@ -144,7 +149,9 @@ fun MerchantProfileScreenContent(
             merchantName = state.merchantName,
             latitude = state.latitude,
             longitude = state.longitude,
+            address = state.address,
             onBackClick = { onIntent(MerchantProfileIntent.OnMapBackClicked) },
+            onShowDirectionsClick = { onIntent(MerchantProfileIntent.OnDirectionsClicked) },
             modifier = modifier
         )
     } else {
@@ -241,7 +248,9 @@ private fun MerchantMapView(
     merchantName: String,
     latitude: Double,
     longitude: Double,
+    address: String,
     onBackClick: () -> Unit,
+    onShowDirectionsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val merchantLocation = LatLong(latitude, longitude)
@@ -283,6 +292,35 @@ private fun MerchantMapView(
                 contentDescription = "Back",
                 tint = LessTheme.colors.backgroundPrimary,
                 modifier = Modifier.size(24.dp)
+            )
+        }
+
+        // Show Direction Button at bottom
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(
+                    horizontal = LessTheme.spacing.medium,
+                    vertical = LessTheme.spacing.medium
+                )
+        ) {
+            DsButton(
+                text = "ShowDirection",
+                onClick = {
+                    // Share location with geo URI for map applications
+                    val shareText = buildString {
+                        append("📍 $merchantName\n")
+                        append("$address\n")
+                        append("geo:$latitude,$longitude")
+                    }
+                    shareContent(shareText)
+                    onShowDirectionsClick()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                variant = ButtonVariant.Primary,
+                size = ButtonSize.Large
             )
         }
     }

@@ -48,6 +48,7 @@ class ExploreViewModel : ViewModel(), ContainerHost<ExploreState, ExploreSideEff
             is ExploreIntent.OnFilterSheetDismissed -> handleFilterSheetDismissed()
             is ExploreIntent.OnFilterOptionClicked -> handleFilterOptionClicked(intent.categoryId, intent.optionId)
             is ExploreIntent.OnApplyFilters -> handleApplyFilters()
+            is ExploreIntent.OnDidCenterCameraOnMarker -> handleDidCenterCameraOnMarker()
         }
     }
 
@@ -205,6 +206,21 @@ class ExploreViewModel : ViewModel(), ContainerHost<ExploreState, ExploreSideEff
             val slots = selectedMerchant?.slots ?: emptyList()
             val merchantName = selectedMerchant?.merchantName ?: ""
 
+            // Find the clicked marker to get its position
+            val clickedMarker = state.markers.find { marker ->
+                val markerVenueId = marker.tag as? String ?: marker.id
+                markerVenueId == venueId
+            }
+
+            // Adjust marker position to move it slightly north (up on screen)
+            // This prevents the marker from being covered by the MerchantSlotsRow overlay at the bottom
+            val adjustedPosition = clickedMarker?.position?.let { position ->
+                LatLong(
+                    latitude = position.latitude, // Add ~1.5 km north (move marker up on screen)
+                    longitude = position.longitude
+                )
+            }
+
            reduce {
                 // Select clicked marker and deselect all others
                 val updatedMarkers =
@@ -222,7 +238,8 @@ class ExploreViewModel : ViewModel(), ContainerHost<ExploreState, ExploreSideEff
                     markers = updatedMarkers,
                     selectedVenueId = venueId,
                     selectedMerchantName = merchantName,
-                    selectedMerchantSlots = slots
+                    selectedMerchantSlots = slots,
+                    selectedMarkerPosition = adjustedPosition // Save adjusted marker position to center camera
                 )
             }
             // Navigate to venue detail
@@ -254,7 +271,8 @@ class ExploreViewModel : ViewModel(), ContainerHost<ExploreState, ExploreSideEff
                     markers = updatedMarkers,
                     selectedVenueId = null,
                     selectedMerchantName = "",
-                    selectedMerchantSlots = emptyList()
+                    selectedMerchantSlots = emptyList(),
+                    selectedMarkerPosition = null // Clear selected marker position
                 )
             }
         }
@@ -316,6 +334,15 @@ class ExploreViewModel : ViewModel(), ContainerHost<ExploreState, ExploreSideEff
 
         // TODO: Apply filters to markers/venues
         // Example: filter markers based on selected filter options
+    }
+    
+    private fun handleDidCenterCameraOnMarker() = intent {
+        // Clear the selected marker position after camera has centered
+        reduce {
+            state.copy(
+                selectedMarkerPosition = null
+            )
+        }
     }
     
     private fun loadFilterData() = intent {

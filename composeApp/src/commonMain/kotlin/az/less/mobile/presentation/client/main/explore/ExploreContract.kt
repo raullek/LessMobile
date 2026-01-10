@@ -22,7 +22,8 @@ data class ExploreState(
     val filterItems: List<FilterItem> = emptyList(),
     val markers: List<Marker> = emptyList(),
     val isFilterSheetVisible: Boolean = false,
-    val filterData: FilterData = FilterData()
+    val filterData: FilterData = FilterData(),
+    val selectedMarkerPosition: az.less.mobile.presentation.maps.models.LatLong? = null // Position to center camera on when marker is clicked
 )
 
 /**
@@ -60,5 +61,6 @@ sealed interface ExploreIntent {
     data class OnFilterOptionClicked(val categoryId: String, val optionId: String) :
         ExploreIntent
     data object OnApplyFilters : ExploreIntent
+    data object OnDidCenterCameraOnMarker : ExploreIntent
 }
 
