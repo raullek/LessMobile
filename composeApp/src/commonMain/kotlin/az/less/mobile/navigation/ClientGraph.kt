@@ -106,9 +106,13 @@ fun NavGraphBuilder.mainGraph(
             navArgument("pickupTime") { type = NavType.StringType }
         )
     ) { backStackEntry ->
-        val orderNumber = backStackEntry.arguments?.getString("orderNumber") ?: ""
-        val venueName = backStackEntry.arguments?.getString("venueName") ?: ""
-        val pickupTime = backStackEntry.arguments?.getString("pickupTime") ?: ""
+//        val orderNumber = backStackEntry.arguments?.getString("orderNumber") ?: ""
+//        val venueName = backStackEntry.arguments?.getString("venueName") ?: ""
+//        val pickupTime = backStackEntry.arguments?.getString("pickupTime") ?: ""
+
+        val orderNumber = "orderNumber"
+        val venueName = "venueName"
+        val pickupTime = "pickupTime"
 
         OrderAcceptedScreen(
             navController = navController,
@@ -148,7 +152,8 @@ fun NavGraphBuilder.moreGraph(
         route = MoreScreens.LoginCode.route,
         arguments = listOf(navArgument("email") { type = NavType.StringType })
     ) { backStackEntry ->
-        val email = backStackEntry.arguments?.getString("email") ?: ""
+        //val email = backStackEntry.arguments?.getString("email") ?: ""
+        val email = "email"
         LoginCodeScreen(
             navController = navController,
             email = email

@@ -161,7 +161,12 @@ fun ExploreScreenContent(
                         val venueId = marker.tag as? String ?: marker.id
                         onIntent(ExploreIntent.OnMapMarkerClicked(venueId))
                     },
-                    onFindMeButtonClick = null // Remove recenter location button
+                    onFindMeButtonClick = null, // Remove recenter location button
+                    shouldCenterCameraOnLatLong = state.selectedMarkerPosition, // Center camera on selected marker
+                    onDidCenterCameraOnLatLong = {
+                        // Clear the position after camera has centered
+                        onIntent(ExploreIntent.OnDidCenterCameraOnMarker)
+                    }
                 )
             }
 

@@ -13,10 +13,16 @@ import az.less.mobile.presentation.maps.models.Location
 import az.less.mobile.presentation.maps.models.MapType
 import az.less.mobile.presentation.maps.models.Marker
 import androidx.compose.runtime.remember
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCAction
+import kotlinx.cinterop.useContents
+import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.Foundation.NSCache
 import platform.Foundation.NSData
+import platform.Foundation.NSSelectorFromString
 import platform.Foundation.NSURL
 import platform.Foundation.dataWithContentsOfURL
 import platform.MapKit.MKAnnotationProtocol
@@ -29,9 +35,11 @@ import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
 import platform.MapKit.MKPointAnnotation
 import platform.UIKit.UIColor
+import platform.UIKit.UIGestureRecognizerStateEnded
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageView
 import platform.UIKit.UILabel
+import platform.UIKit.UITapGestureRecognizer
 import platform.UIKit.UIView
 import platform.UIKit.systemBlueColor
 import platform.darwin.NSObject
@@ -39,6 +47,8 @@ import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_get_main_queue
 import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
+import kotlin.experimental.ExperimentalObjCName
+
 
 /**
  * Custom annotation that extends MKPointAnnotation to hold Marker reference
@@ -115,11 +125,64 @@ private class MapViewDelegate(
         }
     }
 
+    /**
+     * Create a location pin marker view (simple icon marker)
+     * Similar to Android's LocationPinMarker
+     */
+    private fun createLocationPinAnnotationView(
+        annotation: MarkerAnnotation,
+        reuseIdentifier: String
+    ): MKAnnotationView {
+        val annotationView = MKAnnotationView(
+            annotation = annotation,
+            reuseIdentifier = reuseIdentifier
+        )
+        annotationView.canShowCallout = false
+
+        // Remove any existing subviews
+        annotationView.subviews.forEach { subview ->
+            (subview as? UIView)?.removeFromSuperview()
+        }
+
+        // Create a simple icon view (24dp = 24.0 points)
+        val iconSize = 24.0
+        val iconView = UIImageView()
+        iconView.setFrame(platform.CoreGraphics.CGRectMake(0.0, 0.0, iconSize, iconSize))
+        
+        // Use SF Symbol for location icon (mappin.circle.fill or location.fill)
+        // Fallback to a simple colored circle if system image is not available
+        val systemImage = UIImage.systemImageNamed("mappin.circle.fill")
+        if (systemImage != null) {
+            iconView.setImage(systemImage)
+            // Tint with brand color (green as approximation)
+            iconView.setTintColor(UIColor.greenColor)
+        } else {
+            // Fallback: create a simple colored circle
+            iconView.setBackgroundColor(UIColor.greenColor) // Brand color
+            iconView.layer.setCornerRadius(iconSize / 2.0)
+            iconView.layer.setMasksToBounds(true)
+        }
+        
+        iconView.setContentMode(platform.UIKit.UIViewContentMode.UIViewContentModeScaleAspectFit)
+
+        annotationView.setFrame(platform.CoreGraphics.CGRectMake(0.0, 0.0, iconSize, iconSize))
+        annotationView.addSubview(iconView)
+        annotationView.setCenterOffset(platform.CoreGraphics.CGPointMake(0.0, -iconSize / 2.0))
+
+        return annotationView
+    }
+
     private fun createCustomAnnotationView(
         annotation: MarkerAnnotation,
         reuseIdentifier: String
     ): MKAnnotationView {
         val marker = annotation.marker
+        
+        // Check if it's a location pin marker
+        if (marker.tag == "location_pin") {
+            return createLocationPinAnnotationView(annotation, reuseIdentifier)
+        }
+        
         val markerSize = if (marker.isSelected) 40.0 else 36.0
 
         val annotationView = MKAnnotationView(
@@ -224,6 +287,33 @@ private class MapViewDelegate(
     }
 }
 
+@OptIn(ExperimentalObjCName::class)
+@ObjCName("MapTapHandler")
+class MapTapHandler(
+    private val mapView: MKMapView
+) : NSObject() {
+    private var onTap: ((Double, Double) -> Unit)? = null
+
+    fun setOnTap(callback: ((Double, Double) -> Unit)?) {
+        onTap = callback
+    }
+
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    @ObjCAction
+    fun handleTap(gesture: UITapGestureRecognizer) {
+        if (gesture.state == UIGestureRecognizerStateEnded) {
+            val callback = onTap ?: return
+            val point = gesture.locationInView(mapView)
+            mapView.convertPoint(
+                point,
+                toCoordinateFromView = mapView
+            ).useContents {
+                callback(latitude, longitude)
+            }
+        }
+    }
+}
+
 
 /**
  * iOS implementation of GoogleMaps using MapKit (Apple Maps)
@@ -273,6 +363,22 @@ actual fun GoogleMaps(
                 val mapView = MKMapView()
                 mapView.mapType = MKMapTypeStandard
                 mapView.delegate = delegate
+
+                if (onMapClick != null) {
+                    val mapTapHandler = MapTapHandler(mapView).also {
+                        it.setOnTap { lat, long ->
+                            onMapClick(LatLong(lat, long))
+                        }
+                    }
+
+                    val tapGesture = UITapGestureRecognizer(
+                        target = mapTapHandler,
+                        action = NSSelectorFromString("handleTap:")
+                    )
+                    mapView.addGestureRecognizer(tapGesture)
+                }
+
+
 
                 // Configure UI settings
                 mapView.setShowsCompass(isCompassVisible)
