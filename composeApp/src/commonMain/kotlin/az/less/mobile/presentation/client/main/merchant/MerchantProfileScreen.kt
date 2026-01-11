@@ -36,7 +36,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
-import az.less.mobile.navigation.HomeScreens
+import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileContactSection
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileHeroSection
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileInfoSection
@@ -119,7 +119,7 @@ fun MerchantProfileScreen(
             },
             onOrderPlaced = { orderInfo ->
                 navController.navigate(
-                    HomeScreens.OrderAccepted.createRoute(
+                    ClientRoute.OrderAccepted(
                         orderNumber = orderInfo.orderNumber,
                         venueName = orderInfo.venueName,
                         pickupTime = orderInfo.pickupTime

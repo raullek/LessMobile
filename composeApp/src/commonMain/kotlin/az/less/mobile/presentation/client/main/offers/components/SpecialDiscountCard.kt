@@ -32,7 +32,7 @@ import org.jetbrains.compose.resources.painterResource
  */
 @Composable
 fun SpecialDiscountCard(
-    item: az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem,
+    item: SpecialDiscountItem,
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -83,7 +83,7 @@ fun SpecialDiscountCard(
             
             // Subtitle
             Text(
-                text = item.subtitle,
+                text = item.description,
                 style = LessTheme.typography.body14Regular,
                 color = Color.White.copy(alpha = 0.8f) // 80% opacity
             )

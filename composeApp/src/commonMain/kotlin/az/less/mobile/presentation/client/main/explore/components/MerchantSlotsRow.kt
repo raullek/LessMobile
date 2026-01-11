@@ -17,6 +17,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.explore.models.OfferSlot
 import az.less.mobile.presentation.client.main.offers.components.OfferCard
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
+import az.less.mobile.presentation.client.main.offers.models.OfferMerchant
 
 /**
  * Horizontal LazyRow displaying merchant offer slots
@@ -68,12 +69,13 @@ fun MerchantSlotsRow(
                 currentPrice = slot.price,
                 bagType = "Surprise Bag",
                 category = "Mixed",
-                restaurantName = merchantName,
-                restaurantLogoUrl = null,
                 pickupTime = formattedPickupTime,
-                rating = 4.5f, // Default rating (can be enhanced later)
-                distance = "", // Distance not available for slots
-                itemsLeft = 0
+                merchant = OfferMerchant(
+                    id = slot.id,
+                    name = merchantName,
+                    location = "",
+                    rating = 4.5f
+                )
             )
 
             OfferCard(

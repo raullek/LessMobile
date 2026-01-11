@@ -7,6 +7,7 @@ import org.jetbrains.compose.resources.DrawableResource
  */
 data class SearchCategory(
     val id: String,
+    val type: String,
     val title: String,
     val imageUrl: String? = null,
     val testImage: DrawableResource? = null

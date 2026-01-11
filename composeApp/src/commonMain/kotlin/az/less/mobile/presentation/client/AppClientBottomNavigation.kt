@@ -30,7 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.navigation.HomeScreens
+import az.less.mobile.navigation.ClientRoute
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.ic_more_24dp
@@ -70,15 +70,16 @@ fun AppClientBottomNavigation(
             verticalAlignment = Alignment.CenterVertically
         ) {
             bottomNavItems.forEach { item ->
-                val isSelected = currentRoute == item.route
+                val isSelected = currentRoute?.contains(item.route::class.simpleName ?: "") == true
                 BottomNavItem(
                     modifier = Modifier.weight(1f),
                     item = item,
                     isSelected = isSelected,
                     onClick = {
-                        if (currentRoute != item.route) {
-                            val isLeavingExplore = currentRoute == HomeScreens.Explore.route
-                            val isGoingToExplore = item.route == HomeScreens.Explore.route
+                        val isCurrentRoute = currentRoute?.contains(item.route::class.simpleName ?: "") == true
+                        if (!isCurrentRoute) {
+                            val isLeavingExplore = currentRoute?.contains(ClientRoute.Explore::class.simpleName ?: "") == true
+                            val isGoingToExplore = item.route is ClientRoute.Explore
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     // Don't save Explore's state when leaving it
@@ -136,33 +137,33 @@ private fun BottomNavItem(
 private data class BottomNavItemData(
     val icon: DrawableResource,
     val label: String,
-    val route: String
+    val route: ClientRoute
 )
 
 private val bottomNavItems = listOf(
     BottomNavItemData(
         Res.drawable.ic_offers_24dp,
         "Offers",
-        HomeScreens.Offers.route
+        ClientRoute.Offers
     ),
     BottomNavItemData(
         Res.drawable.ic_explore_24dp,
         "Explore",
-        HomeScreens.Explore.route
+        ClientRoute.Explore
     ),
     BottomNavItemData(
         Res.drawable.ic_orders_24dp,
         "Orders",
-        HomeScreens.Orders.route
+        ClientRoute.Orders
     ),
     BottomNavItemData(
         Res.drawable.ic_saved_24dp,
         "Saved",
-        HomeScreens.Saved.route
+        ClientRoute.Saved
     ),
     BottomNavItemData(
         Res.drawable.ic_more_24dp,
         "More",
-        HomeScreens.More.route
+        ClientRoute.More
     )
 )

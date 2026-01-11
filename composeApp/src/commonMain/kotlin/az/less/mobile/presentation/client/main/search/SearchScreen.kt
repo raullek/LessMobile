@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.navOptions
 import az.less.designsystem.base.LessTheme
+import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.offers.components.CategoryCard
 import az.less.mobile.presentation.client.main.search.components.SearchHeader
 import az.less.mobile.presentation.client.main.search.components.SearchInputBar
@@ -48,9 +49,14 @@ fun SearchScreen(
     // Collect side effects for navigation
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is SearchSideEffect.NavigateToCategory -> {
-                // Handle navigation to category
-                // navController.navigate("category/${sideEffect.categoryId}")
+            is SearchSideEffect.NavigateToCategoryOffers -> {
+                navController.navigate(
+                    ClientRoute.CategoryOffers(
+                        categoryId = sideEffect.categoryId,
+                        categoryType = sideEffect.categoryType,
+                        categoryTitle = sideEffect.categoryTitle
+                    )
+                )
             }
             is SearchSideEffect.NavigateBack -> {
                 navController.popBackStack()
@@ -59,12 +65,13 @@ fun SearchScreen(
                 // Show error snackbar
             }
             is SearchSideEffect.NavigateToMap -> {
-                // Handle navigation to map
-                navController.navigate("explore",navOptions {
-                    popUpTo("search") {
-                        inclusive = true
+                navController.navigate(
+                    ClientRoute.Explore,
+                    navOptions {
+                        popUpTo<ClientRoute.Search> {
+                            inclusive = true
+                        }
                     }
-                }
                 )
             }
         }

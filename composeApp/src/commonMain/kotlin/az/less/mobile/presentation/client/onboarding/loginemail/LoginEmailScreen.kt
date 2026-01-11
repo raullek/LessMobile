@@ -20,7 +20,7 @@ import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.DsToolBar
-import az.less.mobile.navigation.MoreScreens
+import az.less.mobile.navigation.ClientRoute
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -39,7 +39,7 @@ fun LoginEmailScreen(
             }
 
             is LoginEmailSideEffect.NavigateNext -> {
-                navController.navigate(MoreScreens.LoginCode.createRoute(state.email))
+                navController.navigate(ClientRoute.LoginCode(email = state.email))
             }
 
             is LoginEmailSideEffect.ShowError -> {

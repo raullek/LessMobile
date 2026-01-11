@@ -6,8 +6,11 @@ package az.less.mobile.presentation.client.main.offers.models
  */
 data class OfferSection(
     val id: String,
+    val type: String = "RECOMMENDATION",
     val title: String,
-    val items: List<OfferItem>,
+    val offers: List<OfferItem>,
     val showSeeAll: Boolean = true
-)
-
+) {
+    // Backward compatibility
+    val items: List<OfferItem> get() = offers
+}
