@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.navigation.HomeScreens
+import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.reserve.ReserveScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -44,9 +44,15 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryOffersScreen(
-    viewModel: CategoryOffersViewModel = koinViewModel(),
-    navController: NavController
+    navController: NavController,
+    categoryId: String,
+    categoryType: String,
+    categoryTitle: String,
+    viewModel: CategoryOffersViewModel = koinViewModel()
 ) {
+    // Initialize ViewModel with navigation parameters
+    viewModel.initialize(categoryId, categoryType, categoryTitle)
+
     val state by viewModel.collectAsState()
     val scope = rememberCoroutineScope()
     
@@ -96,7 +102,7 @@ fun CategoryOffersScreen(
             onOrderPlaced = { orderInfo ->
                 // Navigate to Order Accepted screen
                 navController.navigate(
-                    HomeScreens.OrderAccepted.createRoute(
+                    ClientRoute.OrderAccepted(
                         orderNumber = orderInfo.orderNumber,
                         venueName = orderInfo.venueName,
                         pickupTime = orderInfo.pickupTime
@@ -105,7 +111,7 @@ fun CategoryOffersScreen(
             },
             onNavigateToMerchant = { merchantId ->
                 // Navigate to Merchant screen
-                navController.navigate(HomeScreens.Merchant.createRoute(merchantId))
+                navController.navigate(ClientRoute.Merchant(merchantId = merchantId))
             }
         )
     }

@@ -26,7 +26,7 @@ import az.less.designsystem.components.DsListBottomSheet
 import az.less.designsystem.components.DsSectionHeader
 import az.less.designsystem.components.DsTextBottomSheet
 import az.less.designsystem.components.ListBottomSheetItem
-import az.less.mobile.navigation.MoreScreens
+import az.less.mobile.navigation.ClientRoute
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import org.jetbrains.compose.resources.painterResource
@@ -52,16 +52,16 @@ fun MoreScreen(
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is MoreSideEffect.NavigateToLogin -> {
-                navController.navigate(MoreScreens.Welcome.route)
+                navController.navigate(ClientRoute.Welcome)
             }
             is MoreSideEffect.NavigateToAccount -> {
-                navController.navigate(MoreScreens.Account.route)
+                navController.navigate(ClientRoute.Account)
             }
             is MoreSideEffect.NavigateToPaymentMethods -> {
-                navController.navigate(MoreScreens.PaymentMethods.route)
+                navController.navigate(ClientRoute.PaymentMethods)
             }
             is MoreSideEffect.NavigateToVoucher -> {
-                navController.navigate(MoreScreens.Voucher.route)
+                navController.navigate(ClientRoute.Voucher)
             }
             is MoreSideEffect.NavigateToHistory -> {
                 navigateToMerchant.invoke()
@@ -79,7 +79,7 @@ fun MoreScreen(
                 // Handled via state (showTermsBottomSheet)
             }
             is MoreSideEffect.NavigateToHowToUse -> {
-                navController.navigate(MoreScreens.Welcome.route)
+                navController.navigate(ClientRoute.Welcome)
             }
             is MoreSideEffect.ShowError -> {
                 // Show error snackbar or dialog

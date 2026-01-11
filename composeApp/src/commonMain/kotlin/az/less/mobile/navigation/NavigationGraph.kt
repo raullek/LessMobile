@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -18,6 +19,10 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.AppClientBottomNavigation
 import az.less.mobile.presentation.merchant.AppMerchantBottomNavigation
 
+private fun logNavigation(tag: String, route: String) {
+    println("[$tag] -> $route")
+}
+
 
 const val ROOT_CLIENT = "rootClientNavigation"
 const val ROOT_MERCHANT = "rootMerchantNavigation"
@@ -27,7 +32,6 @@ const val ROOT_MERCHANT = "rootMerchantNavigation"
 @Composable
 fun AppRootNavigation() {
     val navController = rememberNavController()
-
     val startFlow = if (true) ROOT_CLIENT else ROOT_MERCHANT
 
     NavHost(
@@ -44,9 +48,20 @@ fun AppClientRootScreen(rootNavController: NavController) {
     val navController = rememberNavController()
     var showBottomBar = rememberSaveable { mutableStateOf(false) }
 
+    // Navigation logging
+    DisposableEffect(navController) {
+        val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+            logNavigation("CLIENT", destination.route ?: "unknown")
+        }
+        navController.addOnDestinationChangedListener(listener)
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
+        }
+    }
+
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
-    showBottomBar.value = homeRoutes.contains(currentRoute)
+    showBottomBar.value = clientHomeRoutes.any { currentRoute?.contains(it.simpleName ?: "") == true }
 
     Box(
         modifier = Modifier
@@ -56,20 +71,20 @@ fun AppClientRootScreen(rootNavController: NavController) {
         // Navigation content
         NavHost(
             navController = navController,
-            startDestination = HomeScreens.Offers.route,
+            startDestination = ClientRoute.Offers,
             modifier = Modifier.fillMaxSize()
         ) {
             mainGraph(rootNavController = rootNavController, navController = navController)
-            moreGraph(rootNavController = rootNavController,navController = navController)
+            moreGraph(rootNavController = rootNavController, navController = navController)
         }
 
         // Bottom Navigation Bar - positioned at bottom
         if (showBottomBar.value) {
-                AppClientBottomNavigation(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    navController = navController
-                )
-            }
+            AppClientBottomNavigation(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                navController = navController
+            )
+        }
     }
 }
 
@@ -77,6 +92,17 @@ fun AppClientRootScreen(rootNavController: NavController) {
 fun AppMerchantRootScreen(rootNavController: NavController) {
     val navController = rememberNavController()
     var showBottomBar = rememberSaveable { mutableStateOf(false) }
+
+    // Navigation logging
+    DisposableEffect(navController) {
+        val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+            logNavigation("MERCHANT", destination.route ?: "unknown")
+        }
+        navController.addOnDestinationChangedListener(listener)
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
+        }
+    }
 
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route

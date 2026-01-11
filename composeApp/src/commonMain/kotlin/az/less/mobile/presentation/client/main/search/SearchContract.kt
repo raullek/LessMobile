@@ -8,8 +8,8 @@ import az.less.mobile.presentation.client.main.search.models.SearchOffer
  */
 data class SearchState(
     val searchQuery: String = "",
-    val categories: List<az.less.mobile.presentation.client.main.search.models.SearchCategory> = emptyList(),
-    val offers: List<az.less.mobile.presentation.client.main.search.models.SearchOffer> = emptyList(),
+    val categories: List<SearchCategory> = emptyList(),
+    val offers: List<SearchOffer> = emptyList(),
     val isLoading: Boolean = false
 )
 
@@ -17,25 +17,24 @@ data class SearchState(
  * Side Effects for navigation and one-time events
  */
 sealed interface SearchSideEffect {
-    data class ShowError(val message: String) :
-        az.less.mobile.presentation.client.main.search.SearchSideEffect
-    data class NavigateToCategory(val categoryId: String) :
-        az.less.mobile.presentation.client.main.search.SearchSideEffect
-    data object NavigateBack : az.less.mobile.presentation.client.main.search.SearchSideEffect
-    data object NavigateToMap : az.less.mobile.presentation.client.main.search.SearchSideEffect
+    data class ShowError(val message: String) : SearchSideEffect
+    data class NavigateToCategoryOffers(
+        val categoryId: String,
+        val categoryType: String,
+        val categoryTitle: String
+    ) : SearchSideEffect
+    data object NavigateBack : SearchSideEffect
+    data object NavigateToMap : SearchSideEffect
 }
 
 /**
  * User Intents/Actions
  */
 sealed interface SearchIntent {
-    data class OnSearchQueryChanged(val query: String) :
-        az.less.mobile.presentation.client.main.search.SearchIntent
-    data class OnCategorySelected(val categoryId: String) :
-        az.less.mobile.presentation.client.main.search.SearchIntent
-    data class OnOfferClicked(val offerId: String) :
-        az.less.mobile.presentation.client.main.search.SearchIntent
-    data object OnBackClicked : az.less.mobile.presentation.client.main.search.SearchIntent
-    data object OnMapClicked : az.less.mobile.presentation.client.main.search.SearchIntent
+    data class OnSearchQueryChanged(val query: String) : SearchIntent
+    data class OnCategorySelected(val categoryId: String) : SearchIntent
+    data class OnOfferClicked(val offerId: String) : SearchIntent
+    data object OnBackClicked : SearchIntent
+    data object OnMapClicked : SearchIntent
 }
 

@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.DsToolBar
-import az.less.mobile.navigation.HomeScreens
+import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.saved.components.SavedEmptyState
 import az.less.mobile.presentation.client.main.saved.components.SavedMerchantCard
 import org.koin.compose.viewmodel.koinViewModel
@@ -41,10 +41,10 @@ fun SavedScreen(
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is SavedSideEffect.NavigateToMerchantDetail -> {
-                navController.navigate(HomeScreens.Merchant.createRoute(sideEffect.merchantId))
+                navController.navigate(ClientRoute.Merchant(merchantId = sideEffect.merchantId))
             }
             is SavedSideEffect.NavigateToExplore -> {
-                navController.navigate(HomeScreens.Explore.route)
+                navController.navigate(ClientRoute.Explore)
             }
             is SavedSideEffect.ShowError -> {
                 // Show error snackbar

@@ -32,7 +32,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.DsConfirmationBottomSheet
 import az.less.designsystem.components.DsSectionHeader
 import az.less.designsystem.components.DsToolBar
-import az.less.mobile.navigation.MoreScreens
+import az.less.mobile.navigation.ClientRoute
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
@@ -58,7 +58,7 @@ fun PaymentMethodsScreen(
                 navController.popBackStack()
             }
             is PaymentMethodsSideEffect.NavigateToAddCard -> {
-                navController.navigate(MoreScreens.AddNewCard.route)
+                navController.navigate(ClientRoute.AddNewCard)
             }
             is PaymentMethodsSideEffect.NavigateToApplePay -> {
                 // TODO: Navigate to Apple Pay setup

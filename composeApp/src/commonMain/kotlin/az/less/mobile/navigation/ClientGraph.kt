@@ -2,9 +2,8 @@ package az.less.mobile.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import az.less.mobile.presentation.client.account.account.AccountScreen
 import az.less.mobile.presentation.client.account.paymentmethods.PaymentMethodsScreen
 import az.less.mobile.presentation.client.main.categoryoffers.CategoryOffersScreen
@@ -22,149 +21,189 @@ import az.less.mobile.presentation.client.reserve.OrderAcceptedScreen
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
 import az.less.mobile.presentation.client.main.voucher.VoucherScreen
 import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardScreen
+import kotlinx.serialization.Serializable
+import kotlin.reflect.KClass
 
+/**
+ * Client flow screens - Type-safe navigation routes
+ */
+sealed interface ClientRoute {
 
+    // Bottom navigation routes (Home screens)
+    @Serializable
+    data object Offers : ClientRoute
 
+    @Serializable
+    data object Explore : ClientRoute
 
-sealed class HomeScreens(val route: String) {
-    data object Offers : HomeScreens("offers")
-    data object Explore : HomeScreens("explore")
-    data object Orders : HomeScreens("orders")
-    data object Saved : HomeScreens("saved")
-    data object More : HomeScreens("more")
-    data object Search : HomeScreens("search")
-    data object CategoryOffers : HomeScreens("category_offers")
-    data object Merchant : HomeScreens("merchant/{merchantId}") {
-        fun createRoute(merchantId: String): String {
-            return "merchant/$merchantId"
-        }
-    }
+    @Serializable
+    data object Orders : ClientRoute
+
+    @Serializable
+    data object Saved : ClientRoute
+
+    @Serializable
+    data object More : ClientRoute
+
+    @Serializable
+    data object Search : ClientRoute
+
+    @Serializable
+    data class CategoryOffers(
+        val categoryId: String,
+        val categoryType: String,  // Type from backend (e.g., "FOOD_CATEGORY", "DISCOUNT", "NEAREST")
+        val categoryTitle: String
+    ) : ClientRoute
+
+    @Serializable
+    data class OfferDetail(val offerId: String) : ClientRoute
+
+    @Serializable
+    data class Merchant(val merchantId: String) : ClientRoute
 
     /**
      * Reserve Flow
-     * */
-    data object OrderAccepted : HomeScreens("order_accepted/{orderNumber}/{venueName}/{pickupTime}") {
-        fun createRoute(orderNumber: String, venueName: String, pickupTime: String): String {
-            return "order_accepted/$orderNumber/$venueName/$pickupTime"
-        }
-    }
+     */
+    @Serializable
+    data class OrderAccepted(
+        val orderNumber: String,
+        val venueName: String,
+        val pickupTime: String
+    ) : ClientRoute
 
+    // More graph screens
+    @Serializable
+    data object Account : ClientRoute
 
+    @Serializable
+    data object PaymentMethods : ClientRoute
+
+    @Serializable
+    data object AddNewCard : ClientRoute
+
+    @Serializable
+    data object Voucher : ClientRoute
+
+    @Serializable
+    data object Welcome : ClientRoute
+
+    @Serializable
+    data object LoginEmail : ClientRoute
+
+    @Serializable
+    data class LoginCode(val email: String) : ClientRoute
 }
 
-
-sealed class MoreScreens(val route: String) {
-    data object Account : MoreScreens("account")
-    data object PaymentMethods : MoreScreens("paymentMethods")
-    data object AddNewCard : MoreScreens("addNewCard")
-    data object Voucher : MoreScreens("voucher")
-    data object Welcome : MoreScreens("welcome")
-    data object LoginEmail : MoreScreens("loginEmail")
-    data object LoginCode : MoreScreens("loginCode/{email}") {
-        fun createRoute(email: String): String {
-            return "loginCode/$email"
-        }
-    }
-}
-
+/**
+ * Main navigation graph (Home screens)
+ * Contains all main client-related screens
+ */
 fun NavGraphBuilder.mainGraph(
     rootNavController: NavController,
     navController: NavController
 ) {
-    composable(HomeScreens.Offers.route) {
+    composable<ClientRoute.Offers> {
         OffersScreen(navController = navController)
     }
-    composable(HomeScreens.Explore.route) {
+
+    composable<ClientRoute.Explore> {
         ExploreScreen()
     }
-    composable(HomeScreens.Orders.route) {
+
+    composable<ClientRoute.Orders> {
         OrdersScreen()
     }
-    composable(HomeScreens.Saved.route) {
+
+    composable<ClientRoute.Saved> {
         SavedScreen(navController = navController)
     }
-    composable(HomeScreens.More.route) {
-        MoreScreen(navController = navController, navigateToMerchant = {rootNavController.navigate(ROOT_MERCHANT)})
+
+    composable<ClientRoute.More> {
+        MoreScreen(
+            navController = navController,
+            navigateToMerchant = { rootNavController.navigate(ROOT_MERCHANT) }
+        )
     }
-    composable(HomeScreens.Search.route) {
+
+    composable<ClientRoute.Search> {
         SearchScreen(navController = navController)
     }
-    composable(HomeScreens.CategoryOffers.route) {
-        CategoryOffersScreen(navController = navController)
+
+    composable<ClientRoute.CategoryOffers> { backStackEntry ->
+        val args = backStackEntry.toRoute<ClientRoute.CategoryOffers>()
+        CategoryOffersScreen(
+            navController = navController,
+            categoryId = args.categoryId,
+            categoryType = args.categoryType,
+            categoryTitle = args.categoryTitle
+        )
     }
-    composable(
-        route = HomeScreens.Merchant.route,
-        arguments = listOf(navArgument("merchantId") { type = NavType.StringType })
-    ) {
+
+    composable<ClientRoute.Merchant> {
         MerchantProfileScreen(navController = navController)
     }
-    composable(
-        route = HomeScreens.OrderAccepted.route,
-        arguments = listOf(
-            navArgument("orderNumber") { type = NavType.StringType },
-            navArgument("venueName") { type = NavType.StringType },
-            navArgument("pickupTime") { type = NavType.StringType }
-        )
-    ) { backStackEntry ->
-//        val orderNumber = backStackEntry.arguments?.getString("orderNumber") ?: ""
-//        val venueName = backStackEntry.arguments?.getString("venueName") ?: ""
-//        val pickupTime = backStackEntry.arguments?.getString("pickupTime") ?: ""
 
-        val orderNumber = "orderNumber"
-        val venueName = "venueName"
-        val pickupTime = "pickupTime"
-
+    composable<ClientRoute.OrderAccepted> { backStackEntry ->
+        val args = backStackEntry.toRoute<ClientRoute.OrderAccepted>()
         OrderAcceptedScreen(
             navController = navController,
             orderInfo = OrderAccepted(
-                orderNumber = orderNumber,
-                venueName = venueName,
-                pickupTime = pickupTime
+                orderNumber = args.orderNumber,
+                venueName = args.venueName,
+                pickupTime = args.pickupTime
             )
         )
     }
 }
 
-
+/**
+ * More navigation graph
+ * Contains all account and settings related screens
+ */
 fun NavGraphBuilder.moreGraph(
     rootNavController: NavController,
     navController: NavController
 ) {
-    composable(MoreScreens.PaymentMethods.route) {
+    composable<ClientRoute.PaymentMethods> {
         PaymentMethodsScreen(navController = navController)
     }
-    composable(MoreScreens.Account.route) {
+
+    composable<ClientRoute.Account> {
         AccountScreen(navController = navController)
     }
-    composable(MoreScreens.AddNewCard.route) {
+
+    composable<ClientRoute.AddNewCard> {
         AddNewCardScreen(navController = navController)
     }
-    composable(MoreScreens.Voucher.route) {
+
+    composable<ClientRoute.Voucher> {
         VoucherScreen(navController = navController)
     }
-    composable(MoreScreens.Welcome.route) {
+
+    composable<ClientRoute.Welcome> {
         WelcomeScreen(navController = navController)
     }
-    composable(MoreScreens.LoginEmail.route) {
+
+    composable<ClientRoute.LoginEmail> {
         LoginEmailScreen(navController = navController)
     }
-    composable(
-        route = MoreScreens.LoginCode.route,
-        arguments = listOf(navArgument("email") { type = NavType.StringType })
-    ) { backStackEntry ->
-        //val email = backStackEntry.arguments?.getString("email") ?: ""
-        val email = "email"
+
+    composable<ClientRoute.LoginCode> { backStackEntry ->
+        val args = backStackEntry.toRoute<ClientRoute.LoginCode>()
         LoginCodeScreen(
             navController = navController,
-            email = email
+            email = args.email
         )
     }
 }
 
-val homeRoutes = listOf(
-    HomeScreens.Offers.route,
-    HomeScreens.Explore.route,
-    HomeScreens.Orders.route,
-    HomeScreens.Saved.route,
-    HomeScreens.More.route
+/**
+ * Home routes for bottom navigation visibility check
+ */
+val clientHomeRoutes: List<KClass<out ClientRoute>> = listOf(
+    ClientRoute.Offers::class,
+    ClientRoute.Explore::class,
+    ClientRoute.Orders::class,
+    ClientRoute.Saved::class,
+    ClientRoute.More::class
 )

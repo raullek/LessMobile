@@ -1,54 +1,67 @@
 package az.less.mobile.presentation.client.main.offers
 
 import az.less.mobile.presentation.client.main.offers.models.Category
-import az.less.mobile.presentation.client.main.offers.models.FilterSegment
 import az.less.mobile.presentation.client.main.offers.models.OfferSection
+import az.less.mobile.presentation.client.main.offers.models.SegmentedCategory
 import az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem
+import az.less.mobile.presentation.client.main.offers.models.UserInfo
 
 /**
  * State of the Offers Screen
  */
 data class OffersState(
-    val userName: String = "Katheryn",
-    val userAvatarUrl: String? = null,
+    // User info (separate request)
+    val userInfo: UserInfo? = null,
+    val isUserLoading: Boolean = false,
+
+    // Screen data (single request)
+    val categories: List<Category> = emptyList(),
+    val specialCategories: List<SpecialDiscountItem> = emptyList(),
+    val segmentedCategories: List<SegmentedCategory> = emptyList(),
+    val offerSections: List<OfferSection> = emptyList(),
+    val isLoading: Boolean = false,
+
+    // UI state
     val searchQuery: String = "",
-    val categories: List<az.less.mobile.presentation.client.main.offers.models.Category> = emptyList(),
     val selectedCategoryId: String? = null,
-    val specialDiscounts: List<az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem> = emptyList(),
-    val filterSegments: List<az.less.mobile.presentation.client.main.offers.models.FilterSegment> = emptyList(),
-    val selectedFilterSegmentId: String? = null,
-    val offerSections: List<az.less.mobile.presentation.client.main.offers.models.OfferSection> = emptyList(),
-    val isLoading: Boolean = false
-)
+    val selectedSegmentId: String? = null
+) {
+    // Backward compatibility
+    val userName: String get() = userInfo?.name ?: ""
+    val userAvatarUrl: String? get() = userInfo?.avatarUrl
+    val specialDiscounts: List<SpecialDiscountItem> get() = specialCategories
+    val filterSegments: List<SegmentedCategory> get() = segmentedCategories
+    val selectedFilterSegmentId: String? get() = selectedSegmentId
+}
 
 /**
  * Side Effects for navigation and one-time events
  */
 sealed interface OffersSideEffect {
-    data class ShowError(val message: String) :
-        az.less.mobile.presentation.client.main.offers.OffersSideEffect
-    data class NavigateToOfferDetail(val offerId: String) :
-        az.less.mobile.presentation.client.main.offers.OffersSideEffect
-    data object NavigateToSearch : az.less.mobile.presentation.client.main.offers.OffersSideEffect
-    data object NavigateToReserve : az.less.mobile.presentation.client.main.offers.OffersSideEffect
-    data object NavigateToCategoryOffers :
-        az.less.mobile.presentation.client.main.offers.OffersSideEffect
+    data class ShowError(val message: String) : OffersSideEffect
+    data class NavigateToOfferDetail(val offerId: String) : OffersSideEffect
+    data object NavigateToSearch : OffersSideEffect
+    data object NavigateToReserve : OffersSideEffect
+    data class NavigateToCategoryOffers(
+        val categoryId: String,
+        val categoryType: String,
+        val categoryTitle: String
+    ) : OffersSideEffect
 }
 
 /**
  * User Intents/Actions
  */
 sealed interface OffersIntent {
-    data class OnSearchQueryChanged(val query: String) :
-        az.less.mobile.presentation.client.main.offers.OffersIntent
-    data object OnSearchClicked : az.less.mobile.presentation.client.main.offers.OffersIntent
-    data class OnCategorySelected(val categoryId: String) :
-        az.less.mobile.presentation.client.main.offers.OffersIntent
-    data class OnFilterSegmentSelected(val segmentId: String) :
-        az.less.mobile.presentation.client.main.offers.OffersIntent
-    data class OnOfferItemClicked(val offerId: String) :
-        az.less.mobile.presentation.client.main.offers.OffersIntent
-    data class OnSeeAllClicked(val sectionId: String) :
-        az.less.mobile.presentation.client.main.offers.OffersIntent
+    data class OnSearchQueryChanged(val query: String) : OffersIntent
+    data object OnSearchClicked : OffersIntent
+    data class OnCategorySelected(val categoryId: String) : OffersIntent
+    data class OnSpecialCategoryClicked(val specialCategoryId: String) : OffersIntent
+    data class OnSegmentSelected(val segmentId: String) : OffersIntent
+    data class OnOfferItemClicked(val offerId: String) : OffersIntent
+    data class OnSeeAllClicked(val sectionId: String) : OffersIntent
 }
 
+// Backward compatibility alias
+@Deprecated("Use OnSegmentSelected", ReplaceWith("OffersIntent.OnSegmentSelected"))
+typealias OnFilterSegmentSelected = OffersIntent.OnSegmentSelected

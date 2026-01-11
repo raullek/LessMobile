@@ -24,10 +24,10 @@ import org.orbitmvi.orbit.container
  * ViewModel for Search Screen using Orbit MVI
  */
 @OptIn(FlowPreview::class)
-class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.client.main.search.SearchState, az.less.mobile.presentation.client.main.search.SearchSideEffect> {
-    
-    override val container: Container<az.less.mobile.presentation.client.main.search.SearchState, az.less.mobile.presentation.client.main.search.SearchSideEffect> =
-        viewModelScope.container(_root_ide_package_.az.less.mobile.presentation.client.main.search.SearchState())
+class SearchViewModel : ViewModel(), ContainerHost<SearchState, SearchSideEffect> {
+
+    override val container: Container<SearchState, SearchSideEffect> =
+        viewModelScope.container(SearchState())
     
     private val searchQueryFlow = MutableStateFlow("")
     
@@ -64,13 +64,13 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
     /**
      * Handle user intents
      */
-    fun onIntent(intent: az.less.mobile.presentation.client.main.search.SearchIntent) {
+    fun onIntent(intent: SearchIntent) {
         when (intent) {
-            is az.less.mobile.presentation.client.main.search.SearchIntent.OnSearchQueryChanged -> handleSearchQueryChanged(intent.query)
-            is az.less.mobile.presentation.client.main.search.SearchIntent.OnCategorySelected -> handleCategorySelected(intent.categoryId)
-            is az.less.mobile.presentation.client.main.search.SearchIntent.OnOfferClicked -> handleOfferClicked(intent.offerId)
-            is az.less.mobile.presentation.client.main.search.SearchIntent.OnBackClicked -> handleBackClicked()
-            is az.less.mobile.presentation.client.main.search.SearchIntent.OnMapClicked -> handleOnMapClicked()
+            is SearchIntent.OnSearchQueryChanged -> handleSearchQueryChanged(intent.query)
+            is SearchIntent.OnCategorySelected -> handleCategorySelected(intent.categoryId)
+            is SearchIntent.OnOfferClicked -> handleOfferClicked(intent.offerId)
+            is SearchIntent.OnBackClicked -> handleBackClicked()
+            is SearchIntent.OnMapClicked -> handleOnMapClicked()
         }
     }
     
@@ -122,22 +122,25 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
             }
         }
     
-    private fun handleCategorySelected(categoryId: String) =
-        intent {
-           postSideEffect(
-                _root_ide_package_.az.less.mobile.presentation.client.main.search.SearchSideEffect.NavigateToCategory(
-                    categoryId
+    private fun handleCategorySelected(categoryId: String) = intent {
+        val category = state.categories.find { it.id == categoryId }
+        if (category != null) {
+            postSideEffect(
+                SearchSideEffect.NavigateToCategoryOffers(
+                    categoryId = category.id,
+                    categoryType = category.type,
+                    categoryTitle = category.title
                 )
             )
         }
-    
-    private fun handleBackClicked() = intent {
-       postSideEffect(_root_ide_package_.az.less.mobile.presentation.client.main.search.SearchSideEffect.NavigateBack)
     }
     
+    private fun handleBackClicked() = intent {
+        postSideEffect(SearchSideEffect.NavigateBack)
+    }
+
     private fun handleOnMapClicked() = intent {
-       postSideEffect(_root_ide_package_.az.less.mobile.presentation.client.main.search.SearchSideEffect.NavigateToMap)
-        // In real app, navigate to filter screen
+        postSideEffect(SearchSideEffect.NavigateToMap)
     }
     
     private fun handleOfferClicked(offerId: String) =
@@ -147,40 +150,47 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
         }
     
     // Mock data - replace with repository calls in real app
-    private fun getMockCategories(): List<az.less.mobile.presentation.client.main.search.models.SearchCategory> {
+    private fun getMockCategories(): List<SearchCategory> {
         return listOf(
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchCategory(
+            SearchCategory(
                 id = "meals",
+                type = "SEARCH_CATEGORY",
                 title = "Meals",
                 testImage = Res.drawable.test_offer_category_burger
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchCategory(
+            SearchCategory(
                 id = "lunch",
+                type = "SEARCH_CATEGORY",
                 title = "Lunch",
                 testImage = Res.drawable.test_offer_category_pizza
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchCategory(
+            SearchCategory(
                 id = "dinner",
+                type = "SEARCH_CATEGORY",
                 title = "Dinner",
                 testImage = Res.drawable.test_offer_category_sushi
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchCategory(
+            SearchCategory(
                 id = "bakery",
+                type = "SEARCH_CATEGORY",
                 title = "Bakery",
                 testImage = Res.drawable.test_offer_category_pasta
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchCategory(
+            SearchCategory(
                 id = "dessert",
+                type = "SEARCH_CATEGORY",
                 title = "Dessert",
                 testImage = Res.drawable.test_offer_category_burger
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchCategory(
+            SearchCategory(
                 id = "grocery",
+                type = "SEARCH_CATEGORY",
                 title = "Grocery",
                 testImage = Res.drawable.test_offer_category_pizza
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchCategory(
+            SearchCategory(
                 id = "healthy",
+                type = "SEARCH_CATEGORY",
                 title = "Healthy",
                 testImage = Res.drawable.test_offer_category_sushi
             )
@@ -190,9 +200,9 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
     /**
      * Mock offers data for search results
      */
-    private fun getMockOffers(): List<az.less.mobile.presentation.client.main.search.models.SearchOffer> {
+    private fun getMockOffers(): List<SearchOffer> {
         return listOf(
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchOffer(
+            SearchOffer(
                 id = "1",
                 title = "Belgian Waffle Breakfast Box",
                 price = "12.99",
@@ -201,7 +211,7 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
                 reviewCount = "120+",
                 distance = "0.8 km away"
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchOffer(
+            SearchOffer(
                 id = "2",
                 title = "Belgian Chocolate Surprise",
                 price = "8.50",
@@ -210,7 +220,7 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
                 reviewCount = "85+",
                 distance = "1.2 km away"
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchOffer(
+            SearchOffer(
                 id = "3",
                 title = "Fresh Bakery Box",
                 price = "6.99",
@@ -219,7 +229,7 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
                 reviewCount = "45+",
                 distance = "2.1 km away"
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchOffer(
+            SearchOffer(
                 id = "4",
                 title = "Gourmet Pizza Deal",
                 price = "15.99",
@@ -228,7 +238,7 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
                 reviewCount = "200+",
                 distance = "0.5 km away"
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchOffer(
+            SearchOffer(
                 id = "5",
                 title = "Sushi Combo Box",
                 price = "18.50",
@@ -237,7 +247,7 @@ class SearchViewModel : ViewModel(), ContainerHost<az.less.mobile.presentation.c
                 reviewCount = "150+",
                 distance = "1.5 km away"
             ),
-            _root_ide_package_.az.less.mobile.presentation.client.main.search.models.SearchOffer(
+            SearchOffer(
                 id = "6",
                 title = "Healthy Lunch Box",
                 price = "10.99",

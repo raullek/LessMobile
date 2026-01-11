@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.DsButton
-import az.less.mobile.navigation.MoreScreens
+import az.less.mobile.navigation.ClientRoute
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_mail_24dp
 import lessmobile.composeapp.generated.resources.ill_welcome_screen_320dp
@@ -34,7 +34,7 @@ fun WelcomeScreen(
 
     WelcomeScreenContent(
         onLoginClick = {
-            navController.navigate(MoreScreens.LoginEmail.route)
+            navController.navigate(ClientRoute.LoginEmail)
         }
     )
 }

@@ -33,7 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.navigation.HomeScreens
+import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.offers.components.SpecialDiscountPager
 import az.less.mobile.presentation.client.reserve.ReserveScreen
 import kotlinx.coroutines.launch
@@ -68,17 +68,21 @@ fun OffersScreen(
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is OffersSideEffect.NavigateToOfferDetail -> {
-                // Handle navigation to offer detail
-                navController.navigate("offer_detail/${sideEffect.offerId}")
+                navController.navigate(ClientRoute.OfferDetail(offerId = sideEffect.offerId))
             }
 
             is OffersSideEffect.NavigateToSearch -> {
-                // Handle navigation to search screen
-                navController.navigate("search")
+                navController.navigate(ClientRoute.Search)
             }
 
             is OffersSideEffect.NavigateToCategoryOffers -> {
-                navController.navigate(HomeScreens.CategoryOffers.route)
+                navController.navigate(
+                    ClientRoute.CategoryOffers(
+                        categoryId = sideEffect.categoryId,
+                        categoryType = sideEffect.categoryType,
+                        categoryTitle = sideEffect.categoryTitle
+                    )
+                )
             }
 
             is OffersSideEffect.NavigateToReserve -> {
@@ -116,7 +120,7 @@ fun OffersScreen(
         onOrderPlaced = { orderInfo ->
             // Navigate to Order Accepted screen
             navController.navigate(
-                HomeScreens.OrderAccepted.createRoute(
+                ClientRoute.OrderAccepted(
                     orderNumber = orderInfo.orderNumber,
                     venueName = orderInfo.venueName,
                     pickupTime = orderInfo.pickupTime
@@ -125,7 +129,7 @@ fun OffersScreen(
         },
         onNavigateToMerchant = { merchantId ->
             // Navigate to Merchant screen
-            navController.navigate(HomeScreens.Merchant.createRoute(merchantId))
+            navController.navigate(ClientRoute.Merchant(merchantId = merchantId))
         }
     )
 }
@@ -214,7 +218,7 @@ fun OffersScreenContent(
                         items = state.specialDiscounts,
                         onItemClick = { item ->
                             onIntent(
-                                OffersIntent.OnOfferItemClicked(
+                                OffersIntent.OnSpecialCategoryClicked(
                                     item.id
                                 )
                             )
@@ -227,36 +231,34 @@ fun OffersScreenContent(
                 }
             }
 
-            // Filter Segments Section
-            if (state.filterSegments.isNotEmpty()) {
-                item(key = "filter_segments") {
+            // Segmented Categories Section (Filter Segments)
+            if (state.segmentedCategories.isNotEmpty()) {
+                item(key = "segmented_categories") {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = LessTheme.spacing.medium),
                         horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
                     ) {
-                        state.filterSegments.forEach { segment ->
-                            _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.FilterCategoryItem(
-                                modifier = Modifier.weight(1f),
-                                text = segment.text,
-                                icon = vectorResource(segment.icon),
-                                iconTint = _root_ide_package_.androidx.compose.ui.graphics.Color(
-                                    segment.iconTint
-                                ),
-                                onItemClick = {
-                                    onIntent(
-                                        OffersIntent.OnFilterSegmentSelected(
-                                            segment.id
-                                        )
-                                    )
-                                }
-                            )
+                        state.segmentedCategories.forEach { segment ->
+                            segment.icon?.let { icon ->
+                                _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.FilterCategoryItem(
+                                    modifier = Modifier.weight(1f),
+                                    text = segment.title,
+                                    icon = vectorResource(icon),
+                                    iconTint = _root_ide_package_.androidx.compose.ui.graphics.Color(
+                                        segment.iconTint ?: 0xFF000000L
+                                    ),
+                                    onItemClick = {
+                                        onIntent(OffersIntent.OnSegmentSelected(segment.id))
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-                
-                item(key = "filter_segments_spacing") {
+
+                item(key = "segmented_categories_spacing") {
                     Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
                 }
             }
