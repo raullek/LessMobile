@@ -31,8 +31,17 @@ import az.less.mobile.presentation.merchant.more.components.MerchMoreHeader
 import az.less.mobile.presentation.merchant.more.model.MerchCellId
 import az.less.mobile.presentation.merchant.more.model.MerchMoreCellType
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.action_logout
+import lessmobile.composeapp.generated.resources.contact_facebook
+import lessmobile.composeapp.generated.resources.contact_instagram
+import lessmobile.composeapp.generated.resources.contact_telegram
+import lessmobile.composeapp.generated.resources.contact_tiktok
+import lessmobile.composeapp.generated.resources.contact_whatsapp
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
+import lessmobile.composeapp.generated.resources.more_contact_us
+import lessmobile.composeapp.generated.resources.terms_title
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -76,33 +85,33 @@ fun MerchMoreScreen(
         val contactItems = listOf(
             ListBottomSheetItem(
                 id = "instagram",
-                title = "Instagram",
+                title = stringResource(Res.string.contact_instagram),
                 icon = null
             ),
             ListBottomSheetItem(
                 id = "tiktok",
-                title = "TikTok",
+                title = stringResource(Res.string.contact_tiktok),
                 icon = null
             ),
             ListBottomSheetItem(
                 id = "facebook",
-                title = "Facebook",
+                title = stringResource(Res.string.contact_facebook),
                 icon = null
             ),
             ListBottomSheetItem(
                 id = "telegram",
-                title = "Telegram",
+                title = stringResource(Res.string.contact_telegram),
                 icon = null
             ),
             ListBottomSheetItem(
                 id = "whatsapp",
-                title = "Whatsapp",
+                title = stringResource(Res.string.contact_whatsapp),
                 icon = null
             )
         )
 
         DsListBottomSheet(
-            title = "Contact us",
+            title = stringResource(Res.string.more_contact_us),
             items = contactItems,
             onItemClick = { itemId ->
                 viewModel.onIntent(MerchMoreIntent.OnContactUsItemClick(itemId))
@@ -129,7 +138,7 @@ fun MerchMoreScreen(
         """.trimIndent()
 
         DsTextBottomSheet(
-            title = "Terms&Conditions",
+            title = stringResource(Res.string.terms_title),
             content = termsContent,
             onDismiss = {
                 viewModel.onIntent(MerchMoreIntent.OnTermsDismiss)
@@ -169,8 +178,8 @@ fun MerchMoreScreenContent(
         // Sections
         state.sections.forEach { section ->
             // Section header
-            item(key = "header_${section.title}") {
-                DsSectionHeader(title = section.title)
+            item(key = "header_${section.titleRes}") {
+                DsSectionHeader(title = stringResource(section.titleRes))
             }
 
             // Section cells
@@ -179,7 +188,7 @@ fun MerchMoreScreenContent(
                 key = { cell -> cell.id }
             ) { cell ->
                 DsCell(
-                    title = cell.title,
+                    title = stringResource(cell.titleRes),
                     leadingContent = cell.icon?.let { CellLeadingContent(icon = it) },
                     type = when (cell.type) {
                         is MerchMoreCellType.Navigation -> CellType.Navigation(
@@ -203,7 +212,7 @@ fun MerchMoreScreenContent(
             }
 
             // Spacing after section
-            item(key = "spacing_${section.title}") {
+            item(key = "spacing_${section.titleRes}") {
                 Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
             }
         }
@@ -211,7 +220,7 @@ fun MerchMoreScreenContent(
         // Logout button
         item {
             DsButton(
-                text = "Logout",
+                text = stringResource(Res.string.action_logout),
                 onClick = { onIntent(MerchMoreIntent.OnLogoutClicked) },
                 variant = ButtonVariant.Secondary,
                 modifier = Modifier

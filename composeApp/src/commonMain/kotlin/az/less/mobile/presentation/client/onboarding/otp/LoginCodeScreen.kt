@@ -19,6 +19,12 @@ import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.DsToolBar
 import az.less.mobile.presentation.client.onboarding.otp.components.OtpCodeInput
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.login_code_title
+import lessmobile.composeapp.generated.resources.login_code_subtitle
+import lessmobile.composeapp.generated.resources.login_code_default_email
+import lessmobile.composeapp.generated.resources.login_code_resend
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -84,7 +90,7 @@ fun LoginCodeScreenContent(
         ) {
             // Title Text Field
             Text(
-                text = "Enter the 6-digit code",
+                text = stringResource(Res.string.login_code_title),
                 style = LessTheme.typography.title28Bold,
                 color = LessTheme.colors.textIconsBlack,
                 modifier = Modifier.fillMaxWidth()
@@ -93,8 +99,9 @@ fun LoginCodeScreenContent(
             Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
 
             // Subtitle Text Field
+            val emailToShow = state.email.ifEmpty { stringResource(Res.string.login_code_default_email) }
             Text(
-                text = "We sent it to ${state.email.ifEmpty { "Less@gmail.com" }} by mail",
+                text = stringResource(Res.string.login_code_subtitle, emailToShow),
                 style = LessTheme.typography.body16Regular,
                 color = LessTheme.colors.textIconsBlack,
                 modifier = Modifier.fillMaxWidth()
@@ -116,7 +123,7 @@ fun LoginCodeScreenContent(
 
             // "Didn't receive it?" Link at bottom
             Text(
-                text = "Didn't receive it?",
+                text = stringResource(Res.string.login_code_resend),
                 style = LessTheme.typography.body14Regular,
                 color = LessTheme.colors.elementsPrimaryBrand,
                 modifier = Modifier

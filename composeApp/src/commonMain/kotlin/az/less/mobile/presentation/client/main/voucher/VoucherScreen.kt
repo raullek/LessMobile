@@ -36,7 +36,11 @@ import az.less.designsystem.components.DsToolBar
 import az.less.mobile.presentation.client.main.voucher.components.VoucherCard
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_copy_24dp
+import lessmobile.composeapp.generated.resources.voucher_title
+import lessmobile.composeapp.generated.resources.action_share
+import lessmobile.composeapp.generated.resources.action_copy
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -90,7 +94,7 @@ fun VoucherScreenContent(
         containerColor = LessTheme.colors.backgroundSecond,
         topBar = {
             DsToolBar(
-                title = "Vaucher",
+                title = stringResource(Res.string.voucher_title),
                 onBackClick = { onIntent(VoucherIntent.OnBackClicked) },
                 backgroundColor = LessTheme.colors.backgroundSecond
             )
@@ -123,7 +127,7 @@ fun VoucherScreenContent(
                     )
                     Icon(
                         painter = painterResource(Res.drawable.ic_copy_24dp),
-                        contentDescription = "Copy",
+                        contentDescription = stringResource(Res.string.action_copy),
                         tint = LessTheme.colors.textIconsGrey,
                         modifier = Modifier
                             .size(LessTheme.size.medium)
@@ -135,7 +139,7 @@ fun VoucherScreenContent(
 
                 // Share button
                 DsButton(
-                    text = "Share",
+                    text = stringResource(Res.string.action_share),
                     onClick = { onIntent(VoucherIntent.OnShareClicked) },
                     variant = ButtonVariant.Primary,
                     size = ButtonSize.Large,

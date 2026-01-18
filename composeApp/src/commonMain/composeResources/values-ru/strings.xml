@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Less</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_offers">Предложения</string>
+    <string name="nav_explore">Обзор</string>
+    <string name="nav_orders">Заказы</string>
+    <string name="nav_saved">Избранное</string>
+    <string name="nav_more">Ещё</string>
+
+    <!-- Common Actions -->
+    <string name="action_back">Назад</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_share">Поделиться</string>
+    <string name="action_copy">Копировать</string>
+    <string name="action_next">Далее</string>
+    <string name="action_search">Поиск</string>
+    <string name="action_filter">Фильтр</string>
+    <string name="action_apply_filters">Применить фильтры</string>
+    <string name="action_see_all">Смотреть все</string>
+    <string name="action_logout">Выйти</string>
+    <string name="action_home">Главная</string>
+
+    <!-- Welcome/Onboarding Screen -->
+    <string name="welcome_title">Добро пожаловать в Less</string>
+    <string name="welcome_subtitle">Выберите способ входа</string>
+    <string name="welcome_login_email">Войти через почту</string>
+
+    <!-- Login Email Screen -->
+    <string name="login_email_title">Email</string>
+    <string name="login_email_placeholder">Почта</string>
+
+    <!-- Login Code Screen -->
+    <string name="login_code_title">Введите 6-значный код</string>
+    <string name="login_code_subtitle">Мы отправили его на %1$s по почте</string>
+    <string name="login_code_default_email">Less@gmail.com</string>
+    <string name="login_code_resend">Не получили код?</string>
+
+    <!-- Offers Screen -->
+    <string name="offers_search_placeholder">Напитки, шоколад и снеки</string>
+
+    <!-- Orders Screen -->
+    <string name="orders_title">Заказы</string>
+    <string name="orders_tab_active">Активные</string>
+    <string name="orders_tab_previous">Предыдущие заказы</string>
+
+    <!-- Saved/Favorites Screen -->
+    <string name="saved_title">Избранное</string>
+    <string name="saved_empty_title">У вас нет избранного</string>
+    <string name="saved_empty_description">Сохранённые элементы из всех категорий появятся здесь. Вы можете удалить или использовать их в любое время</string>
+    <string name="saved_explore_venues">Найти новые заведения</string>
+
+    <!-- More Screen -->
+    <string name="more_section_application">Приложение</string>
+    <string name="more_section_support">Поддержка</string>
+    <string name="more_account">Аккаунт</string>
+    <string name="more_payment_methods">Способы оплаты</string>
+    <string name="more_vouchers">Ваучеры</string>
+    <string name="more_history">История</string>
+    <string name="more_notification">Уведомления</string>
+    <string name="more_contact_us">Связаться с нами</string>
+    <string name="more_terms_of_service">Условия использования</string>
+    <string name="more_how_to_use">Как пользоваться</string>
+    <string name="more_eco_hero">Эко-герой</string>
+    <string name="more_eco_hero_description">Вы сохранили %1$d блюд!</string>
+
+    <!-- Contact Us Bottom Sheet -->
+    <string name="contact_instagram">Instagram</string>
+    <string name="contact_tiktok">TikTok</string>
+    <string name="contact_facebook">Facebook</string>
+    <string name="contact_telegram">Telegram</string>
+    <string name="contact_whatsapp">Whatsapp</string>
+
+    <!-- Terms Bottom Sheet -->
+    <string name="terms_title">Условия и положения</string>
+
+    <!-- Account Screen -->
+    <string name="account_title">Аккаунт</string>
+    <string name="account_edit_photo">Изменить фото профиля</string>
+    <string name="account_name_placeholder">Имя Фамилия</string>
+    <string name="account_phone_placeholder">Номер телефона</string>
+    <string name="account_email_placeholder">Email</string>
+    <string name="account_gender_placeholder">Пол</string>
+    <string name="account_birthday_placeholder">Дата рождения</string>
+    <string name="account_delete">Удалить аккаунт</string>
+    <string name="account_select_gender">Выберите пол</string>
+    <string name="account_profile_photo">Фото профиля</string>
+
+    <!-- Payment Methods Screen -->
+    <string name="payment_methods_title">Способы оплаты</string>
+    <string name="payment_credit_debit_cards">Кредитные и дебетовые карты</string>
+    <string name="payment_other_methods">Другие способы</string>
+    <string name="payment_add_new_card">Добавить новую карту</string>
+    <string name="payment_mastercard">Mastercard</string>
+    <string name="payment_visa">Visa</string>
+    <string name="payment_apple_pay">Apple Pay</string>
+    <string name="payment_google_pay">Google Pay</string>
+    <string name="payment_selected">Выбрано</string>
+    <string name="payment_delete_mastercard">Удалить Mastercard %1$s</string>
+    <string name="payment_delete_visa">Удалить Visa %1$s</string>
+    <string name="payment_delete_apple_pay">Удалить Apple Pay</string>
+    <string name="payment_delete_google_pay">Удалить Google Pay</string>
+    <string name="payment_delete_card">Удалить карту</string>
+    <string name="payment_delete_confirmation">Вы уверены, что хотите удалить эту карту из приложения? После удаления вам нужно будет выбрать другую карту для оплаты</string>
+
+    <!-- Add New Card Screen -->
+    <string name="add_card_title">Добавить новую карту</string>
+    <string name="add_card_number_placeholder">0000 0000 0000 0000</string>
+    <string name="add_card_expiry_placeholder">ММ/ГГ</string>
+    <string name="add_card_cvv_placeholder">CVV/CVC</string>
+    <string name="add_card_verification_text">Для проверки карты мы спишем 1 AZN с вашего баланса. Деньги сразу вернутся на ваш баланс.</string>
+    <string name="add_card_button">Добавить карту</string>
+
+    <!-- Voucher Screen -->
+    <string name="voucher_title">Ваучер</string>
+
+    <!-- Category Offers Screen -->
+    <string name="category_offers_empty">Нет доступных предложений</string>
+
+    <!-- Merchant Profile Screen -->
+    <string name="merchant_no_reviews">Пока нет отзывов</string>
+    <string name="merchant_show_direction">Показать маршрут</string>
+    <string name="merchant_tab_offers">Предложения</string>
+    <string name="merchant_tab_reviews">Отзывы</string>
+    <string name="merchant_view_location">Показать на карте</string>
+    <string name="merchant_directions">Маршрут</string>
+
+    <!-- Reserve Screen -->
+    <string name="reserve_lot_size_info">Информация о порции</string>
+    <string name="reserve_items_left">Осталось %1$d шт.</string>
+    <string name="reserve_see_more_deals">Смотреть больше предложений от этого заведения</string>
+    <string name="reserve_select_voucher">Выбрать ваучер</string>
+    <string name="reserve_price_per_piece">Цена за штуку</string>
+    <string name="reserve_service_fee">Сервисный сбор</string>
+    <string name="reserve_subtotal">Итого</string>
+    <string name="reserve_select_payment_method">Выбрать способ оплаты</string>
+    <string name="reserve_and_pay">Забронировать и оплатить</string>
+
+    <!-- Order Accepted Screen -->
+    <string name="order_accepted_title">Ваш заказ принят</string>
+    <string name="order_accepted_description">Ваш заказ подтверждён. Заберите его из заведения в указанное время.</string>
+    <string name="order_accepted_go_orders">Перейти к заказам</string>
+
+    <!-- Reserve Info Bottom Sheet -->
+    <string name="reserve_info_reserve_number">Номер брони</string>
+    <string name="reserve_info_date">Дата</string>
+    <string name="reserve_info_show_location">Показать местоположение</string>
+
+    <!-- Filter Bottom Sheet -->
+    <string name="filter_title">Фильтры</string>
+
+    <!-- Select Payment Method Bottom Sheet -->
+    <string name="select_payment_title">Выберите способ оплаты</string>
+
+    <!-- Select Voucher Bottom Sheet -->
+    <string name="select_voucher_title">Выберите ваучер</string>
+
+    <!-- Lot Size Info Bottom Sheet -->
+    <string name="lot_size_info_title">Информация о порции</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_user_avatar">Аватар пользователя</string>
+    <string name="cd_notifications">Уведомления</string>
+    <string name="cd_messages">Сообщения</string>
+    <string name="cd_merchant_logo">Логотип заведения</string>
+    <string name="cd_merchant_hero_image">Изображение заведения</string>
+    <string name="cd_offer_image">Изображение предложения</string>
+    <string name="cd_restaurant_logo">Логотип ресторана</string>
+    <string name="cd_rating">Рейтинг</string>
+    <string name="cd_favorite">Избранное</string>
+    <string name="cd_liked">Понравилось</string>
+    <string name="cd_completed">Завершено</string>
+    <string name="cd_gift">Подарок</string>
+    <string name="cd_phone">Телефон</string>
+    <string name="cd_location">Местоположение</string>
+    <string name="cd_app_logo">Логотип приложения</string>
+    <string name="cd_plus">Плюс</string>
+    <string name="cd_minus">Минус</string>
+    <string name="cd_see_more">Смотреть ещё</string>
+    <string name="cd_select_payment">Выбрать оплату</string>
+
+    <!-- Error Messages -->
+    <string name="error_invalid_email">Неверный адрес электронной почты</string>
+    <string name="error_invalid_phone">Неверный номер телефона</string>
+    <string name="error_invalid_card_number">Неверный номер карты</string>
+    <string name="error_invalid_expiry_date">Неверная дата истечения</string>
+    <string name="error_invalid_cvv">Неверный CVV</string>
+    <string name="error_generic">Что-то пошло не так</string>
+
+    <!-- Currency -->
+    <string name="currency_azn">%1$s &#8380;</string>
+
+    <!-- ==================== MERCHANT FLOW ==================== -->
+
+    <!-- Merchant Bottom Navigation -->
+    <string name="merch_nav_orders">Заказы</string>
+    <string name="merch_nav_add">Добавить</string>
+    <string name="merch_nav_history">История</string>
+    <string name="merch_nav_more">Ещё</string>
+
+    <!-- Merchant More Screen -->
+    <string name="merch_more_places">Филиалы</string>
+    <string name="merch_more_dark_mode">Тёмная тема</string>
+
+    <!-- Merchant Orders Screen -->
+    <string name="merch_orders_awaiting_pickup">Ожидают выдачи</string>
+    <string name="merch_orders_awaiting_purchase">Ожидают покупки</string>
+    <string name="merch_orders_lot_added">Лот успешно добавлен</string>
+    <string name="merch_orders_lot_remove_info">Вы можете удалить лот только в течение 1 часа</string>
+    <string name="merch_orders_items_left">Осталось %1$d</string>
+    <string name="merch_orders_pickup_time">Забрать с %1$s до %2$s</string>
+    <string name="merch_orders_handed_over">Выдан</string>
+    <string name="merch_orders_cancel_lot">Отменить лот</string>
+    <string name="merch_orders_cancellation_ended">Время отмены истекло</string>
+
+    <!-- Add Lot Screen -->
+    <string name="add_lot_title">Добавить лот</string>
+    <string name="add_lot_loading">Загрузка...</string>
+    <string name="add_lot_button">Добавить лоты</string>
+    <string name="add_lot_select_time">Выбрать время</string>
+
+    <!-- Income History Screen -->
+    <string name="history_title">История</string>
+    <string name="history_select_month">Выбрать месяц</string>
+    <string name="history_all_branches">Все филиалы</string>
+    <string name="history_empty">История доходов не найдена</string>
+
+    <!-- Places Screen -->
+    <string name="places_title">Филиалы</string>
+    <string name="places_add_branch">Добавить филиал</string>
+    <string name="places_empty_title">Пока нет филиалов</string>
+    <string name="places_empty_description">Добавьте свой первый филиал, чтобы начать управлять локациями. Клиенты смогут находить и посещать ваши заведения.</string>
+    <string name="places_cd_no_places">Нет филиалов</string>
+
+    <!-- Edit Merchant Profile Screen -->
+    <string name="edit_profile_manage_email">Управлять этой локацией с этого email</string>
+    <string name="edit_profile_create_branch">Создать филиал</string>
+    <string name="edit_profile_update_branch">Обновить филиал</string>
+
+    <!-- Branch Verification Screen -->
+    <string name="branch_verification_title">Заведение добавлено</string>
+    <string name="branch_verification_description">Если вам нужны дополнительные настройки</string>
+    <string name="branch_verification_add_users">Добавить пользователей</string>
+
+    <!-- Branch Users Screen -->
+    <string name="branch_users_title">Пользователи %1$s</string>
+    <string name="branch_users_add_other">Добавить ещё пользователя</string>
+    <string name="branch_users_empty_title">У вас нет добавленных пользователей</string>
+    <string name="branch_users_empty_description">Если вам нужен кто-то для управления заказами, например кассир</string>
+    <string name="branch_users_add_user">Добавить пользователя</string>
+    <string name="branch_users_cd_no_users">Нет пользователей</string>
+
+    <!-- Add Branch User Screen -->
+    <string name="add_user_title">Пользователь %1$d</string>
+    <string name="add_user_name_placeholder">Имя</string>
+    <string name="add_user_delete">Удалить пользователя</string>
+    <string name="add_user_save">Сохранить изменения</string>
+
+    <!-- Select Location Screen -->
+    <string name="select_location_title">Выберите адрес на карте</string>
+    <string name="select_location_hint">Нажмите на карту для выбора локации</string>
+    <string name="select_location_confirm">Подтвердить локацию</string>
+    <string name="select_location_selected">Выбранная локация</string>
+</resources>

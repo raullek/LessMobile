@@ -33,6 +33,12 @@ import az.less.designsystem.components.ToastType
 import az.less.mobile.presentation.merchant.orders.components.MerchOrderCard
 import az.less.mobile.presentation.merchant.orders.model.MerchOrderTab
 import az.less.mobile.presentation.merchant.orders.model.OrderButtonState
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.merch_orders_awaiting_pickup
+import lessmobile.composeapp.generated.resources.merch_orders_awaiting_purchase
+import lessmobile.composeapp.generated.resources.merch_orders_lot_added
+import lessmobile.composeapp.generated.resources.merch_orders_lot_remove_info
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -111,11 +117,11 @@ fun MerchOrdersScreenContent(
                 options = listOf(
                     SegmentOption(
                         id = MerchOrderTab.AWAITING_PICKUP.name,
-                        text = "Awaiting Pickup"
+                        text = stringResource(Res.string.merch_orders_awaiting_pickup)
                     ),
                     SegmentOption(
                         id = MerchOrderTab.AWAITING_PURCHASE.name,
-                        text = "Awaiting Purchase"
+                        text = stringResource(Res.string.merch_orders_awaiting_purchase)
                     )
                 ),
                 selectedOptionId = state.selectedTab.name,
@@ -177,8 +183,8 @@ fun MerchOrdersScreenContent(
         // Success Toast with gradient scrim
         AnimatedToast(
             visible = showHandedOverToast,
-            title = "Lot successfully added",
-            subtitle = "You can remove lot only in 1 hour",
+            title = stringResource(Res.string.merch_orders_lot_added),
+            subtitle = stringResource(Res.string.merch_orders_lot_remove_info),
             type = ToastType.Success,
             showGradientScrim = true,
             contentPadding = PaddingValues(

@@ -41,7 +41,12 @@ import az.less.mobile.presentation.maps.models.MapType
 import az.less.mobile.presentation.maps.models.Marker
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_map_24dp
+import lessmobile.composeapp.generated.resources.select_location_confirm
+import lessmobile.composeapp.generated.resources.select_location_hint
+import lessmobile.composeapp.generated.resources.select_location_selected
+import lessmobile.composeapp.generated.resources.select_location_title
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -117,12 +122,13 @@ fun SelectBranchLocationOnMapScreenContent(
     modifier: Modifier = Modifier
 ) {
     // Create marker for selected location
+    val selectedLocationTitle = stringResource(Res.string.select_location_selected)
     val selectedLocationMarker = state.selectedLocation?.let { location ->
         listOf(
             Marker(
                 id = "selected_location",
                 position = location,
-                title = "Selected Location",
+                title = selectedLocationTitle,
                 tag = "location_pin", // Tag to identify as location pin marker
                 isVisible = true
             )
@@ -168,14 +174,14 @@ fun SelectBranchLocationOnMapScreenContent(
         ) {
             // Header/Toolbar
             DsToolBar(
-                title = "Select address on map",
+                title = stringResource(Res.string.select_location_title),
                 onBackClick = { onIntent(SelectBranchLocationOnMapIntent.OnBackClick) },
                 backgroundColor = Color.Transparent
             )
 
             // Address card (clickable to open InputAddressScreen)
             AddressCard(
-                address = state.selectedAddress.ifEmpty { "Tap on map to select location" },
+                address = state.selectedAddress.ifEmpty { stringResource(Res.string.select_location_hint) },
                 onClick = { onIntent(SelectBranchLocationOnMapIntent.OnAddressCardClick) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -186,7 +192,7 @@ fun SelectBranchLocationOnMapScreenContent(
 
         // Bottom confirm button (on map)
         DsButton(
-            text = "Confirm Location",
+            text = stringResource(Res.string.select_location_confirm),
             onClick = { onIntent(SelectBranchLocationOnMapIntent.OnConfirmClick) },
             modifier = Modifier
                 .align(Alignment.BottomCenter)

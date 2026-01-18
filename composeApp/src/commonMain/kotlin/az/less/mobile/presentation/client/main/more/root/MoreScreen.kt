@@ -32,6 +32,16 @@ import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import org.jetbrains.compose.resources.painterResource
 import az.less.mobile.presentation.client.main.more.root.components.MoreHeader
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellType
+
+import lessmobile.composeapp.generated.resources.more_contact_us
+import lessmobile.composeapp.generated.resources.contact_instagram
+import lessmobile.composeapp.generated.resources.contact_tiktok
+import lessmobile.composeapp.generated.resources.contact_facebook
+import lessmobile.composeapp.generated.resources.contact_telegram
+import lessmobile.composeapp.generated.resources.contact_whatsapp
+import lessmobile.composeapp.generated.resources.terms_title
+import lessmobile.composeapp.generated.resources.action_logout
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -98,33 +108,33 @@ fun MoreScreen(
         val contactItems = listOf(
             ListBottomSheetItem(
                 id = "instagram",
-                title = "Instagram",
+                title = stringResource(Res.string.contact_instagram),
                 icon = null // TODO: Add Instagram icon
             ),
             ListBottomSheetItem(
                 id = "tiktok",
-                title = "TikTok",
+                title = stringResource(Res.string.contact_tiktok),
                 icon = null // TODO: Add TikTok icon
             ),
             ListBottomSheetItem(
                 id = "facebook",
-                title = "Facebook",
+                title = stringResource(Res.string.contact_facebook),
                 icon = null // TODO: Add Facebook icon
             ),
             ListBottomSheetItem(
                 id = "telegram",
-                title = "Telegram",
+                title = stringResource(Res.string.contact_telegram),
                 icon = null // TODO: Add Telegram icon
             ),
             ListBottomSheetItem(
                 id = "whatsapp",
-                title = "Whatsapp",
+                title = stringResource(Res.string.contact_whatsapp),
                 icon = null // TODO: Add Whatsapp icon
             )
         )
-        
+
         DsListBottomSheet(
-            title = "Contact us",
+            title = stringResource(Res.string.more_contact_us),
             items = contactItems,
             onItemClick = { itemId ->
                 viewModel.onIntent(MoreIntent.OnContactUsItemClick(itemId))
@@ -151,7 +161,7 @@ fun MoreScreen(
         """.trimIndent()
         
         DsTextBottomSheet(
-            title = "Terms&Conditions",
+            title = stringResource(Res.string.terms_title),
             content = termsContent,
             onDismiss = {
                 viewModel.onIntent(MoreIntent.OnTermsDismiss)
@@ -243,7 +253,7 @@ fun MoreScreenContent(
         if (state.isLoggedIn) {
             item {
                 DsButton(
-                    text = "Logout",
+                    text = stringResource(Res.string.action_logout),
                     onClick = { onIntent(MoreIntent.OnLogoutClicked) },
                     variant = ButtonVariant.Secondary,
                     modifier = Modifier

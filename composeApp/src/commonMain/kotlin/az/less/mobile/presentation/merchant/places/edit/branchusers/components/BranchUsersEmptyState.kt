@@ -24,9 +24,14 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.branch_users_add_user
+import lessmobile.composeapp.generated.resources.branch_users_cd_no_users
+import lessmobile.composeapp.generated.resources.branch_users_empty_description
+import lessmobile.composeapp.generated.resources.branch_users_empty_title
 import lessmobile.composeapp.generated.resources.ic_account_24dp
 import lessmobile.composeapp.generated.resources.ic_plus_24dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Empty state component for Branch Users screen
@@ -53,7 +58,7 @@ fun BranchUsersEmptyState(
             // Main user icon
             Icon(
                 painter = painterResource(Res.drawable.ic_account_24dp),
-                contentDescription = "No users",
+                contentDescription = stringResource(Res.string.branch_users_cd_no_users),
                 tint = LessTheme.colors.textIconsBrand,
                 modifier = Modifier.size(48.dp)
             )
@@ -80,7 +85,7 @@ fun BranchUsersEmptyState(
 
         // Title
         Text(
-            text = "You dont has any added users",
+            text = stringResource(Res.string.branch_users_empty_title),
             style = LessTheme.typography.title24Bold,
             color = LessTheme.colors.textIconsBlack,
             textAlign = TextAlign.Center
@@ -90,7 +95,7 @@ fun BranchUsersEmptyState(
 
         // Description
         Text(
-            text = "If you need someone to add to control your orders for example cashier",
+            text = stringResource(Res.string.branch_users_empty_description),
             style = LessTheme.typography.body16Regular,
             color = LessTheme.colors.textIconsGrey,
             textAlign = TextAlign.Center
@@ -101,7 +106,7 @@ fun BranchUsersEmptyState(
         // Button
         DsButton(
             modifier = Modifier.fillMaxWidth(),
-            text = "Add user",
+            text = stringResource(Res.string.branch_users_add_user),
             onClick = onAddUserClick,
             size = ButtonSize.Large,
             variant = ButtonVariant.Primary

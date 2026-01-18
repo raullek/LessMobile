@@ -28,6 +28,14 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.mobile.presentation.client.reserve.models.ReserveInfo
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.reserve_info_reserve_number
+import lessmobile.composeapp.generated.resources.reserve_info_date
+import lessmobile.composeapp.generated.resources.reserve_price_per_piece
+import lessmobile.composeapp.generated.resources.reserve_service_fee
+import lessmobile.composeapp.generated.resources.reserve_subtotal
+import lessmobile.composeapp.generated.resources.reserve_info_show_location
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Stateful Reserve Info Bottom Sheet
@@ -195,7 +203,7 @@ private fun ReserveNumberSection(
 
         // Label
         Text(
-            text = "Reserve number",
+            text = stringResource(Res.string.reserve_info_reserve_number),
             style = LessTheme.typography.body16Medium,
             color = LessTheme.colors.textIconsBlack,
             textAlign = TextAlign.Center,
@@ -219,22 +227,22 @@ private fun DetailsSection(
         verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
     ) {
         DetailRow(
-            label = "Date",
+            label = stringResource(Res.string.reserve_info_date),
             value = reserveInfo.date
         )
 
         DetailRow(
-            label = "Price per piece",
+            label = stringResource(Res.string.reserve_price_per_piece),
             value = "${reserveInfo.pricePerPiece} ₼"
         )
 
         DetailRow(
-            label = "Service fee",
+            label = stringResource(Res.string.reserve_service_fee),
             value = "${reserveInfo.serviceFee} ₼"
         )
 
         DetailRow(
-            label = "Subtotal",
+            label = stringResource(Res.string.reserve_subtotal),
             value = "${reserveInfo.subtotal} ₼"
         )
     }
@@ -249,7 +257,7 @@ private fun ActionButton(
     modifier: Modifier = Modifier
 ) {
     DsButton(
-        text = "Show me location",
+        text = stringResource(Res.string.reserve_info_show_location),
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()

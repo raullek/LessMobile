@@ -30,6 +30,10 @@ import az.less.designsystem.components.DsToolBar
 import az.less.mobile.navigation.MerchantRoute
 import az.less.mobile.presentation.merchant.places.components.BranchCard
 import az.less.mobile.presentation.merchant.places.components.PlacesEmptyState
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.places_add_branch
+import lessmobile.composeapp.generated.resources.places_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -88,7 +92,7 @@ fun MerchPlacesScreenContent(
     ) {
         // Fixed Toolbar
         DsToolBar(
-            title = "Places",
+            title = stringResource(Res.string.places_title),
             onBackClick = { onIntent(MerchPlacesIntent.OnBackClick) },
             backgroundColor = LessTheme.colors.backgroundSecond
         )
@@ -169,7 +173,7 @@ fun MerchPlacesScreenContent(
                         .windowInsetsPadding(WindowInsets.navigationBars)
                 ) {
                     DsButton(
-                        text = "Add branch",
+                        text = stringResource(Res.string.places_add_branch),
                         onClick = { onIntent(MerchPlacesIntent.OnAddBranchClick) },
                         modifier = Modifier.fillMaxWidth(),
                         variant = ButtonVariant.Primary,

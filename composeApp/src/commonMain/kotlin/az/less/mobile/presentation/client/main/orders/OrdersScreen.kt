@@ -34,6 +34,11 @@ import az.less.mobile.presentation.client.main.orders.components.OrderItem
 import az.less.mobile.presentation.client.reserve.ReserveInfoBottomSheet
 import az.less.mobile.presentation.client.reserve.models.ReserveInfo
 import kotlinx.coroutines.launch
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.orders_title
+import lessmobile.composeapp.generated.resources.orders_tab_active
+import lessmobile.composeapp.generated.resources.orders_tab_previous
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -138,7 +143,7 @@ fun OrdersScreenContent(
         
         // Title
         Text(
-            text = "Orders",
+            text = stringResource(Res.string.orders_title),
             style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsBlack,
             textAlign = TextAlign.Center,
@@ -146,20 +151,20 @@ fun OrdersScreenContent(
                 .fillMaxWidth()
                 .padding(horizontal = LessTheme.spacing.large)
         )
-        
+
         // Spacing between title and segmented button
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-        
+
         // SegmentedButton
         SegmentedButton(
             options = listOf(
                 SegmentOption(
                     id = OrderTab.CART.name,
-                    text = "Active"
+                    text = stringResource(Res.string.orders_tab_active)
                 ),
                 SegmentOption(
                     id = OrderTab.HISTORY.name,
-                    text = "Previous orders"
+                    text = stringResource(Res.string.orders_tab_previous)
                 )
             ),
             selectedOptionId = state.selectedTab.name,

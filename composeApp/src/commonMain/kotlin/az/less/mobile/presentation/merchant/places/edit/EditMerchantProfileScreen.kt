@@ -36,6 +36,11 @@ import az.less.mobile.presentation.merchant.places.edit.components.EditPhoneNumb
 import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
 import kotlinx.coroutines.launch
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.edit_profile_create_branch
+import lessmobile.composeapp.generated.resources.edit_profile_manage_email
+import lessmobile.composeapp.generated.resources.edit_profile_update_branch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -259,7 +264,7 @@ fun EditMerchantProfileScreenContent(
             // Toggle Section (using DsCell like in More screen)
             item(key = "toggle_section") {
                 DsCell(
-                    title = "Manage this location from this email",
+                    title = stringResource(Res.string.edit_profile_manage_email),
                     type = CellType.Toggle(
                         checked = state.manageFromEmail,
                         onCheckedChange = { onIntent(EditMerchantProfileIntent.OnManageFromEmailToggled(it)) }
@@ -282,7 +287,7 @@ fun EditMerchantProfileScreenContent(
                 .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
             DsButton(
-                text = if (state.branchId == null) "Create branch" else "Update branch",
+                text = if (state.branchId == null) stringResource(Res.string.edit_profile_create_branch) else stringResource(Res.string.edit_profile_update_branch),
                 onClick = { onIntent(EditMerchantProfileIntent.OnCreateBranchClick) },
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Primary,

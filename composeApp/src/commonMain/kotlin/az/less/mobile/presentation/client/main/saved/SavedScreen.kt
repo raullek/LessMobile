@@ -22,6 +22,9 @@ import az.less.designsystem.components.DsToolBar
 import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.saved.components.SavedEmptyState
 import az.less.mobile.presentation.client.main.saved.components.SavedMerchantCard
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.saved_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -78,7 +81,7 @@ fun SavedScreenContent(
     ) {
         // Fixed Toolbar with title
         DsToolBar(
-            title = "Favourites",
+            title = stringResource(Res.string.saved_title),
             backgroundColor = LessTheme.colors.backgroundSecond
         )
 
