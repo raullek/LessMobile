@@ -1,22 +1,25 @@
 package az.less.mobile.presentation.client.account.account
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,13 +28,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
+import io.github.skeptick.inputmask.compose.phone.rememberPhoneInputMaskVisualTransformation
+import io.github.skeptick.inputmask.compose.rememberInputMaskVisualTransformation
 import kotlinx.coroutines.launch
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
@@ -42,9 +49,7 @@ import az.less.designsystem.components.DsSelectionField
 import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.DsToolBar
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.test_merchant_logo
 import lessmobile.composeapp.generated.resources.account_title
-import lessmobile.composeapp.generated.resources.account_edit_photo
 import lessmobile.composeapp.generated.resources.account_name_placeholder
 import lessmobile.composeapp.generated.resources.account_phone_placeholder
 import lessmobile.composeapp.generated.resources.account_email_placeholder
@@ -54,11 +59,23 @@ import lessmobile.composeapp.generated.resources.account_delete
 import lessmobile.composeapp.generated.resources.action_save
 import lessmobile.composeapp.generated.resources.account_select_gender
 import lessmobile.composeapp.generated.resources.account_profile_photo
+import lessmobile.composeapp.generated.resources.ic_edit_24dp
+import lessmobile.composeapp.generated.resources.image_placeholder
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
+
+/**
+ * Phone number mask for Azerbaijan format: +994 XX XXX XX XX
+ */
+private const val PHONE_MASK = "+{994} [00] [000] [00] [00]"
+
+/**
+ * Date mask for birthday format: DD.MM.YYYY
+ */
+private const val DATE_MASK = "[00].[00].[0000]"
 
 @Composable
 fun AccountScreen(
@@ -93,6 +110,12 @@ fun AccountScreenContent(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
+
+    // Phone mask with +994 prefix - handles pasting with or without country code
+    val phoneVisualTransformation = rememberPhoneInputMaskVisualTransformation(PHONE_MASK)
+
+    // Date mask for birthday field
+    val dateVisualTransformation = rememberInputMaskVisualTransformation(DATE_MASK)
 
     LaunchedEffect(state.showGenderBottomSheet) {
         if (state.showGenderBottomSheet) {
@@ -149,12 +172,7 @@ fun AccountScreenContent(
             Box(
                 modifier = Modifier
                     .size(96.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(
-                        width = 2.dp,
-                        color = LessTheme.colors.elementsPrimaryBrand,
-                        shape = RoundedCornerShape(16.dp)
-                    ),
+                    .clip(RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 if (state.profilePhotoBytes != null) {
@@ -168,23 +186,33 @@ fun AccountScreenContent(
                     )
                 } else {
                     Image(
-                        painter = painterResource(Res.drawable.test_merchant_logo),
-                        contentDescription = null,
+                        painter = painterResource(Res.drawable.image_placeholder),
+                        contentDescription = stringResource(Res.string.account_profile_photo),
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(96.dp)
                             .clip(RoundedCornerShape(16.dp))
                     )
                 }
+
+                // Edit icon overlay
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(Color(0x80171A1C))
+                        .clickable { onIntent(AccountIntent.OnEditPhotoClicked) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_edit_24dp),
+                        contentDescription = "Edit photo",
+                        tint = LessTheme.colors.textIconsNested,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-
-            DsButton(
-                text = stringResource(Res.string.account_edit_photo),
-                size = ButtonSize.Medium,
-                onClick = { onIntent(AccountIntent.OnEditPhotoClicked) },
-                variant = ButtonVariant.Primary
-            )
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxLarge))
 
@@ -199,11 +227,16 @@ fun AccountScreenContent(
 
             DsTextField(
                 value = state.phoneNumber,
-                onValueChange = { onIntent(AccountIntent.OnPhoneChanged(it)) },
-                placeholder = stringResource(Res.string.account_phone_placeholder),
+                onValueChange = { newValue ->
+                    val sanitized = phoneVisualTransformation.sanitize(newValue)
+                    onIntent(AccountIntent.OnPhoneChanged(sanitized))
+                },
+                placeholder = "+994 XX XXX XX XX",
                 isError = state.phoneNumberError != null,
                 errorMessage = state.phoneNumberError,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                visualTransformation = phoneVisualTransformation
             )
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.small))
@@ -229,12 +262,16 @@ fun AccountScreenContent(
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.small))
 
-            DsSelectionField(
-                value = state.birthDate.takeIf { it.isNotEmpty() },
-                placeholder = stringResource(Res.string.account_birthday_placeholder),
-                onClick = { onIntent(AccountIntent.OnBirthDateClick) },
-                onClear = { onIntent(AccountIntent.OnBirthDateClear) },
-                modifier = Modifier.fillMaxWidth()
+            DsTextField(
+                value = state.birthDate,
+                onValueChange = { newValue ->
+                    val sanitized = dateVisualTransformation.sanitize(newValue)
+                    onIntent(AccountIntent.OnBirthDateChanged(sanitized))
+                },
+                placeholder = "DD.MM.YYYY",
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                visualTransformation = dateVisualTransformation
             )
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxLarge))
