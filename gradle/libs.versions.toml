@@ -29,6 +29,7 @@ googleMapsCompose = "6.12.2"
 playServicesLocation = "21.3.0"
 google-MapsAndroidComposeVersion = "3.1.0"
 core-splashscreen="1.0.1"
+buildkonfig = "0.17.1"
 
 pods-google-maps = "9.1.1"
 pods-google-ios-maps-utils = "6.0.0"
@@ -114,6 +115,7 @@ compose-shimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.
 imagepickerkmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepickerkmp" }
 
 [plugins]
+buildkonfig = {id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig"}
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
