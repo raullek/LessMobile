@@ -27,6 +27,13 @@ import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.DsToolBar
 import io.github.skeptick.inputmask.compose.phone.rememberPhoneInputMaskVisualTransformation
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.add_user_delete
+import lessmobile.composeapp.generated.resources.add_user_name_placeholder
+import lessmobile.composeapp.generated.resources.add_user_save
+import lessmobile.composeapp.generated.resources.add_user_title
+import lessmobile.composeapp.generated.resources.login_email_placeholder
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -94,7 +101,7 @@ fun AddBranchUserScreenContent(
     ) {
         // Toolbar with user number
         DsToolBar(
-            title = "User ${state.userNumber}",
+            title = stringResource(Res.string.add_user_title, state.userNumber),
             onBackClick = { onIntent(AddBranchUserIntent.OnBackClick) },
             backgroundColor = LessTheme.colors.backgroundPrimary
         )
@@ -110,7 +117,7 @@ fun AddBranchUserScreenContent(
             DsTextField(
                 value = state.name,
                 onValueChange = { onIntent(AddBranchUserIntent.OnNameChange(it)) },
-                placeholder = "Name",
+                placeholder = stringResource(Res.string.add_user_name_placeholder),
                 isError = state.nameError != null,
                 errorMessage = state.nameError,
                 onEndIconClick = { onIntent(AddBranchUserIntent.OnNameChange("")) },
@@ -137,7 +144,7 @@ fun AddBranchUserScreenContent(
             DsTextField(
                 value = state.email,
                 onValueChange = { onIntent(AddBranchUserIntent.OnEmailChange(it)) },
-                placeholder = "Mail",
+                placeholder = stringResource(Res.string.login_email_placeholder),
                 isError = state.emailError != null,
                 errorMessage = state.emailError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -160,7 +167,7 @@ fun AddBranchUserScreenContent(
 
             if (state.isEditMode) {
                 DsButton(
-                    text = "Delete user",
+                    text = stringResource(Res.string.add_user_delete),
                     onClick = { onIntent(AddBranchUserIntent.OnDeleteClick) },
                     textColor = LessTheme.colors.textIconsError,
                     variant = ButtonVariant.Secondary,
@@ -169,7 +176,7 @@ fun AddBranchUserScreenContent(
             }
             // Save button
             DsButton(
-                text = "Save changes",
+                text = stringResource(Res.string.add_user_save),
                 onClick = { onIntent(AddBranchUserIntent.OnSaveClick) },
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Primary,

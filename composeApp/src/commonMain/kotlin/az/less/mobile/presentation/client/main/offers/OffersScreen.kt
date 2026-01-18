@@ -39,7 +39,9 @@ import az.less.mobile.presentation.client.reserve.ReserveScreen
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
+import lessmobile.composeapp.generated.resources.action_see_all
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -291,13 +293,13 @@ fun OffersScreenContent(
                                     }
                                 ) {
                                     Text(
-                                        text = "See all",
+                                        text = stringResource(Res.string.action_see_all),
                                         style = LessTheme.typography.body16Semibold,
                                         color = LessTheme.colors.textIconsBrand
                                     )
                                     Icon(
                                         painter = painterResource(Res.drawable.ic_chevron_right_24dp),
-                                        contentDescription = "See all",
+                                        contentDescription = stringResource(Res.string.action_see_all),
                                         tint = LessTheme.colors.textIconsBrand,
                                         modifier = Modifier.padding(start = LessTheme.spacing.xxxSmall)
                                     )

@@ -29,6 +29,12 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.merchant.history.components.DownloadIconButton
 import az.less.mobile.presentation.merchant.history.components.FilterButton
 import az.less.mobile.presentation.merchant.history.components.IncomePositionItem
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.history_all_branches
+import lessmobile.composeapp.generated.resources.history_empty
+import lessmobile.composeapp.generated.resources.history_select_month
+import lessmobile.composeapp.generated.resources.history_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -95,7 +101,7 @@ fun IncomeHistoryScreenContent(
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
-                text = "History",
+                text = stringResource(Res.string.history_title),
                 style = LessTheme.typography.title24Bold,
                 color = LessTheme.colors.textIconsBlack
             )
@@ -118,14 +124,14 @@ fun IncomeHistoryScreenContent(
             
             // Month filter button
             FilterButton(
-                text = state.selectedMonth?.displayName ?: "Select Month",
+                text = state.selectedMonth?.displayName ?: stringResource(Res.string.history_select_month),
                 onClick = { onIntent(IncomeHistoryIntent.OnMonthFilterClicked) },
                 modifier = Modifier.weight(1f)
             )
-            
+
             // Branch filter button
             FilterButton(
-                text = state.selectedBranch?.name ?: "All branches",
+                text = state.selectedBranch?.name ?: stringResource(Res.string.history_all_branches),
                 onClick = { onIntent(IncomeHistoryIntent.OnBranchFilterClicked) },
                 modifier = Modifier.weight(1f)
             )
@@ -147,7 +153,7 @@ fun IncomeHistoryScreenContent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No income history found",
+                    text = stringResource(Res.string.history_empty),
                     style = LessTheme.typography.body16Medium,
                     color = LessTheme.colors.textIconsGrey,
                     textAlign = TextAlign.Center

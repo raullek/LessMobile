@@ -23,7 +23,11 @@ import az.less.mobile.navigation.ClientRoute
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_mail_24dp
 import lessmobile.composeapp.generated.resources.ill_welcome_screen_320dp
+import lessmobile.composeapp.generated.resources.welcome_title
+import lessmobile.composeapp.generated.resources.welcome_subtitle
+import lessmobile.composeapp.generated.resources.welcome_login_email
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 
@@ -73,7 +77,7 @@ fun WelcomeScreenContent(
 
             // Welcome message
             Text(
-                text = "Welcome to Less",
+                text = stringResource(Res.string.welcome_title),
                 style = LessTheme.typography.title24Bold,
                 color = LessTheme.colors.textIconsBrand,
                 textAlign = TextAlign.Center
@@ -82,7 +86,7 @@ fun WelcomeScreenContent(
             Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
             Text(
-                text = "Select your preferred method to log in",
+                text = stringResource(Res.string.welcome_subtitle),
                 style = LessTheme.typography.body16Bold,
                 color = LessTheme.colors.textIconsBlack,
                 textAlign = TextAlign.Center
@@ -92,7 +96,7 @@ fun WelcomeScreenContent(
         // Button at the bottom
         DsButton(
             modifier = Modifier.fillMaxWidth(),
-            text = "Log in with email",
+            text = stringResource(Res.string.welcome_login_email),
             onClick = {
                 onLoginClick()
             },

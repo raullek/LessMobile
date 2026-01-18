@@ -33,6 +33,9 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.reserve.ReserveScreen
 import kotlinx.coroutines.launch
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.category_offers_empty
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -154,7 +157,7 @@ fun CategoryOffersScreenContent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No offers available",
+                    text = stringResource(Res.string.category_offers_empty),
                     style = LessTheme.typography.body16Regular,
                     color = LessTheme.colors.textIconsGrey,
                     textAlign = TextAlign.Center

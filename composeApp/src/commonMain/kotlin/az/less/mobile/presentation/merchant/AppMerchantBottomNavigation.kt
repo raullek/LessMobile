@@ -36,8 +36,14 @@ import lessmobile.composeapp.generated.resources.ic_history_24dp
 import lessmobile.composeapp.generated.resources.ic_more_24dp
 import lessmobile.composeapp.generated.resources.ic_orders_24dp
 import lessmobile.composeapp.generated.resources.ic_plus_square_24dp
+import lessmobile.composeapp.generated.resources.merch_nav_add
+import lessmobile.composeapp.generated.resources.merch_nav_history
+import lessmobile.composeapp.generated.resources.merch_nav_more
+import lessmobile.composeapp.generated.resources.merch_nav_orders
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import kotlin.reflect.KClass
 
 @Composable
@@ -114,14 +120,15 @@ private fun BottomNavItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        val label = stringResource(item.labelRes)
         Icon(
             painter = painterResource(resource = item.icon),
-            contentDescription = item.label,
+            contentDescription = label,
             tint = iconColor,
             modifier = Modifier.size(LessTheme.size.medium)
         )
         Text(
-            text = item.label,
+            text = label,
             style = LessTheme.typography.caption12Bold,
             color = iconColor,
             modifier = Modifier.padding(top = LessTheme.spacing.xxSmall)
@@ -131,7 +138,7 @@ private fun BottomNavItem(
 
 private data class BottomNavItemData(
     val icon: DrawableResource,
-    val label: String,
+    val labelRes: StringResource,
     val route: Any,
     val routeClass: KClass<*>
 )
@@ -139,25 +146,25 @@ private data class BottomNavItemData(
 private val bottomNavItems = listOf(
     BottomNavItemData(
         icon = Res.drawable.ic_orders_24dp,
-        label = "Orders",
+        labelRes = Res.string.merch_nav_orders,
         route = MerchantRoute.Orders,
         routeClass = MerchantRoute.Orders::class
     ),
     BottomNavItemData(
         icon = Res.drawable.ic_plus_square_24dp,
-        label = "Add",
+        labelRes = Res.string.merch_nav_add,
         route = MerchantRoute.AddLot,
         routeClass = MerchantRoute.AddLot::class
     ),
     BottomNavItemData(
         icon = Res.drawable.ic_history_24dp,
-        label = "History",
+        labelRes = Res.string.merch_nav_history,
         route = MerchantRoute.History,
         routeClass = MerchantRoute.History::class
     ),
     BottomNavItemData(
         icon = Res.drawable.ic_more_24dp,
-        label = "More",
+        labelRes = Res.string.merch_nav_more,
         route = MerchantRoute.More,
         routeClass = MerchantRoute.More::class
     )

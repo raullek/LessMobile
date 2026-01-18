@@ -38,9 +38,16 @@ import az.less.mobile.presentation.merchant.orders.model.MerchOrderItem
 import az.less.mobile.presentation.merchant.orders.model.OrderButtonState
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.cd_rating
 import lessmobile.composeapp.generated.resources.ic_star_24dp
+import lessmobile.composeapp.generated.resources.merch_orders_cancel_lot
+import lessmobile.composeapp.generated.resources.merch_orders_cancellation_ended
+import lessmobile.composeapp.generated.resources.merch_orders_handed_over
+import lessmobile.composeapp.generated.resources.merch_orders_items_left
+import lessmobile.composeapp.generated.resources.merch_orders_pickup_time
 import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Order card component for merchant orders screen
@@ -115,7 +122,7 @@ fun MerchOrderCard(
                     .padding(horizontal = LessTheme.spacing.xSmall, vertical = LessTheme.spacing.xxSmall)
             ) {
                 Text(
-                    text = "${order.itemsLeft} left",
+                    text = stringResource(Res.string.merch_orders_items_left, order.itemsLeft),
                     style = LessTheme.typography.caption12Semibold,
                     color = LessTheme.colors.textIconsNested
                 )
@@ -248,7 +255,7 @@ fun MerchOrderCard(
                     
                     // Pickup time
                     Text(
-                        text = "Pick up from ${order.pickupTimeStart} to ${order.pickupTimeEnd}",
+                        text = stringResource(Res.string.merch_orders_pickup_time, order.pickupTimeStart, order.pickupTimeEnd),
                         style = LessTheme.typography.body14Medium,
                         color = LessTheme.colors.textIconsGrey,
                         maxLines = 1,
@@ -301,7 +308,7 @@ fun MerchOrderCard(
                     ) {
                         Image(
                             painter = painterResource(Res.drawable.ic_star_24dp),
-                            contentDescription = "Rating",
+                            contentDescription = stringResource(Res.string.cd_rating),
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -365,17 +372,17 @@ private fun OrderActionButton(
     when (buttonState) {
         OrderButtonState.HANDED_OVER -> {
             DsButton(
-                text = "Handed Over",
+                text = stringResource(Res.string.merch_orders_handed_over),
                 onClick = onClick,
                 modifier = modifier,
                 variant = ButtonVariant.Primary,
                 size = ButtonSize.Medium
             )
         }
-        
+
         OrderButtonState.CANCEL_LOT -> {
             DsButton(
-                text = "Cancel Lot",
+                text = stringResource(Res.string.merch_orders_cancel_lot),
                 onClick = onClick,
                 modifier = modifier,
                 variant = ButtonVariant.Secondary,
@@ -383,10 +390,10 @@ private fun OrderActionButton(
                 textColor = LessTheme.colors.textIconsError
             )
         }
-        
+
         OrderButtonState.CANCELLATION_TIME_ENDED -> {
             DsButton(
-                text = "Cancellation Time Ended",
+                text = stringResource(Res.string.merch_orders_cancellation_ended),
                 onClick = { /* Disabled - no action */ },
                 modifier = modifier,
                 variant = ButtonVariant.Secondary,

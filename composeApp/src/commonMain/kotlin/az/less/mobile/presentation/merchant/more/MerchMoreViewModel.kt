@@ -12,6 +12,13 @@ import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.ic_more_24dp
 import lessmobile.composeapp.generated.resources.ic_notification_24dp
 import lessmobile.composeapp.generated.resources.ic_terms_file_24dp
+import lessmobile.composeapp.generated.resources.merch_more_dark_mode
+import lessmobile.composeapp.generated.resources.merch_more_places
+import lessmobile.composeapp.generated.resources.more_contact_us
+import lessmobile.composeapp.generated.resources.more_notification
+import lessmobile.composeapp.generated.resources.more_section_application
+import lessmobile.composeapp.generated.resources.more_section_support
+import lessmobile.composeapp.generated.resources.more_terms_of_service
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -130,23 +137,23 @@ class MerchMoreViewModel : ViewModel(), ContainerHost<MerchMoreState, MerchMoreS
     private fun buildSections(notificationEnabled: Boolean, darkModeEnabled: Boolean): List<MerchMoreSection> {
         return listOf(
             MerchMoreSection(
-                title = "Application",
+                titleRes = Res.string.more_section_application,
                 cells = listOf(
                     MerchMoreCellModel(
                         id = MerchCellId.Places,
-                        title = "Places",
+                        titleRes = Res.string.merch_more_places,
                         icon = Res.drawable.ic_explore_24dp,
                         type = MerchMoreCellType.Navigation
                     ),
                     MerchMoreCellModel(
                         id = MerchCellId.Notification,
-                        title = "Notification",
+                        titleRes = Res.string.more_notification,
                         icon = Res.drawable.ic_notification_24dp,
                         type = MerchMoreCellType.Toggle(notificationEnabled)
                     ),
                     MerchMoreCellModel(
                         id = MerchCellId.DarkMode,
-                        title = "Dark mode",
+                        titleRes = Res.string.merch_more_dark_mode,
                         icon = Res.drawable.ic_more_24dp,
                         type = MerchMoreCellType.Toggle(darkModeEnabled),
                         showDivider = false
@@ -154,17 +161,17 @@ class MerchMoreViewModel : ViewModel(), ContainerHost<MerchMoreState, MerchMoreS
                 )
             ),
             MerchMoreSection(
-                title = "Support",
+                titleRes = Res.string.more_section_support,
                 cells = listOf(
                     MerchMoreCellModel(
                         id = MerchCellId.ContactUs,
-                        title = "Contact us",
+                        titleRes = Res.string.more_contact_us,
                         icon = Res.drawable.ic_customer_support_24dp,
                         type = MerchMoreCellType.Navigation
                     ),
                     MerchMoreCellModel(
                         id = MerchCellId.TermsOfService,
-                        title = "Terms of Service",
+                        titleRes = Res.string.more_terms_of_service,
                         icon = Res.drawable.ic_terms_file_24dp,
                         type = MerchMoreCellType.Navigation,
                         showDivider = false

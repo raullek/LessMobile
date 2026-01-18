@@ -32,6 +32,12 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.order_accepted_title
+import lessmobile.composeapp.generated.resources.order_accepted_description
+import lessmobile.composeapp.generated.resources.order_accepted_go_orders
+import lessmobile.composeapp.generated.resources.action_home
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Stateful Order Accepted Screen
@@ -110,7 +116,7 @@ private fun OrderAcceptedScreenContent(
 
             // Title
             Text(
-                text = "Your order is accepted",
+                text = stringResource(Res.string.order_accepted_title),
                 style = LessTheme.typography.body16Semibold.copy(
                     fontSize = 20.sp
                 ),
@@ -123,7 +129,7 @@ private fun OrderAcceptedScreenContent(
 
             // Description
             Text(
-                text = "Your order has been confirmed. Pick it up from the venue during the specified time.",
+                text = stringResource(Res.string.order_accepted_description),
                 style = LessTheme.typography.body14Regular.copy(
                     fontSize = 14.sp,
                     lineHeight = 22.sp
@@ -176,7 +182,7 @@ private fun OrderAcceptedScreenContent(
         ) {
             // Go Orders button
             DsButton(
-                text = "Go Orders",
+                text = stringResource(Res.string.order_accepted_go_orders),
                 onClick = onGoToOrdersClicked,
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Primary,
@@ -187,7 +193,7 @@ private fun OrderAcceptedScreenContent(
 
             // Home button (secondary style)
             DsButton(
-                text = "Home",
+                text = stringResource(Res.string.action_home),
                 onClick = onGoToHomeClicked,
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Secondary,

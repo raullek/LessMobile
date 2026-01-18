@@ -31,6 +31,10 @@ import az.less.mobile.presentation.client.main.explore.models.FilterCategory
 import az.less.mobile.presentation.client.main.explore.models.FilterData
 import az.less.mobile.presentation.client.main.explore.models.FilterIconType
 import az.less.mobile.presentation.client.main.explore.models.FilterOption
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.filter_title
+import lessmobile.composeapp.generated.resources.action_apply_filters
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Filter Bottom Sheet component
@@ -94,7 +98,7 @@ fun FilterBottomSheet(
                         // Title item
                         item {
                             Text(
-                                text = "Filters",
+                                text = stringResource(Res.string.filter_title),
                                 style = LessTheme.typography.title24Bold,
                                 color = LessTheme.colors.textIconsBlack
                             )
@@ -124,7 +128,7 @@ fun FilterBottomSheet(
                             )
                     ) {
                         DsButton(
-                            text = "Apply Filters",
+                            text = stringResource(Res.string.action_apply_filters),
                             onClick = onApplyFilters,
                             variant = ButtonVariant.Primary,
                             size = ButtonSize.Large,

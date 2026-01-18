@@ -30,6 +30,10 @@ import az.less.designsystem.components.DsToolBar
 import az.less.mobile.navigation.MerchantRoute
 import az.less.mobile.presentation.merchant.places.edit.branchusers.components.BranchUsersEmptyState
 import az.less.mobile.presentation.merchant.places.edit.branchusers.components.UserCell
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.branch_users_add_other
+import lessmobile.composeapp.generated.resources.branch_users_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -94,7 +98,7 @@ fun BranchUsersScreenContent(
     ) {
         // Fixed Toolbar with branch name
         DsToolBar(
-            title = "${state.branchName} users",
+            title = stringResource(Res.string.branch_users_title, state.branchName),
             onBackClick = { onIntent(BranchUsersIntent.OnBackClick) },
             backgroundColor = LessTheme.colors.backgroundPrimary
         )
@@ -156,7 +160,7 @@ fun BranchUsersScreenContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Add other user",
+                                    text = stringResource(Res.string.branch_users_add_other),
                                     style = LessTheme.typography.body16Medium,
                                     color = LessTheme.colors.textIconsBrand,
                                     modifier = Modifier.clickable(

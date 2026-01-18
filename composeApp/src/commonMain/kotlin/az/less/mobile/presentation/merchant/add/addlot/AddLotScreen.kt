@@ -46,6 +46,12 @@ import az.less.mobile.presentation.merchant.add.addlot.model.InputType
 import az.less.mobile.presentation.merchant.add.addlot.model.TextareaSection
 import az.less.mobile.presentation.merchant.add.addlot.model.TimeRangeSelectorSection
 import az.less.mobile.presentation.merchant.add.addlot.model.TwoInputsSection
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.add_lot_button
+import lessmobile.composeapp.generated.resources.add_lot_loading
+import lessmobile.composeapp.generated.resources.add_lot_select_time
+import lessmobile.composeapp.generated.resources.add_lot_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -91,7 +97,7 @@ fun AddLotScreenContent(
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
         DsToolBar(
-            title = "Add Lot",
+            title = stringResource(Res.string.add_lot_title),
             onBackClick = { onIntent(AddLotIntent.OnBackClick) },
             backgroundColor = LessTheme.colors.backgroundPrimary
         )
@@ -111,7 +117,7 @@ fun AddLotScreenContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Loading...",
+                        text = stringResource(Res.string.add_lot_loading),
                         style = LessTheme.typography.body16Regular,
                         color = LessTheme.colors.textIconsGrey
                     )
@@ -141,7 +147,7 @@ fun AddLotScreenContent(
                     // Add Lots Button (local, not from backend)
                     item(key = "addButton") {
                         DsButton(
-                            text = "Add lots",
+                            text = stringResource(Res.string.add_lot_button),
                             onClick = { onIntent(AddLotIntent.OnAddLotClick) },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -330,10 +336,11 @@ private fun TimeRangeSectionContent(
             }
 
             if (section.allowCustom) {
+                val selectTimeLabel = stringResource(Res.string.add_lot_select_time)
                 val customLabel = if (state.customTimeStart != null && state.customTimeEnd != null) {
                     "${state.customTimeStart}-${state.customTimeEnd}"
                 } else {
-                    "Select time"
+                    selectTimeLabel
                 }
                 val isCustomSelected = state.customTimeStart != null && state.customTimeEnd != null
                 TimeSlotButton(

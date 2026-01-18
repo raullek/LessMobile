@@ -21,7 +21,12 @@ import az.less.designsystem.components.DsButton
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ill_branch_venue
 import lessmobile.composeapp.generated.resources.image_placeholder
+import lessmobile.composeapp.generated.resources.places_add_branch
+import lessmobile.composeapp.generated.resources.places_cd_no_places
+import lessmobile.composeapp.generated.resources.places_empty_description
+import lessmobile.composeapp.generated.resources.places_empty_title
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Empty state component for Merchant Places screen
@@ -43,7 +48,7 @@ fun PlacesEmptyState(
         // Placeholder Image
         Image(
             painter = painterResource(Res.drawable.ill_branch_venue),
-            contentDescription = "No places",
+            contentDescription = stringResource(Res.string.places_cd_no_places),
             contentScale = ContentScale.Fit,
             modifier = Modifier.size(LessTheme.size.xxLarge)
         )
@@ -52,7 +57,7 @@ fun PlacesEmptyState(
 
         // Title
         Text(
-            text = "No branches yet",
+            text = stringResource(Res.string.places_empty_title),
             style = LessTheme.typography.title24Bold,
             color = LessTheme.colors.textIconsBlack,
             textAlign = TextAlign.Center
@@ -62,7 +67,7 @@ fun PlacesEmptyState(
 
         // Description
         Text(
-            text = "Add your first branch to start managing your locations. Customers will be able to find and visit your places.",
+            text = stringResource(Res.string.places_empty_description),
             style = LessTheme.typography.body16Regular,
             color = LessTheme.colors.textIconsThird,
             textAlign = TextAlign.Center
@@ -75,7 +80,7 @@ fun PlacesEmptyState(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = LessTheme.spacing.medium),
-            text = "Add branch",
+            text = stringResource(Res.string.places_add_branch),
             onClick = onAddBranchClick,
             size = ButtonSize.Large,
             variant = ButtonVariant.Primary

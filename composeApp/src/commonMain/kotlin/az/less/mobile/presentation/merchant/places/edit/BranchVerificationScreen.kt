@@ -29,6 +29,12 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.action_home
+import lessmobile.composeapp.generated.resources.branch_verification_add_users
+import lessmobile.composeapp.generated.resources.branch_verification_description
+import lessmobile.composeapp.generated.resources.branch_verification_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Branch Verification Screen - shown after venue/branch was added
@@ -91,7 +97,7 @@ private fun BranchVerificationScreenContent(
 
             // Title
             Text(
-                text = "Venue was added",
+                text = stringResource(Res.string.branch_verification_title),
                 style = LessTheme.typography.title20Semibold,
                 color = LessTheme.colors.textIconsBlack,
                 textAlign = TextAlign.Center,
@@ -102,7 +108,7 @@ private fun BranchVerificationScreenContent(
 
             // Description
             Text(
-                text = "If you need some custom edits",
+                text = stringResource(Res.string.branch_verification_description),
                 style = LessTheme.typography.body14Medium.copy(
                     lineHeight = 22.sp
                 ),
@@ -124,7 +130,7 @@ private fun BranchVerificationScreenContent(
         ) {
             // Add users button (Primary)
             DsButton(
-                text = "Add users",
+                text = stringResource(Res.string.branch_verification_add_users),
                 onClick = onAddUsersClicked,
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Primary,
@@ -135,7 +141,7 @@ private fun BranchVerificationScreenContent(
 
             // Home button (Tertiary - text only)
             DsButton(
-                text = "Home",
+                text = stringResource(Res.string.action_home),
                 onClick = onHomeClicked,
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Tertiary,

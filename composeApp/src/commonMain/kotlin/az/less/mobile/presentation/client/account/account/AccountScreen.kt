@@ -43,7 +43,19 @@ import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.DsToolBar
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.test_merchant_logo
+import lessmobile.composeapp.generated.resources.account_title
+import lessmobile.composeapp.generated.resources.account_edit_photo
+import lessmobile.composeapp.generated.resources.account_name_placeholder
+import lessmobile.composeapp.generated.resources.account_phone_placeholder
+import lessmobile.composeapp.generated.resources.account_email_placeholder
+import lessmobile.composeapp.generated.resources.account_gender_placeholder
+import lessmobile.composeapp.generated.resources.account_birthday_placeholder
+import lessmobile.composeapp.generated.resources.account_delete
+import lessmobile.composeapp.generated.resources.action_save
+import lessmobile.composeapp.generated.resources.account_select_gender
+import lessmobile.composeapp.generated.resources.account_profile_photo
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -112,7 +124,7 @@ fun AccountScreenContent(
     Scaffold(
         topBar = {
             DsToolBar(
-                title = "Account",
+                title = stringResource(Res.string.account_title),
                 onBackClick = { onIntent(AccountIntent.OnBackClicked) }
             )
         },
@@ -148,7 +160,7 @@ fun AccountScreenContent(
                 if (state.profilePhotoBytes != null) {
                     AsyncImage(
                         model = state.profilePhotoBytes,
-                        contentDescription = "Profile photo",
+                        contentDescription = stringResource(Res.string.account_profile_photo),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(96.dp)
@@ -168,7 +180,7 @@ fun AccountScreenContent(
             Spacer(modifier = Modifier.height(LessTheme.spacing.small))
 
             DsButton(
-                text = "Edit profile photo",
+                text = stringResource(Res.string.account_edit_photo),
                 size = ButtonSize.Medium,
                 onClick = { onIntent(AccountIntent.OnEditPhotoClicked) },
                 variant = ButtonVariant.Primary
@@ -179,7 +191,7 @@ fun AccountScreenContent(
             DsTextField(
                 value = state.fullName,
                 onValueChange = { onIntent(AccountIntent.OnFullNameChanged(it)) },
-                placeholder = "Name Surname",
+                placeholder = stringResource(Res.string.account_name_placeholder),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -188,7 +200,7 @@ fun AccountScreenContent(
             DsTextField(
                 value = state.phoneNumber,
                 onValueChange = { onIntent(AccountIntent.OnPhoneChanged(it)) },
-                placeholder = "Phone number",
+                placeholder = stringResource(Res.string.account_phone_placeholder),
                 isError = state.phoneNumberError != null,
                 errorMessage = state.phoneNumberError,
                 modifier = Modifier.fillMaxWidth()
@@ -199,7 +211,7 @@ fun AccountScreenContent(
             DsTextField(
                 value = state.email,
                 onValueChange = { onIntent(AccountIntent.OnEmailChanged(it)) },
-                placeholder = "Email",
+                placeholder = stringResource(Res.string.account_email_placeholder),
                 isError = state.emailError != null,
                 errorMessage = state.emailError,
                 modifier = Modifier.fillMaxWidth()
@@ -209,7 +221,7 @@ fun AccountScreenContent(
 
             DsSelectionField(
                 value = state.gender.takeIf { it.isNotEmpty() },
-                placeholder = "Gender",
+                placeholder = stringResource(Res.string.account_gender_placeholder),
                 onClick = { onIntent(AccountIntent.OnGenderClick) },
                 onClear = { onIntent(AccountIntent.OnGenderClear) },
                 modifier = Modifier.fillMaxWidth()
@@ -219,7 +231,7 @@ fun AccountScreenContent(
 
             DsSelectionField(
                 value = state.birthDate.takeIf { it.isNotEmpty() },
-                placeholder = "Birth day",
+                placeholder = stringResource(Res.string.account_birthday_placeholder),
                 onClick = { onIntent(AccountIntent.OnBirthDateClick) },
                 onClear = { onIntent(AccountIntent.OnBirthDateClear) },
                 modifier = Modifier.fillMaxWidth()
@@ -228,7 +240,7 @@ fun AccountScreenContent(
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxLarge))
 
             DsButton(
-                text = "Delete account",
+                text = stringResource(Res.string.account_delete),
                 textColor = LessTheme.colors.textIconsError,
                 onClick = { onIntent(AccountIntent.OnDeleteAccountClicked) },
                 variant = ButtonVariant.Secondary,
@@ -238,7 +250,7 @@ fun AccountScreenContent(
             Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
             DsButton(
-                text = "Save",
+                text = stringResource(Res.string.action_save),
                 onClick = {
                     focusManager.clearFocus()
                     onIntent(AccountIntent.OnSaveClicked)
@@ -247,10 +259,10 @@ fun AccountScreenContent(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        
+
         if (state.showGenderBottomSheet) {
             DsSelectionBottomSheet(
-                title = "Select Gender",
+                title = stringResource(Res.string.account_select_gender),
                 items = state.genderList,
                 selectedItem = state.gender.takeIf { it.isNotEmpty() },
                 onSelect = { gender ->

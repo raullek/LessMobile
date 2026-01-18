@@ -1,6 +1,7 @@
 package az.less.mobile.presentation.merchant.more.model
 
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 
 /**
  * Enum representing cell identifiers in MerchMore screen
@@ -18,7 +19,7 @@ enum class MerchCellId {
  */
 data class MerchMoreCellModel(
     val id: MerchCellId,
-    val title: String,
+    val titleRes: StringResource,
     val icon: DrawableResource? = null,
     val type: MerchMoreCellType = MerchMoreCellType.Navigation,
     val showDivider: Boolean = true
@@ -36,6 +37,6 @@ sealed class MerchMoreCellType {
  * Section model for grouping cells
  */
 data class MerchMoreSection(
-    val title: String,
+    val titleRes: StringResource,
     val cells: List<MerchMoreCellModel>
 )

@@ -16,6 +16,14 @@ import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.DsToolBar
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.add_card_title
+import lessmobile.composeapp.generated.resources.add_card_number_placeholder
+import lessmobile.composeapp.generated.resources.add_card_expiry_placeholder
+import lessmobile.composeapp.generated.resources.add_card_cvv_placeholder
+import lessmobile.composeapp.generated.resources.add_card_verification_text
+import lessmobile.composeapp.generated.resources.add_card_button
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -60,7 +68,7 @@ fun AddNewCardScreenContent(
             .background(LessTheme.colors.backgroundPrimary)
     ) {
         DsToolBar(
-            title = "Add new card",
+            title = stringResource(Res.string.add_card_title),
             onBackClick = { onIntent(AddNewCardIntent.OnBackClicked) }
         )
 
@@ -80,7 +88,7 @@ fun AddNewCardScreenContent(
                     val digitsOnly = value.filter { it.isDigit() }
                     onIntent(AddNewCardIntent.OnCardNumberChanged(digitsOnly))
                 },
-                placeholder = "0000 0000 0000 0000",
+                placeholder = stringResource(Res.string.add_card_number_placeholder),
                 isError = state.cardNumberError != null,
                 errorMessage = state.cardNumberError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -102,7 +110,7 @@ fun AddNewCardScreenContent(
                     onValueChange = { value ->
                         onIntent(AddNewCardIntent.OnExpirationDateChanged(value))
                     },
-                    placeholder = "MM/YY",
+                    placeholder = stringResource(Res.string.add_card_expiry_placeholder),
                     isError = state.expirationDateError != null,
                     errorMessage = state.expirationDateError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -117,7 +125,7 @@ fun AddNewCardScreenContent(
                     onValueChange = { value ->
                         onIntent(AddNewCardIntent.OnCvvChanged(value))
                     },
-                    placeholder = "CVV/CVC",
+                    placeholder = stringResource(Res.string.add_card_cvv_placeholder),
                     isError = state.cvvError != null,
                     errorMessage = state.cvvError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -130,7 +138,7 @@ fun AddNewCardScreenContent(
 
             // Verification Text
             Text(
-                text = "To verify your card, we will debit 1 AZN from your balance. The money will immediately return back to your balance.",
+                text = stringResource(Res.string.add_card_verification_text),
                 style = LessTheme.typography.body14Regular,
                 color = LessTheme.colors.textIconsGrey,
                 modifier = Modifier.fillMaxWidth()
@@ -140,7 +148,7 @@ fun AddNewCardScreenContent(
 
             // Add Card Button
             DsButton(
-                text = "Add card",
+                text = stringResource(Res.string.add_card_button),
                 onClick = { onIntent(AddNewCardIntent.OnAddCardClicked) },
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Primary,

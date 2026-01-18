@@ -21,6 +21,11 @@ import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.DsToolBar
 import az.less.mobile.navigation.ClientRoute
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.login_email_title
+import lessmobile.composeapp.generated.resources.login_email_placeholder
+import lessmobile.composeapp.generated.resources.action_next
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -63,7 +68,7 @@ fun LoginEmailScreenContent(
     Scaffold(
         topBar = {
             DsToolBar(
-                title = "Email",
+                title = stringResource(Res.string.login_email_title),
                 onBackClick = { onIntent(LoginEmailIntent.OnBackClicked) }
             )
         },
@@ -83,7 +88,7 @@ fun LoginEmailScreenContent(
             DsTextField(
                 value = state.email,
                 onValueChange = { onIntent(LoginEmailIntent.OnEmailChanged(it)) },
-                placeholder = "Mail",
+                placeholder = stringResource(Res.string.login_email_placeholder),
                 isError = state.emailError != null,
                 errorMessage = state.emailError,
                 keyboardOptions = KeyboardOptions(
@@ -97,7 +102,7 @@ fun LoginEmailScreenContent(
 
             // Next Button
             DsButton(
-                text = "Next",
+                text = stringResource(Res.string.action_next),
                 onClick = { onIntent(LoginEmailIntent.OnNextClicked) },
                 variant = ButtonVariant.Primary,
                 modifier = Modifier

@@ -20,7 +20,12 @@ import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_saved_24dp
+import lessmobile.composeapp.generated.resources.saved_empty_title
+import lessmobile.composeapp.generated.resources.saved_empty_description
+import lessmobile.composeapp.generated.resources.saved_explore_venues
+import lessmobile.composeapp.generated.resources.cd_favorite
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Empty state component for Saved/Favorites screen
@@ -41,36 +46,36 @@ fun SavedEmptyState(
         // Heart Icon
         Icon(
             painter = painterResource(Res.drawable.ic_saved_24dp),
-            contentDescription = "No favorites",
+            contentDescription = stringResource(Res.string.cd_favorite),
             tint = LessTheme.colors.textIconsBrand,
             modifier = Modifier.size(LessTheme.size.xxLarge)
         )
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-        
+
         // Title
         Text(
-            text = "You don't have favorites",
+            text = stringResource(Res.string.saved_empty_title),
             style = LessTheme.typography.title24Bold,
             color = LessTheme.colors.textIconsBlack,
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
-        
+
         // Description
         Text(
-            text = "Your saved items from all categories will appear here. You can delete or use them at any time",
+            text = stringResource(Res.string.saved_empty_description),
             style = LessTheme.typography.body16Regular,
             color = LessTheme.colors.textIconsThird,
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-        
+
         // Button
         DsButton(
-            text = "Explore new venues",
+            text = stringResource(Res.string.saved_explore_venues),
             onClick = onExploreNewVenuesClick,
             size = ButtonSize.Large,
             variant = ButtonVariant.Primary
