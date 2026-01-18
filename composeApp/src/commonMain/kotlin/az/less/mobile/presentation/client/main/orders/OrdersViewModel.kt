@@ -3,6 +3,7 @@ package az.less.mobile.presentation.client.main.orders
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.mobile.presentation.client.main.orders.models.CartItem
+import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -32,10 +33,16 @@ class OrdersViewModel : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect
     }
 
     private fun loadCartItems() = intent {
-       reduce {
-           state.copy(
+        reduce { state.copy(isLoading = true) }
+
+        // Mock network delay for shimmer loading demonstration
+        delay(2000L)
+
+        reduce {
+            state.copy(
                 cartItems = getMockCartItems(),
-                historyItems = getMockHistoryItems()
+                historyItems = getMockHistoryItems(),
+                isLoading = false
             )
         }
     }

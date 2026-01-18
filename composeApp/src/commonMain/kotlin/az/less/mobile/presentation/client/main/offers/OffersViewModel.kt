@@ -17,6 +17,7 @@ import az.less.mobile.presentation.client.main.offers.models.SegmentedCategory
 import az.less.mobile.presentation.client.main.offers.models.SegmentedCategoryType
 import az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem
 import az.less.mobile.presentation.client.main.offers.models.UserInfo
+import kotlinx.coroutines.delay
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.ic_mark_16dp
@@ -81,7 +82,10 @@ class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect
      * GET /api/v1/offers/home
      */
     private fun loadScreenData() = intent {
-        reduce { state.copy(isLoading = true) }
+        // isLoading is already true from initial state for instant shimmer display
+
+        // Mock network delay for shimmer loading demonstration
+        delay(2000L)
 
         // TODO: Replace with actual API call
         val response = getOffers()

@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.ClientRoute
+import az.less.mobile.presentation.client.main.offers.components.OffersScreenShimmer
 import az.less.mobile.presentation.client.main.offers.components.SpecialDiscountPager
 import az.less.mobile.presentation.client.reserve.ReserveScreen
 import kotlinx.coroutines.launch
@@ -178,12 +179,17 @@ fun OffersScreenContent(
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
-        // Scrollable Content
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Horizontal Categories Section
-            item(key = "categories") {
+        // Scrollable Content - Show shimmer when loading
+        if (state.isLoading) {
+            OffersScreenShimmer(
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Horizontal Categories Section
+                item(key = "categories") {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(start = LessTheme.spacing.medium),
@@ -347,6 +353,7 @@ fun OffersScreenContent(
             item(key = "bottom_spacing") {
                 Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
             }
+        }
         }
     }
 }

@@ -22,6 +22,7 @@ import az.less.designsystem.components.DsToolBar
 import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.saved.components.SavedEmptyState
 import az.less.mobile.presentation.client.main.saved.components.SavedMerchantCard
+import az.less.mobile.presentation.client.main.saved.components.SavedScreenShimmer
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.saved_title
 import org.jetbrains.compose.resources.stringResource
@@ -85,40 +86,49 @@ fun SavedScreenContent(
             backgroundColor = LessTheme.colors.backgroundSecond
         )
 
-        if (state.isEmpty) {
-            // Empty State
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = LessTheme.spacing.medium),
-                contentAlignment = Alignment.Center
-            ) {
-                SavedEmptyState(
-                    onExploreNewVenuesClick = {
-                        onIntent(SavedIntent.OnExploreNewVenuesClicked)
-                    }
+        when {
+            state.isLoading -> {
+                // Shimmer loading state
+                SavedScreenShimmer(
+                    modifier = Modifier.fillMaxSize()
                 )
             }
-        } else {
-            // List of Saved Merchants
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    horizontal = LessTheme.spacing.medium
-                ),
-                verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
-            ) {
-                // Saved Merchants
-                items(
-                    items = state.savedMerchants,
-                    key = { merchant -> merchant.id }
-                ) { merchant ->
-                    SavedMerchantCard(
-                        merchant = merchant,
-                        onClick = {
-                            onIntent(SavedIntent.OnMerchantClicked(merchant.id))
+            state.isEmpty -> {
+                // Empty State
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = LessTheme.spacing.medium),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SavedEmptyState(
+                        onExploreNewVenuesClick = {
+                            onIntent(SavedIntent.OnExploreNewVenuesClicked)
                         }
                     )
+                }
+            }
+            else -> {
+                // List of Saved Merchants
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        horizontal = LessTheme.spacing.medium
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
+                ) {
+                    // Saved Merchants
+                    items(
+                        items = state.savedMerchants,
+                        key = { merchant -> merchant.id }
+                    ) { merchant ->
+                        SavedMerchantCard(
+                            merchant = merchant,
+                            onClick = {
+                                onIntent(SavedIntent.OnMerchantClicked(merchant.id))
+                            }
+                        )
+                    }
                 }
             }
         }

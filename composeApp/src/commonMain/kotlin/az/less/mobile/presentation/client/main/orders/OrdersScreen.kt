@@ -31,6 +31,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.SegmentOption
 import az.less.designsystem.components.SegmentedButton
 import az.less.mobile.presentation.client.main.orders.components.OrderItem
+import az.less.mobile.presentation.client.main.orders.components.OrdersScreenShimmer
 import az.less.mobile.presentation.client.reserve.ReserveInfoBottomSheet
 import az.less.mobile.presentation.client.reserve.models.ReserveInfo
 import kotlinx.coroutines.launch
@@ -179,35 +180,41 @@ fun OrdersScreenContent(
         // Spacing between segmented button and list
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
         
-        // Order items list
-        val items = when (state.selectedTab) {
-            OrderTab.CART -> state.cartItems
-            OrderTab.HISTORY -> state.historyItems
-        }
-        
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall),
-        ) {
-            items(
-                items = items,
-                key = { it.id }
-            ) { item ->
-                OrderItem(
-                    item = item,
-                    onClick = {
-                        onIntent(OrdersIntent.OnCartItemClicked(item.id))
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                
-                // Divider between items (except last)
-                if (item != items.last()) {
-                    HorizontalDivider(
-                        color = LessTheme.colors.borderPrimary,
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(vertical = LessTheme.spacing.medium)
+        // Order items list - show shimmer when loading
+        if (state.isLoading) {
+            OrdersScreenShimmer(
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            val items = when (state.selectedTab) {
+                OrderTab.CART -> state.cartItems
+                OrderTab.HISTORY -> state.historyItems
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall),
+            ) {
+                items(
+                    items = items,
+                    key = { it.id }
+                ) { item ->
+                    OrderItem(
+                        item = item,
+                        onClick = {
+                            onIntent(OrdersIntent.OnCartItemClicked(item.id))
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
+
+                    // Divider between items (except last)
+                    if (item != items.last()) {
+                        HorizontalDivider(
+                            color = LessTheme.colors.borderPrimary,
+                            thickness = 1.dp,
+                            modifier = Modifier.padding(vertical = LessTheme.spacing.medium)
+                        )
+                    }
                 }
             }
         }

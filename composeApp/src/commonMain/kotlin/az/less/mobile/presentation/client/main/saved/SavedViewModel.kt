@@ -3,6 +3,7 @@ package az.less.mobile.presentation.client.main.saved
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.mobile.presentation.client.main.saved.models.SavedMerchant
+import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -31,6 +32,11 @@ class SavedViewModel : ViewModel(), ContainerHost<SavedState, SavedSideEffect> {
     }
 
     private fun loadSavedMerchants() = intent {
+        reduce { state.copy(isLoading = true) }
+
+        // Mock network delay for shimmer loading demonstration
+        delay(2000L)
+
         reduce {
             state.copy(
                 savedMerchants = getMockSavedMerchants(),

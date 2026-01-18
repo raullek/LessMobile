@@ -19,7 +19,7 @@ data class OffersState(
     val specialCategories: List<SpecialDiscountItem> = emptyList(),
     val segmentedCategories: List<SegmentedCategory> = emptyList(),
     val offerSections: List<OfferSection> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true, // Start with loading to show shimmer immediately
 
     // UI state
     val searchQuery: String = "",
