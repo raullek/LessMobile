@@ -1,6 +1,8 @@
 import com.android.build.api.dsl.androidLibrary
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.regex.Pattern
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,16 +10,17 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.buildkonfig)
 }
 
 kotlin {
-
+    project.extra.set("buildkonfig.flavor", currentBuildVariant())
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -27,7 +30,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
@@ -77,18 +80,18 @@ kotlin {
             implementation(libs.orbit.viewmodel)
 
             implementation(libs.navigation.compose)
-            
+
             // Design System Module
             implementation(projects.designSystem)
 
             implementation(libs.androidx.datastore)
             // The Preferences DataStore library
             implementation(libs.androidx.datastore.preferences)
-            
+
             // Input Mask for Compose Multiplatform
             implementation(libs.inputmask.core)
             implementation(libs.inputmask.compose)
-            
+
             // Compose Shimmer - Shimmer Effect
             implementation(libs.compose.shimmer)
 
@@ -139,6 +142,61 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    flavorDimensions.add("variant")
+    productFlavors {
+        create("dev") {
+            dimension = "variant"
+            isDefault = true
+            applicationIdSuffix = ".dev"
+            resValue("string", "app_name", "Config Sample Dev")
+        }
+
+        create("prod") {
+            dimension = "variant"
+        }
+    }
+}
+
+buildkonfig {
+    packageName = "az.less.mobile"
+    defaultConfigs {}
+    defaultConfigs("dev") {
+        buildConfigField(FieldSpec.Type.STRING, "variant", "dev")
+        buildConfigField(FieldSpec.Type.STRING, "apiEndPoint", "https://dev.example.com")
+
+    }
+
+    defaultConfigs("prod") {
+        buildConfigField(FieldSpec.Type.STRING, "variant", "dev")
+        buildConfigField(FieldSpec.Type.STRING, "apiEndPoint", "https://prod.example.com")
+    }
+}
+
+fun Project.getAndroidBuildVariantOrNull(): String? {
+    val variants = setOf("dev", "prod")
+    val taskRequestsStr = gradle.startParameter.taskRequests.toString()
+    val pattern: Pattern = if (taskRequestsStr.contains("assemble")) {
+        Pattern.compile("assemble(\\w+)(Release|Debug)")
+    } else {
+        Pattern.compile("bundle(\\w+)(Release|Debug)")
+    }
+
+    val matcher = pattern.matcher(taskRequestsStr)
+    val variant = if (matcher.find()) matcher.group(1).lowercase() else null
+    return if (variant in variants) {
+        variant
+    } else {
+        null
+    }
+}
+
+private fun Project.currentBuildVariant(): String {
+    val variants = setOf("dev", "prod")
+    return getAndroidBuildVariantOrNull()
+        ?: System.getenv()["VARIANT"]
+            .toString()
+            .takeIf { it in variants } ?: "dev"
 }
 
 dependencies {
