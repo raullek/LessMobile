@@ -1,4 +1,4 @@
-package az.less.mobile.data.remote.dto
+package az.less.mobile.data.remote.model
 
 import kotlinx.serialization.Serializable
 

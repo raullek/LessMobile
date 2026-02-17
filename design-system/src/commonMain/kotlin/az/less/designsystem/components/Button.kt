@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
@@ -45,6 +46,7 @@ fun DsButton(
     variant: ButtonVariant = ButtonVariant.Primary,
     size: ButtonSize = ButtonSize.Large,
     enabled: Boolean = true,
+    isLoading: Boolean = false,
     leadingIcon: ImageVector? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
@@ -101,18 +103,18 @@ fun DsButton(
         ButtonSize.Medium -> LessTheme.spacing.large  // 24dp
     }
 
-//    val textStyle = when (size) {
-//        ButtonSize.Large -> LessTheme.typography.body16Semibold
-//        ButtonSize.Medium -> LessTheme.typography.body14Semibold
-//    }
-
     val iconSize = when (size) {
         ButtonSize.Large -> LessTheme.spacing.large  // 24dp
         ButtonSize.Medium -> LessTheme.spacing.medium  // 16dp
     }
 
+    val loaderSize = when (size) {
+        ButtonSize.Large -> 24.dp
+        ButtonSize.Medium -> 20.dp
+    }
+
     Button(
-        onClick = onClick,
+        onClick = { if (!isLoading) onClick() },
         modifier = modifier.defaultMinSize(minHeight = height),
         enabled = enabled,
         shape = RoundedCornerShape(LessTheme.radius.small),  // 12dp
@@ -125,24 +127,31 @@ fun DsButton(
             disabledElevation = 0.dp
         )
     ) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (leadingIcon != null) {
-                Icon(
-                    imageVector = leadingIcon,
-                    contentDescription = null,
-                    modifier = Modifier.size(iconSize)
-                )
-                Spacer(modifier = Modifier.width(LessTheme.spacing.xSmall))  // 8dp
-            }
-            Text(
-                text = text,
-                style = LessTheme.typography.body16Semibold,
-                color = textColor ?: LocalContentColor.current
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(loaderSize),
+                color = LessTheme.colors.textIconsNested,
+                strokeWidth = 2.dp
             )
+        } else {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (leadingIcon != null) {
+                    Icon(
+                        imageVector = leadingIcon,
+                        contentDescription = null,
+                        modifier = Modifier.size(iconSize)
+                    )
+                    Spacer(modifier = Modifier.width(LessTheme.spacing.xSmall))  // 8dp
+                }
+                Text(
+                    text = text,
+                    style = LessTheme.typography.body16Semibold,
+                    color = textColor ?: LocalContentColor.current
+                )
+            }
         }
     }
 }
-
