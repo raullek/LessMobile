@@ -2,13 +2,13 @@ package az.less.mobile.presentation.client.main.offers
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.data.remote.dto.CategoryDto
-import az.less.mobile.data.remote.dto.MerchantDto
-import az.less.mobile.data.remote.dto.OfferDto
-import az.less.mobile.data.remote.dto.OfferSectionDto
-import az.less.mobile.data.remote.dto.OffersScreenDto
-import az.less.mobile.data.remote.dto.SegmentedCategoryDto
-import az.less.mobile.data.remote.dto.SpecialCategoryDto
+import az.less.mobile.data.remote.model.CategoryDto
+import az.less.mobile.data.remote.model.MerchantDto
+import az.less.mobile.data.remote.model.OfferDto
+import az.less.mobile.data.remote.model.OfferSectionDto
+import az.less.mobile.data.remote.model.OffersScreenDto
+import az.less.mobile.data.remote.model.SegmentedCategoryDto
+import az.less.mobile.data.remote.model.SpecialCategoryDto
 import az.less.mobile.presentation.client.main.offers.models.Category
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
 import az.less.mobile.presentation.client.main.offers.models.OfferMerchant

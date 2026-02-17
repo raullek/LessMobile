@@ -37,6 +37,7 @@ fun OtpCodeInput(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    isLoading: Boolean = false,
     isError: Boolean = false,
     errorMessage: String? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
@@ -91,7 +92,7 @@ fun OtpCodeInput(
                 .fillMaxWidth()
                 .height(50.dp)
                 .focusRequester(focusRequester),
-            enabled = enabled,
+            enabled = enabled && !isLoading,
             textStyle = TextStyle(
                 fontSize = 48.sp, // 48sp as per design
                 color = textColor,
