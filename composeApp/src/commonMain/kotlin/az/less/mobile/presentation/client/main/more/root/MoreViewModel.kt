@@ -2,7 +2,7 @@ package az.less.mobile.presentation.client.main.more.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.data.repository.UserRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.main.more.root.models.CellId
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellModel
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellType
@@ -26,7 +26,7 @@ import org.orbitmvi.orbit.container
  * ViewModel for More Screen using Orbit MVI
  */
 class MoreViewModel(
-    private val userRepository: UserRepository
+    private val userLocalRepository: SessionLocalRepository
 ) : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
 
     override val container: Container<MoreState, MoreSideEffect> =
@@ -38,7 +38,7 @@ class MoreViewModel(
 
     private fun observeUserState() {
         viewModelScope.launch {
-            userRepository.currentUser.collectLatest { user ->
+            userLocalRepository.currentUser.collectLatest { user ->
                 intent {
                     if (user != null) {
                         reduce {
@@ -46,11 +46,6 @@ class MoreViewModel(
                                 isLoggedIn = true,
                                 userName = user.name,
                                 userEmail = user.email,
-                                userAvatarUrl = user.avatarUrl,
-                                co2Saved = user.co2Saved,
-                                moneySaved = user.moneySaved,
-                                ecoHeroTitle = "Eco-hero",
-                                ecoHeroDescription = "You saved 2 meals!",
                                 sections = buildAuthSections(state.notificationEnabled)
                             )
                         }
@@ -60,11 +55,6 @@ class MoreViewModel(
                                 isLoggedIn = false,
                                 userName = null,
                                 userEmail = null,
-                                userAvatarUrl = null,
-                                co2Saved = null,
-                                moneySaved = null,
-                                ecoHeroTitle = null,
-                                ecoHeroDescription = null,
                                 sections = buildNonAuthSections(state.notificationEnabled)
                             )
                         }
@@ -96,7 +86,7 @@ class MoreViewModel(
 
     private fun handleLogoutClicked() = intent {
         // Clear user data from DataStore
-        userRepository.clearUser()
+        userLocalRepository.clearSession()
         // State will be updated automatically via observeUserState()
     }
 

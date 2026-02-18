@@ -2,16 +2,15 @@ package az.less.mobile.presentation.client.onboarding.otp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.data.model.User
-import az.less.mobile.data.repository.UserRepository
+import az.less.mobile.domain.model.auth.User
 import az.less.mobile.domain.repository.AuthorizationRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
-import kotlin.random.Random
 
 class LoginCodeViewModel(
-    private val userRepository: UserRepository,
+    private val userLocalRepository: SessionLocalRepository,
     private val authorizationRepository: AuthorizationRepository
 ) : ViewModel(), ContainerHost<LoginCodeState, LoginCodeSideEffect> {
 
@@ -46,21 +45,20 @@ class LoginCodeViewModel(
 
             authorizationRepository.verifyOtp(state.email, state.code)
                 .onSuccess { data ->
-                    if (data.verified) {
-                        val user = User(
-                            id = "user_${Random.nextInt(100000, 999999)}",
-                            name = "User",
-                            email = state.email,
-                            avatarUrl = null,
-                            co2Saved = "0 kg",
-                            moneySaved = "$0"
-                        )
-                        userRepository.saveUser(user)
-                        reduce { state.copy(isLoading = false) }
-                        postSideEffect(LoginCodeSideEffect.NavigateNext)
-                    } else {
-                        reduce { state.copy(isLoading = false, codeError = "Verification failed", code = "") }
-                    }
+                    val user = User(
+                        id = data.user.id,
+                        name = data.user.name,
+                        email = data.user.email,
+                        roles = data.user.roles,
+                        status = data.user.status
+                    )
+                    userLocalRepository.saveSession(
+                        user = user,
+                        accessToken = data.accessToken,
+                        refreshToken = data.refreshToken
+                    )
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(LoginCodeSideEffect.NavigateNext)
                 }
                 .onError { error ->
                     reduce { state.copy(isLoading = false, codeError = error.message, code = "") }

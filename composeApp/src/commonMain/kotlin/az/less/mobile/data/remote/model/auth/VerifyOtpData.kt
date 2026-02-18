@@ -8,6 +8,18 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class VerifyOtpData(
-    val message: String,
-    val verified: Boolean
+    val accessToken: String,
+    val refreshToken: String,
+    val user: VerifyOtpUser,
+    val isNewUser: Boolean,
+    val message: String
+)
+
+@Serializable
+data class VerifyOtpUser(
+    val id: String,
+    val email: String,
+    val name: String,
+    val roles: List<String>,
+    val status: String
 )
