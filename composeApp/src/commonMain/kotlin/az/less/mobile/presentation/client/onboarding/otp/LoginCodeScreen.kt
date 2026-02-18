@@ -29,6 +29,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.AnimatedToast
 import az.less.designsystem.components.DsToolBar
 import az.less.designsystem.components.ToastType
+import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.onboarding.otp.components.OtpCodeInput
 import kotlinx.coroutines.delay
 import lessmobile.composeapp.generated.resources.Res
@@ -80,7 +81,7 @@ fun LoginCodeScreen(
                 navController.popBackStack()
             }
             is LoginCodeSideEffect.NavigateNext -> {
-                navController.popBackStack("more", inclusive = false)
+                navController.popBackStack<ClientRoute.More>(inclusive = false)
             }
             is LoginCodeSideEffect.ShowSuccess -> {
                 toastState = ToastState(sideEffect.message, ToastType.Success)

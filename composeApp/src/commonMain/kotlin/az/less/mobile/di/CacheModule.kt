@@ -1,10 +1,18 @@
 package az.less.mobile.di
 
-import az.less.mobile.data.repository.UserRepository
+import az.less.mobile.data.repository.SessionLocalRepositoryImpl
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.preferences.createPlatformDataStore
+import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
 val cacheModule = module {
     single { createPlatformDataStore() }
-    single { UserRepository(get()) }
+    single {
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
+    }
+    single<SessionLocalRepository> { SessionLocalRepositoryImpl(get(), get()) }
 }
