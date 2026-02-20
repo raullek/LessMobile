@@ -2,6 +2,9 @@ package az.less.mobile.data.datasource
 
 import az.less.mobile.data.remote.model.auth.EmailLoginData
 import az.less.mobile.data.remote.model.auth.EmailLoginRequest
+import az.less.mobile.data.remote.model.auth.LogoutData
+import az.less.mobile.data.remote.model.auth.RefreshTokenData
+import az.less.mobile.data.remote.model.auth.RefreshTokenRequest
 import az.less.mobile.data.remote.model.auth.ResendOtpData
 import az.less.mobile.data.remote.model.auth.ResendOtpRequest
 import az.less.mobile.data.remote.model.auth.VerifyOtpData
@@ -35,6 +38,22 @@ class AuthDataSource(
         return safeApiCall {
             httpClient.post("v1/auth/resend-otp") {
                 setBody(ResendOtpRequest(email = email))
+            }
+        }
+    }
+
+    suspend fun refreshToken(refreshToken: String): NetworkResult<RefreshTokenData> {
+        return safeApiCall {
+            httpClient.post("v1/auth/refresh-token") {
+                setBody(RefreshTokenRequest(refreshToken = refreshToken))
+            }
+        }
+    }
+
+    suspend fun logout(refreshToken: String): NetworkResult<LogoutData> {
+        return safeApiCall {
+            httpClient.post("v1/auth/logout") {
+                setBody(RefreshTokenRequest(refreshToken = refreshToken))
             }
         }
     }

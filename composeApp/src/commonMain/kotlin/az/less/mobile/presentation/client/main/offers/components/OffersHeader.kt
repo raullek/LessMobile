@@ -19,17 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.compose_multiplatform
 import lessmobile.composeapp.generated.resources.ic_notification_24dp
+import lessmobile.composeapp.generated.resources.person_image_placeholder
 import org.jetbrains.compose.resources.painterResource
 
-/**
- * Header component for Offers screen with user avatar, greeting, and notification buttons
- * Based on Figma design: "Hi, Katheryn!" with two white circular buttons
- */
 @Composable
 fun OffersHeader(
     userName: String,
@@ -47,23 +43,25 @@ fun OffersHeader(
         // User Avatar
         Box(
             modifier = Modifier
-                .size(LessTheme.size.xxLarge)
+                .size(LessTheme.size.xLarge)
                 .clip(CircleShape)
                 .background(LessTheme.colors.elementsSecondaryElement),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(Res.drawable.compose_multiplatform),
-                contentDescription = "User Avatar",
-                modifier = Modifier
-                    .size(LessTheme.size.xxLarge)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
+                AsyncImage(
+                    model = userAvatarUrl,
+                    contentDescription = "User Avatar",
+                    modifier = Modifier
+                        .size(LessTheme.size.xLarge)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(Res.drawable.person_image_placeholder),
+                    placeholder = painterResource(Res.drawable.person_image_placeholder)
+                )
         }
-        
+
         Spacer(modifier = Modifier.width(LessTheme.spacing.xSmall))
-        
+
         // User Greeting
         Text(
             text = "Hi, $userName!",
@@ -72,11 +70,10 @@ fun OffersHeader(
             modifier = Modifier.weight(1f)
         )
 
-        
-        // Notification Button 2 (Message/Bell icon)
+        // Notification Button
         Box(
             modifier = Modifier
-                .size(LessTheme.size.xLarge + LessTheme.spacing.xxSmall) // 40 + 4 = 44dp
+                .size(LessTheme.size.xLarge + LessTheme.spacing.xxSmall)
                 .clip(RoundedCornerShape(LessTheme.radius.medium))
                 .background(LessTheme.colors.textIconsNested)
                 .clickable { onMessageClick() },
@@ -85,7 +82,7 @@ fun OffersHeader(
             Icon(
                 painter = painterResource(Res.drawable.ic_notification_24dp),
                 contentDescription = "Messages",
-                modifier = Modifier.size(LessTheme.size.small + LessTheme.spacing.xxxSmall), // 20 + 2 = 22dp
+                modifier = Modifier.size(LessTheme.size.small + LessTheme.spacing.xxxSmall),
                 tint = LessTheme.colors.textIconsBlack
             )
         }

@@ -12,7 +12,8 @@
       "WebFetch(domain:docs.compass.jordond.dev)",
       "WebFetch(domain:proandroiddev.com)",
       "WebFetch(domain:insert-koin.io)",
-      "WebFetch(domain:pl-coding.com)"
+      "WebFetch(domain:pl-coding.com)",
+      "mcp__context7__resolve-library-id"
     ]
   }
 }

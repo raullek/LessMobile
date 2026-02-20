@@ -58,7 +58,12 @@ class LoginCodeViewModel(
                         refreshToken = data.refreshToken
                     )
                     reduce { state.copy(isLoading = false) }
-                    postSideEffect(LoginCodeSideEffect.NavigateNext)
+
+                    if (data.user.roles.contains("merchant")) {
+                        postSideEffect(LoginCodeSideEffect.NavigateToMerchant)
+                    } else {
+                        postSideEffect(LoginCodeSideEffect.NavigateToClient)
+                    }
                 }
                 .onError { error ->
                     reduce { state.copy(isLoading = false, codeError = error.message, code = "") }

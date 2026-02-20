@@ -8,6 +8,7 @@ import az.less.mobile.domain.model.auth.User
 import az.less.mobile.data.model.UserEntity
 import az.less.mobile.domain.repository.SessionLocalRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
@@ -44,6 +45,14 @@ class SessionLocalRepositoryImpl(
         preferences[REFRESH_TOKEN]
     }
 
+    override suspend fun getAccessToken(): String? {
+        return dataStore.data.first()[ACCESS_TOKEN]
+    }
+
+    override suspend fun getRefreshToken(): String? {
+        return dataStore.data.first()[REFRESH_TOKEN]
+    }
+
     override suspend fun saveSession(user: User, accessToken: String, refreshToken: String) {
         val entity = UserEntity(
             id = user.id,
@@ -54,6 +63,13 @@ class SessionLocalRepositoryImpl(
         )
         dataStore.edit { preferences ->
             preferences[USER_JSON] = json.encodeToString(UserEntity.serializer(), entity)
+            preferences[ACCESS_TOKEN] = accessToken
+            preferences[REFRESH_TOKEN] = refreshToken
+        }
+    }
+
+    override suspend fun updateTokens(accessToken: String, refreshToken: String) {
+        dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN] = accessToken
             preferences[REFRESH_TOKEN] = refreshToken
         }

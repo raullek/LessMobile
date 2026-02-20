@@ -19,7 +19,7 @@ data class CategoryDto(
     val id: String,
     val type: String,
     val title: String,
-    val imageUrl: String
+    val imageUrl: String? = null
 )
 
 @Serializable
@@ -28,7 +28,7 @@ data class SpecialCategoryDto(
     val type: String,
     val title: String,
     val description: String,
-    val imageUrl: String
+    val imageUrl: String? = null
 )
 
 @Serializable

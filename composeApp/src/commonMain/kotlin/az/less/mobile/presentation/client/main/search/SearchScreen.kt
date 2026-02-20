@@ -157,7 +157,6 @@ fun SearchScreenContent(
                                     )
                                 )
                             },
-                            testImage = category.testImage
                         )
                     }
                 }
