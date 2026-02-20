@@ -192,7 +192,8 @@ fun NavGraphBuilder.moreGraph(
         val args = backStackEntry.toRoute<ClientRoute.LoginCode>()
         LoginCodeScreen(
             navController = navController,
-            email = args.email
+            email = args.email,
+            navigateToMerchant = { rootNavController.navigate(ROOT_MERCHANT) }
         )
     }
 }

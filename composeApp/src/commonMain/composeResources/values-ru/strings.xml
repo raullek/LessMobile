@@ -41,6 +41,7 @@
     <string name="login_code_resend">Не получили код?</string>
 
     <!-- Offers Screen -->
+    <string name="offers_greeting_guest">Дорогой пользователь</string>
     <string name="offers_search_placeholder">Напитки, шоколад и снеки</string>
 
     <!-- Orders Screen -->

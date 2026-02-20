@@ -2,6 +2,7 @@ package az.less.mobile.presentation.client.main.more.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.main.more.root.models.CellId
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellModel
@@ -26,7 +27,8 @@ import org.orbitmvi.orbit.container
  * ViewModel for More Screen using Orbit MVI
  */
 class MoreViewModel(
-    private val userLocalRepository: SessionLocalRepository
+    private val userLocalRepository: SessionLocalRepository,
+    private val authorizationRepository: AuthorizationRepository
 ) : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
 
     override val container: Container<MoreState, MoreSideEffect> =
@@ -85,7 +87,14 @@ class MoreViewModel(
     }
 
     private fun handleLogoutClicked() = intent {
-        // Clear user data from DataStore
+        reduce { state.copy(isLoading = true) }
+
+        val refreshToken = userLocalRepository.getRefreshToken()
+        if (refreshToken != null) {
+            authorizationRepository.logout(refreshToken)
+        }
+
+        // Always clear session locally regardless of API result
         userLocalRepository.clearSession()
         // State will be updated automatically via observeUserState()
     }

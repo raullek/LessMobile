@@ -51,6 +51,7 @@ data class ToastState(
 fun LoginCodeScreen(
     navController: NavController,
     email: String = "",
+    navigateToMerchant: () -> Unit = {},
     viewModel: LoginCodeViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
@@ -80,8 +81,11 @@ fun LoginCodeScreen(
             is LoginCodeSideEffect.NavigateBack -> {
                 navController.popBackStack()
             }
-            is LoginCodeSideEffect.NavigateNext -> {
+            is LoginCodeSideEffect.NavigateToClient -> {
                 navController.popBackStack<ClientRoute.More>(inclusive = false)
+            }
+            is LoginCodeSideEffect.NavigateToMerchant -> {
+                navigateToMerchant()
             }
             is LoginCodeSideEffect.ShowSuccess -> {
                 toastState = ToastState(sideEffect.message, ToastType.Success)

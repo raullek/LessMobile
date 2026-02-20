@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -16,8 +17,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import az.less.designsystem.base.LessTheme
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.AppClientBottomNavigation
 import az.less.mobile.presentation.merchant.AppMerchantBottomNavigation
+import kotlinx.coroutines.flow.first
+import org.koin.compose.koinInject
 
 private fun logNavigation(tag: String, route: String) {
     println("[$tag] -> $route")
@@ -31,12 +35,21 @@ const val ROOT_MERCHANT = "rootMerchantNavigation"
 
 @Composable
 fun AppRootNavigation() {
+    val sessionLocalRepository: SessionLocalRepository = koinInject()
     val navController = rememberNavController()
-    val startFlow = if (true) ROOT_CLIENT else ROOT_MERCHANT
+
+    LaunchedEffect(Unit) {
+        val user = sessionLocalRepository.currentUser.first()
+        if (user?.roles?.contains("merchant") == true) {
+            navController.navigate(ROOT_MERCHANT) {
+                popUpTo(ROOT_CLIENT) { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
-        startDestination = startFlow
+        startDestination = ROOT_CLIENT
     ) {
         clientGraph(navController)
         merchantGraph(navController)

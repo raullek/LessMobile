@@ -41,6 +41,7 @@
     <string name="login_code_resend">Didn\'t receive it?</string>
 
     <!-- Offers Screen -->
+    <string name="offers_greeting_guest">Dear User</string>
     <string name="offers_search_placeholder">Drinks, chocolates and snacks</string>
 
     <!-- Orders Screen -->
