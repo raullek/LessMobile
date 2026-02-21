@@ -5,5 +5,6 @@ data class User(
     val name: String,
     val email: String,
     val roles: List<String> = emptyList(),
-    val status: String = ""
+    val status: String = "",
+    val avatarUrl: String? = null
 )

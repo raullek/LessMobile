@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.client.main.saved.components
+package az.less.mobile.presentation.client.main.favorites.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,7 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.presentation.client.main.saved.models.SavedMerchant
+import az.less.mobile.presentation.client.main.favorites.models.FavoriteMerchant
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_star_24dp
@@ -37,14 +37,9 @@ import lessmobile.composeapp.generated.resources.test_merchant_logo
 import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
 
-/**
- * Saved merchant card component for Saved screen
- * Displays a saved merchant with image, badge, logo, name, address, rating and distance
- * Uses DS components and tokens for consistent styling
- */
 @Composable
-fun SavedMerchantCard(
-    merchant: SavedMerchant,
+fun FavoriteMerchantCard(
+    merchant: FavoriteMerchant,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -92,7 +87,11 @@ fun SavedMerchantCard(
                 }
             }
 
-            // Badge - top left ("X items on sale" or "No active offer")
+            // Badge - top left
+            val badgeLabel = merchant.badgeText
+                ?: if (merchant.itemsOnSale > 0) "${merchant.itemsOnSale} items on sale"
+                else "No active offer"
+
             Box(
                 modifier = Modifier
                     .padding(start = LessTheme.spacing.small, top = LessTheme.spacing.small)
@@ -104,13 +103,13 @@ fun SavedMerchantCard(
                             LessTheme.colors.textIconsGrey,
                         shape = RoundedCornerShape(LessTheme.radius.xLarge)
                     )
-                    .padding(horizontal = LessTheme.spacing.xSmall, vertical = LessTheme.spacing.xxSmall)
+                    .padding(
+                        horizontal = LessTheme.spacing.xSmall,
+                        vertical = LessTheme.spacing.xxSmall
+                    )
             ) {
                 Text(
-                    text = if (merchant.itemsOnSale > 0)
-                        "${merchant.itemsOnSale} items on sale"
-                    else
-                        "No active offer",
+                    text = badgeLabel,
                     style = LessTheme.typography.caption12Semibold,
                     color = LessTheme.colors.textIconsNested
                 )
@@ -155,7 +154,6 @@ fun SavedMerchantCard(
                 .padding(horizontal = LessTheme.spacing.small)
                 .padding(top = LessTheme.spacing.xxSmall, bottom = LessTheme.spacing.small)
         ) {
-            // Merchant name
             Text(
                 text = merchant.merchantName,
                 style = LessTheme.typography.body16Semibold,
@@ -166,7 +164,6 @@ fun SavedMerchantCard(
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
 
-            // Address
             Text(
                 text = merchant.address,
                 style = LessTheme.typography.body14Medium,
@@ -177,17 +174,14 @@ fun SavedMerchantCard(
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
 
-            // Rating and distance row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Rating
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Star icon
                     Box(
                         modifier = Modifier
                             .size(20.dp)
@@ -212,7 +206,6 @@ fun SavedMerchantCard(
                     )
                 }
 
-                // Dot separator
                 Box(
                     modifier = Modifier
                         .size(3.dp)
@@ -222,7 +215,6 @@ fun SavedMerchantCard(
                         )
                 )
 
-                // Distance
                 Text(
                     text = merchant.distance,
                     style = LessTheme.typography.body14Medium,

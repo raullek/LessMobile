@@ -10,9 +10,6 @@ data class OffersState(
     val userInfo: UserInfo? = null,
     val isUserLoading: Boolean = false,
 
-    val latitude: Double? = null,
-    val longitude: Double? = null,
-
     val categories: List<Category> = emptyList(),
     val specialCategories: List<SpecialDiscountItem> = emptyList(),
     val segmentedCategories: List<SegmentedCategory> = emptyList(),
@@ -22,7 +19,8 @@ data class OffersState(
 
     val searchQuery: String = "",
     val selectedCategoryId: String? = null,
-    val selectedSegmentId: String? = null
+    val selectedSegmentId: String? = null,
+    val locationPermissionGranted: Boolean = false
 ) {
     val userName: String? get() = userInfo?.name?.takeIf { it.isNotBlank() }
     val userAvatarUrl: String? get() = userInfo?.avatarUrl
@@ -41,6 +39,7 @@ sealed interface OffersSideEffect {
 }
 
 sealed interface OffersIntent {
+    data class OnLocationPermissionChanged(val granted: Boolean) : OffersIntent
     data class OnSearchQueryChanged(val query: String) : OffersIntent
     data object OnSearchClicked : OffersIntent
     data class OnCategorySelected(val categoryId: String) : OffersIntent

@@ -21,6 +21,7 @@ data class MoreState(
     // Sections list
     val sections: List<az.less.mobile.presentation.client.main.more.root.models.MoreSection> = emptyList(),
     // Bottom sheets
+    val locationPermissionGranted: Boolean = false,
     val showContactUsBottomSheet: Boolean = false,
     val showTermsBottomSheet: Boolean = false
 )
@@ -44,6 +45,8 @@ sealed interface MoreSideEffect {
     data object NavigateToTermsOfService :
         az.less.mobile.presentation.client.main.more.root.MoreSideEffect
     data object NavigateToHowToUse :
+        az.less.mobile.presentation.client.main.more.root.MoreSideEffect
+    data object NavigateToAppSettings :
         az.less.mobile.presentation.client.main.more.root.MoreSideEffect
     data class ShowError(val message: String) :
         az.less.mobile.presentation.client.main.more.root.MoreSideEffect

@@ -33,6 +33,7 @@ import org.jetbrains.compose.resources.painterResource
 import az.less.mobile.presentation.client.main.more.root.components.MoreHeader
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellType
 
+import az.less.mobile.utils.openAppSettings
 import lessmobile.composeapp.generated.resources.more_contact_us
 import lessmobile.composeapp.generated.resources.contact_instagram
 import lessmobile.composeapp.generated.resources.contact_tiktok
@@ -90,6 +91,9 @@ fun MoreScreen(
             }
             is MoreSideEffect.NavigateToHowToUse -> {
                 navController.navigate(ClientRoute.Welcome)
+            }
+            is MoreSideEffect.NavigateToAppSettings -> {
+                openAppSettings()
             }
             is MoreSideEffect.ShowError -> {
                 // Show error snackbar or dialog
@@ -201,6 +205,7 @@ fun MoreScreenContent(
                 onLoginClick = { onIntent(MoreIntent.OnLoginClicked) },
                 userName = state.userName,
                 userEmail = state.userEmail,
+                userAvatarUrl = state.userAvatarUrl,
                 co2Saved = state.co2Saved,
                 moneySaved = state.moneySaved,
                 ecoHeroTitle = state.ecoHeroTitle,
@@ -214,19 +219,20 @@ fun MoreScreenContent(
         }
         
         // Sections
-        state.sections.forEach { section ->
+        state.sections.forEachIndexed { index, section ->
             // Section header
-            item(key = "header_${section.title}") {
-                DsSectionHeader(title = section.title)
+            item(key = "header_$index") {
+                DsSectionHeader(title = stringResource(section.titleRes))
             }
-            
+
             // Section cells
             items(
                 items = section.cells,
                 key = { cell -> cell.id }
             ) { cell ->
                 DsCell(
-                    title = cell.title,
+                    title = stringResource(cell.titleRes),
+                    subtitle = cell.subtitleRes?.let { stringResource(it) },
                     leadingContent = cell.icon?.let { CellLeadingContent(icon = it) },
                     type = when (cell.type) {
                         is MoreCellType.Navigation -> CellType.Navigation(
@@ -242,9 +248,9 @@ fun MoreScreenContent(
                     modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
                 )
             }
-            
+
             // Spacing after section
-            item(key = "spacing_${section.title}") {
+            item(key = "spacing_$index") {
                 Spacer(modifier = Modifier.height(LessTheme.spacing.large).background(LessTheme.colors.backgroundPrimary))
             }
         }

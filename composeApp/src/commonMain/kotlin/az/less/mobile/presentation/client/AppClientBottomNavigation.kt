@@ -37,8 +37,15 @@ import lessmobile.composeapp.generated.resources.ic_more_24dp
 import lessmobile.composeapp.generated.resources.ic_offers_24dp
 import lessmobile.composeapp.generated.resources.ic_orders_24dp
 import lessmobile.composeapp.generated.resources.ic_saved_24dp
+import lessmobile.composeapp.generated.resources.nav_offers
+import lessmobile.composeapp.generated.resources.nav_explore
+import lessmobile.composeapp.generated.resources.nav_orders
+import lessmobile.composeapp.generated.resources.nav_saved
+import lessmobile.composeapp.generated.resources.nav_more
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AppClientBottomNavigation(
@@ -119,14 +126,15 @@ private fun BottomNavItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        val label = stringResource(item.labelRes)
         Icon(
             painter = painterResource(resource = item.icon),
-            contentDescription = item.label,
+            contentDescription = label,
             tint = iconColor,
             modifier = Modifier.size(LessTheme.size.medium)
         )
         Text(
-            text = item.label,
+            text = label,
             style = LessTheme.typography.caption12Bold,
             color = iconColor,
             modifier = Modifier.padding(top = LessTheme.spacing.xxSmall)
@@ -136,34 +144,34 @@ private fun BottomNavItem(
 
 private data class BottomNavItemData(
     val icon: DrawableResource,
-    val label: String,
+    val labelRes: StringResource,
     val route: ClientRoute
 )
 
 private val bottomNavItems = listOf(
     BottomNavItemData(
         Res.drawable.ic_offers_24dp,
-        "Offers",
+        Res.string.nav_offers,
         ClientRoute.Offers
     ),
     BottomNavItemData(
         Res.drawable.ic_explore_24dp,
-        "Explore",
+        Res.string.nav_explore,
         ClientRoute.Explore
     ),
     BottomNavItemData(
         Res.drawable.ic_orders_24dp,
-        "Orders",
+        Res.string.nav_orders,
         ClientRoute.Orders
     ),
     BottomNavItemData(
         Res.drawable.ic_saved_24dp,
-        "Saved",
-        ClientRoute.Saved
+        Res.string.nav_saved,
+        ClientRoute.Favorites
     ),
     BottomNavItemData(
         Res.drawable.ic_more_24dp,
-        "More",
+        Res.string.nav_more,
         ClientRoute.More
     )
 )

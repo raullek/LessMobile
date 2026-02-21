@@ -59,7 +59,8 @@ class SessionLocalRepositoryImpl(
             name = user.name,
             email = user.email,
             roles = user.roles,
-            status = user.status
+            status = user.status,
+            avatarUrl = user.avatarUrl
         )
         dataStore.edit { preferences ->
             preferences[USER_JSON] = json.encodeToString(UserEntity.serializer(), entity)

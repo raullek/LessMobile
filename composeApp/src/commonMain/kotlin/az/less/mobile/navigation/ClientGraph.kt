@@ -12,7 +12,7 @@ import az.less.mobile.presentation.client.main.merchant.MerchantProfileScreen
 import az.less.mobile.presentation.client.main.more.root.MoreScreen
 import az.less.mobile.presentation.client.main.offers.OffersScreen
 import az.less.mobile.presentation.client.main.orders.OrdersScreen
-import az.less.mobile.presentation.client.main.saved.SavedScreen
+import az.less.mobile.presentation.client.main.favorites.FavoritesScreen
 import az.less.mobile.presentation.client.main.search.SearchScreen
 import az.less.mobile.presentation.client.onboarding.loginemail.LoginEmailScreen
 import az.less.mobile.presentation.client.onboarding.otp.LoginCodeScreen
@@ -40,7 +40,7 @@ sealed interface ClientRoute {
     data object Orders : ClientRoute
 
     @Serializable
-    data object Saved : ClientRoute
+    data object Favorites : ClientRoute
 
     @Serializable
     data object More : ClientRoute
@@ -111,11 +111,11 @@ fun NavGraphBuilder.mainGraph(
     }
 
     composable<ClientRoute.Orders> {
-        OrdersScreen()
+        OrdersScreen(navController = navController)
     }
 
-    composable<ClientRoute.Saved> {
-        SavedScreen(navController = navController)
+    composable<ClientRoute.Favorites> {
+        FavoritesScreen(navController = navController)
     }
 
     composable<ClientRoute.More> {
@@ -205,6 +205,6 @@ val clientHomeRoutes: List<KClass<out ClientRoute>> = listOf(
     ClientRoute.Offers::class,
     ClientRoute.Explore::class,
     ClientRoute.Orders::class,
-    ClientRoute.Saved::class,
+    ClientRoute.Favorites::class,
     ClientRoute.More::class
 )

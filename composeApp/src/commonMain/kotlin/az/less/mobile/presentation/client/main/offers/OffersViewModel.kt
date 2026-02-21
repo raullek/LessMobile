@@ -9,6 +9,7 @@ import dev.jordond.compass.geolocation.Geolocator
 import dev.jordond.compass.geolocation.mobile
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -25,11 +26,12 @@ class OffersViewModel(
 
     init {
         observeUserInfo()
-        fetchLocationAndLoadData()
+        loadOffers()
     }
 
     fun onIntent(intent: OffersIntent) {
         when (intent) {
+            is OffersIntent.OnLocationPermissionChanged -> handleLocationPermissionChanged(intent.granted)
             is OffersIntent.OnSearchQueryChanged -> handleSearchQueryChanged(intent.query)
             is OffersIntent.OnSearchClicked -> handleSearchClicked()
             is OffersIntent.OnCategorySelected -> handleCategorySelected(intent.categoryId)
@@ -62,21 +64,25 @@ class OffersViewModel(
         }
     }
 
-    private fun fetchLocationAndLoadData() = intent {
-        geolocator.current()
-            .getOrNull()
-            ?.let { location ->
-                reduce {
-                    state.copy(
-                        latitude = location.coordinates.latitude,
-                        longitude = location.coordinates.longitude
-                    )
-                }
-            }
+    private fun handleLocationPermissionChanged(granted: Boolean) = intent {
+        reduce { state.copy(locationPermissionGranted = granted) }
+        if (granted) {
+            loadOffers()
+        }
+    }
+
+    private suspend fun getLocation() = withTimeoutOrNull(3000L) {
+        if (geolocator.isAvailable()) geolocator.current().getOrNull() else null
+    }
+
+    private fun loadOffers() = intent {
+        val location = if (state.locationPermissionGranted) getLocation() else null
+        val latitude = location?.coordinates?.latitude
+        val longitude = location?.coordinates?.longitude
 
         offersRepository.getHomeOffers(
-            latitude = state.latitude,
-            longitude = state.longitude
+            latitude = latitude,
+            longitude = longitude
         )
             .onSuccess { data ->
                 reduce {
@@ -158,9 +164,13 @@ class OffersViewModel(
     private fun handleRefresh() = intent {
         reduce { state.copy(isRefreshing = true) }
 
+        val location = if (state.locationPermissionGranted) getLocation() else null
+        val latitude = location?.coordinates?.latitude
+        val longitude = location?.coordinates?.longitude
+
         offersRepository.getHomeOffers(
-            latitude = state.latitude,
-            longitude = state.longitude
+            latitude = latitude,
+            longitude = longitude
         )
             .onSuccess { data ->
                 reduce {

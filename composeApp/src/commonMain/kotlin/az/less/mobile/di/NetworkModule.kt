@@ -99,8 +99,8 @@ val networkModule = module {
                 url("https://axshambazari.com/api/")
                 contentType(ContentType.Application.Json)
                 headers.append(HttpHeaders.Accept, ContentType.Application.Json.toString())
-//                headers.append("X-Data-Env", "test")
-//                headers.append("X-Test-Db-Key", "axshamlar")
+                headers.append("X-Data-Env", "test")
+                headers.append("X-Test-Db-Key", "axshamlar")
             }
         }
     }

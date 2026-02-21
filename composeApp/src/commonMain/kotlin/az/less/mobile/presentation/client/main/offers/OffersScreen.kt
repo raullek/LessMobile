@@ -43,6 +43,7 @@ import az.less.mobile.presentation.client.main.offers.components.OffersScreenShi
 import az.less.mobile.presentation.client.main.offers.components.SearchFilterBar
 import az.less.mobile.presentation.client.main.offers.components.SpecialDiscountPager
 import az.less.mobile.presentation.client.reserve.ReserveScreen
+import az.less.mobile.presentation.maps.LocationPermissionHandler
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
@@ -68,6 +69,15 @@ fun OffersScreen(
     val reserveSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+    LocationPermissionHandler(
+        onPermissionGranted = {
+            viewModel.onIntent(OffersIntent.OnLocationPermissionChanged(granted = true))
+        },
+        onPermissionDenied = {
+            viewModel.onIntent(OffersIntent.OnLocationPermissionChanged(granted = false))
+        }
+    ) {}
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {

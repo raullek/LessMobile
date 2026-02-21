@@ -1,46 +1,43 @@
 package az.less.mobile.presentation.client.main.orders
 
-import az.less.mobile.presentation.client.main.orders.models.CartItem
+import az.less.mobile.presentation.client.main.orders.models.Order
 
 /**
  * State of the Orders Screen
  */
 data class OrdersState(
-    val selectedTab: az.less.mobile.presentation.client.main.orders.OrderTab = _root_ide_package_.az.less.mobile.presentation.client.main.orders.OrderTab.CART,
-    val cartItems: List<az.less.mobile.presentation.client.main.orders.models.CartItem> = emptyList(),
-    val historyItems: List<az.less.mobile.presentation.client.main.orders.models.CartItem> = emptyList(),
-    val isLoading: Boolean = false
+    val selectedTab: OrderTab = OrderTab.ACTIVE,
+    val isLoggedIn: Boolean = true
 )
 
 /**
  * Order tabs enum
  */
 enum class OrderTab {
-    CART,
-    HISTORY
+    ACTIVE,
+    PREVIOUS
 }
 
 /**
  * Side Effects for navigation and one-time events
  */
 sealed interface OrdersSideEffect {
-    data object NavigateToCheckout : az.less.mobile.presentation.client.main.orders.OrdersSideEffect
-    data class ShowReserveInfo(val cartItem: az.less.mobile.presentation.client.main.orders.models.CartItem) :
-        az.less.mobile.presentation.client.main.orders.OrdersSideEffect
-    data object NavigateBack : az.less.mobile.presentation.client.main.orders.OrdersSideEffect
-    data class ShowError(val message: String) :
-        az.less.mobile.presentation.client.main.orders.OrdersSideEffect
+    data object NavigateToCheckout : OrdersSideEffect
+    data class ShowReserveInfo(val order: Order) : OrdersSideEffect
+    data object NavigateBack : OrdersSideEffect
+    data class ShowError(val message: String) : OrdersSideEffect
+    data object NavigateToOffers : OrdersSideEffect
+    data object NavigateToMore : OrdersSideEffect
 }
 
 /**
  * User Intents/Actions
  */
 sealed interface OrdersIntent {
-    data class OnTabSelected(val tab: az.less.mobile.presentation.client.main.orders.OrderTab) :
-        az.less.mobile.presentation.client.main.orders.OrdersIntent
-    data class OnCartItemClicked(val itemId: String) :
-        az.less.mobile.presentation.client.main.orders.OrdersIntent
-    data object OnCheckoutClicked : az.less.mobile.presentation.client.main.orders.OrdersIntent
-    data object OnBackClicked : az.less.mobile.presentation.client.main.orders.OrdersIntent
+    data class OnTabSelected(val tab: OrderTab) : OrdersIntent
+    data class OnOrderClicked(val order: Order) : OrdersIntent
+    data object OnCheckoutClicked : OrdersIntent
+    data object OnBackClicked : OrdersIntent
+    data object OnExploreOffersClicked : OrdersIntent
+    data object OnSignInClicked : OrdersIntent
 }
-
