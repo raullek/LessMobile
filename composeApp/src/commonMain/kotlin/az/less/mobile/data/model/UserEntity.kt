@@ -9,13 +9,15 @@ data class UserEntity(
     val name: String,
     val email: String,
     val roles: List<String>,
-    val status: String
+    val status: String,
+    val avatarUrl: String? = null
 ) {
     fun toUser(): User = User(
         id = id,
         name = name,
         email = email,
         roles = roles,
-        status = status
+        status = status,
+        avatarUrl = avatarUrl
     )
 }

@@ -22,9 +22,13 @@ import androidx.compose.ui.layout.ContentScale
 import az.less.designsystem.base.LessTheme
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.cd_messages
+import lessmobile.composeapp.generated.resources.cd_user_avatar
 import lessmobile.composeapp.generated.resources.ic_notification_24dp
+import lessmobile.composeapp.generated.resources.offers_greeting
 import lessmobile.composeapp.generated.resources.person_image_placeholder
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun OffersHeader(
@@ -50,7 +54,7 @@ fun OffersHeader(
         ) {
                 AsyncImage(
                     model = userAvatarUrl,
-                    contentDescription = "User Avatar",
+                    contentDescription = stringResource(Res.string.cd_user_avatar),
                     modifier = Modifier
                         .size(LessTheme.size.xLarge)
                         .clip(CircleShape),
@@ -64,7 +68,7 @@ fun OffersHeader(
 
         // User Greeting
         Text(
-            text = "Hi, $userName!",
+            text = stringResource(Res.string.offers_greeting, userName),
             style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsBlack,
             modifier = Modifier.weight(1f)
@@ -81,7 +85,7 @@ fun OffersHeader(
         ) {
             Icon(
                 painter = painterResource(Res.drawable.ic_notification_24dp),
-                contentDescription = "Messages",
+                contentDescription = stringResource(Res.string.cd_messages),
                 modifier = Modifier.size(LessTheme.size.small + LessTheme.spacing.xxxSmall),
                 tint = LessTheme.colors.textIconsBlack
             )

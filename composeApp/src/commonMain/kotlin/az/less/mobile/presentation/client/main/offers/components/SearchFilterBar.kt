@@ -19,10 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.action_search
 import lessmobile.composeapp.generated.resources.ic_bubble_question_24dp
 import lessmobile.composeapp.generated.resources.ic_filter_24dp
 import lessmobile.composeapp.generated.resources.ic_search_24dp
+import lessmobile.composeapp.generated.resources.offers_search_placeholder
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Search bar with filter button component for Offers screen
@@ -56,7 +59,7 @@ fun SearchFilterBar(
             ) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_search_24dp),
-                    contentDescription = "Search",
+                    contentDescription = stringResource(Res.string.action_search),
                     tint = LessTheme.colors.textIconsGrey,
                     modifier = Modifier.size(LessTheme.size.medium)
                 )
@@ -64,7 +67,7 @@ fun SearchFilterBar(
                 Spacer(modifier = Modifier.width(LessTheme.spacing.small + LessTheme.spacing.xxxSmall)) // 12 + 2 = 14dp
                 
                 Text(
-                    text = if (searchQuery.isEmpty()) "Drinks, chocolates and snacks" else searchQuery,
+                    text = if (searchQuery.isEmpty()) stringResource(Res.string.offers_search_placeholder) else searchQuery,
                     style = LessTheme.typography.body14Medium,
                     color = if (searchQuery.isEmpty()) 
                         LessTheme.colors.textIconsThird 

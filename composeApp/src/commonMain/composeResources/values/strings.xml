@@ -42,18 +42,31 @@
 
     <!-- Offers Screen -->
     <string name="offers_greeting_guest">Dear User</string>
+    <string name="offers_greeting">Hi, %1$s!</string>
     <string name="offers_search_placeholder">Drinks, chocolates and snacks</string>
 
     <!-- Orders Screen -->
     <string name="orders_title">Orders</string>
     <string name="orders_tab_active">Active</string>
     <string name="orders_tab_previous">Previous orders</string>
+    <string name="orders_not_logged_in_title">Sign in to see your orders</string>
+    <string name="orders_not_logged_in_description">Log in to view and manage your orders</string>
+    <string name="orders_sign_in">Sign in</string>
+    <string name="orders_empty_title">You don\'t have any orders</string>
+    <string name="orders_empty_description">Your orders will appear here once you make a purchase</string>
+    <string name="orders_explore_offers">Explore offers</string>
+    <string name="orders_reserve_number">Reserve number: </string>
+    <string name="orders_picked_up_on">Picked up on %1$s</string>
+    <string name="orders_pickup_time">Pick up from %1$s to %2$s</string>
 
     <!-- Saved/Favorites Screen -->
     <string name="saved_title">Favourites</string>
     <string name="saved_empty_title">You don\'t have favorites</string>
     <string name="saved_empty_description">Your saved items from all categories will appear here. You can delete or use them at any time</string>
     <string name="saved_explore_venues">Explore new venues</string>
+    <string name="saved_not_logged_in_title">Sign in to see your favorites</string>
+    <string name="saved_not_logged_in_description">Log in to save and view your favorite venues</string>
+    <string name="saved_sign_in">Sign in</string>
 
     <!-- More Screen -->
     <string name="more_section_application">Application</string>
@@ -68,6 +81,14 @@
     <string name="more_how_to_use">How to use</string>
     <string name="more_eco_hero">Eco-hero</string>
     <string name="more_eco_hero_description">You saved %1$d meals!</string>
+    <string name="more_location">Location</string>
+    <string name="more_location_granted">Granted</string>
+    <string name="more_location_not_granted">Not granted</string>
+    <string name="more_get_more_features">Welcome to Less</string>
+    <string name="more_get_more_features_description">Log in to the application to take advantage of special offers from Less</string>
+    <string name="more_log_in_or_sign_up">Log in</string>
+    <string name="more_co2_saved">CO2, saved</string>
+    <string name="more_money_saved">Saved</string>
 
     <!-- Contact Us Bottom Sheet -->
     <string name="contact_instagram">Instagram</string>

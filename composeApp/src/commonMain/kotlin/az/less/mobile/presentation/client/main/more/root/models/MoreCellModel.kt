@@ -1,6 +1,7 @@
 package az.less.mobile.presentation.client.main.more.root.models
 
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 
 /**
  * Enum representing cell identifiers in More screen
@@ -15,17 +16,19 @@ enum class CellId {
     SignStore,
     TermsOfService,
     HowToUse,
-    Notification
+    Notification,
+    Location
 }
 
 /**
  * Model representing a cell item in More screen
  */
 data class MoreCellModel(
-    val id: az.less.mobile.presentation.client.main.more.root.models.CellId,
-    val title: String,
+    val id: CellId,
+    val titleRes: StringResource,
+    val subtitleRes: StringResource? = null,
     val icon: DrawableResource? = null,
-    val type: az.less.mobile.presentation.client.main.more.root.models.MoreCellType = _root_ide_package_.az.less.mobile.presentation.client.main.more.root.models.MoreCellType.Navigation,
+    val type: MoreCellType = MoreCellType.Navigation,
     val showDivider: Boolean = true
 )
 
@@ -33,15 +36,14 @@ data class MoreCellModel(
  * Type of cell interaction
  */
 sealed class MoreCellType {
-    data object Navigation : az.less.mobile.presentation.client.main.more.root.models.MoreCellType()
-    data class Toggle(val checked: Boolean) : az.less.mobile.presentation.client.main.more.root.models.MoreCellType()
+    data object Navigation : MoreCellType()
+    data class Toggle(val checked: Boolean) : MoreCellType()
 }
 
 /**
  * Section model for grouping cells
  */
 data class MoreSection(
-    val title: String,
-    val cells: List<az.less.mobile.presentation.client.main.more.root.models.MoreCellModel>
+    val titleRes: StringResource,
+    val cells: List<MoreCellModel>
 )
-

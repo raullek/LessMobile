@@ -4,7 +4,7 @@
     <string name="app_name">Less</string>
 
     <!-- Bottom Navigation -->
-    <string name="nav_offers">Предложения</string>
+    <string name="nav_offers">Офферы</string>
     <string name="nav_explore">Обзор</string>
     <string name="nav_orders">Заказы</string>
     <string name="nav_saved">Избранное</string>
@@ -42,18 +42,31 @@
 
     <!-- Offers Screen -->
     <string name="offers_greeting_guest">Дорогой пользователь</string>
+    <string name="offers_greeting">Привет, %1$s!</string>
     <string name="offers_search_placeholder">Напитки, шоколад и снеки</string>
 
     <!-- Orders Screen -->
     <string name="orders_title">Заказы</string>
     <string name="orders_tab_active">Активные</string>
     <string name="orders_tab_previous">Предыдущие заказы</string>
+    <string name="orders_not_logged_in_title">Войдите, чтобы увидеть заказы</string>
+    <string name="orders_not_logged_in_description">Войдите, чтобы просматривать и управлять заказами</string>
+    <string name="orders_sign_in">Войти</string>
+    <string name="orders_empty_title">У вас нет заказов</string>
+    <string name="orders_empty_description">Ваши заказы появятся здесь после покупки</string>
+    <string name="orders_explore_offers">Посмотреть предложения</string>
+    <string name="orders_reserve_number">Номер брони: </string>
+    <string name="orders_picked_up_on">Забрано %1$s</string>
+    <string name="orders_pickup_time">Забрать с %1$s до %2$s</string>
 
     <!-- Saved/Favorites Screen -->
     <string name="saved_title">Избранное</string>
     <string name="saved_empty_title">У вас нет избранного</string>
     <string name="saved_empty_description">Сохранённые элементы из всех категорий появятся здесь. Вы можете удалить или использовать их в любое время</string>
     <string name="saved_explore_venues">Найти новые заведения</string>
+    <string name="saved_not_logged_in_title">Войдите, чтобы увидеть избранное</string>
+    <string name="saved_not_logged_in_description">Войдите, чтобы сохранять и просматривать избранные заведения</string>
+    <string name="saved_sign_in">Войти</string>
 
     <!-- More Screen -->
     <string name="more_section_application">Приложение</string>
@@ -68,6 +81,14 @@
     <string name="more_how_to_use">Как пользоваться</string>
     <string name="more_eco_hero">Эко-герой</string>
     <string name="more_eco_hero_description">Вы сохранили %1$d блюд!</string>
+    <string name="more_location">Местоположение</string>
+    <string name="more_location_granted">Разрешено</string>
+    <string name="more_location_not_granted">Не разрешено</string>
+    <string name="more_get_more_features">Добро пожаловать</string>
+    <string name="more_get_more_features_description">Войдите в приложение, чтобы воспользоваться специальными предложениями от Less</string>
+    <string name="more_log_in_or_sign_up">Войти</string>
+    <string name="more_co2_saved">CO2, сэкономлено</string>
+    <string name="more_money_saved">Сэкономлено</string>
 
     <!-- Contact Us Bottom Sheet -->
     <string name="contact_instagram">Instagram</string>

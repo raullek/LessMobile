@@ -14,11 +14,11 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         // Enable edge-to-edge with transparent system bars
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(
+            statusBarStyle = SystemBarStyle.light(
                 android.graphics.Color.TRANSPARENT,
                 android.graphics.Color.TRANSPARENT
             ),
-            navigationBarStyle = SystemBarStyle.auto(
+            navigationBarStyle = SystemBarStyle.light(
                 android.graphics.Color.TRANSPARENT,
                 android.graphics.Color.TRANSPARENT
             )

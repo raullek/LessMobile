@@ -1,4 +1,4 @@
-package az.less.mobile.presentation.client.main.saved.components
+package az.less.mobile.presentation.client.main.favorites.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,12 +22,8 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import com.valentinilk.shimmer.shimmer
 
-/**
- * Shimmer placeholder for Saved Screen
- * Displays loading state that matches the SavedMerchantCard layout
- */
 @Composable
-fun SavedScreenShimmer(
+fun FavoritesScreenShimmer(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -40,17 +36,13 @@ fun SavedScreenShimmer(
         verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
     ) {
         items(4) {
-            SavedMerchantCardShimmer()
+            FavoriteMerchantCardShimmer()
         }
     }
 }
 
-/**
- * Shimmer placeholder for SavedMerchantCard
- * Matches the layout: image (140dp) + content section
- */
 @Composable
-private fun SavedMerchantCardShimmer(
+private fun FavoriteMerchantCardShimmer(
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -59,7 +51,6 @@ private fun SavedMerchantCardShimmer(
             .clip(RoundedCornerShape(LessTheme.radius.medium))
             .background(LessTheme.colors.backgroundPrimary)
     ) {
-        // Image section placeholder
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,14 +60,12 @@ private fun SavedMerchantCardShimmer(
                 .background(LessTheme.colors.textIconsSecondary)
         )
 
-        // Content section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = LessTheme.spacing.small)
                 .padding(top = LessTheme.spacing.xxSmall, bottom = LessTheme.spacing.small)
         ) {
-            // Merchant name placeholder
             Box(
                 modifier = Modifier
                     .width(180.dp)
@@ -87,7 +76,6 @@ private fun SavedMerchantCardShimmer(
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
 
-            // Address placeholder
             Box(
                 modifier = Modifier
                     .width(140.dp)
@@ -98,18 +86,15 @@ private fun SavedMerchantCardShimmer(
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
 
-            // Rating and distance row placeholder
             Row(
                 horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
             ) {
-                // Rating box
                 Box(
                     modifier = Modifier
                         .size(20.dp)
                         .clip(RoundedCornerShape(LessTheme.radius.xSmall))
                         .background(LessTheme.colors.textIconsSecondary)
                 )
-                // Rating text
                 Box(
                     modifier = Modifier
                         .width(30.dp)
@@ -117,7 +102,6 @@ private fun SavedMerchantCardShimmer(
                         .clip(RoundedCornerShape(2.dp))
                         .background(LessTheme.colors.textIconsSecondary)
                 )
-                // Distance
                 Box(
                     modifier = Modifier
                         .width(50.dp)

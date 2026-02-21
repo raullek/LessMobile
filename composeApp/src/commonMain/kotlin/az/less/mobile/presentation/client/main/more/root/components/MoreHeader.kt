@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,11 +29,20 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.DsButton
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.compose_multiplatform
+import lessmobile.composeapp.generated.resources.cd_app_logo
+import lessmobile.composeapp.generated.resources.cd_user_avatar
+import lessmobile.composeapp.generated.resources.ic_app_logo
 import lessmobile.composeapp.generated.resources.ic_eco_leaf_24dp
-import org.jetbrains.compose.resources.DrawableResource
+import lessmobile.composeapp.generated.resources.more_co2_saved
+import lessmobile.composeapp.generated.resources.more_get_more_features
+import lessmobile.composeapp.generated.resources.more_get_more_features_description
+import lessmobile.composeapp.generated.resources.more_log_in_or_sign_up
+import lessmobile.composeapp.generated.resources.more_money_saved
+import lessmobile.composeapp.generated.resources.person_image_placeholder
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Header component for More screen that handles two states:
@@ -46,7 +56,7 @@ fun MoreHeader(
     modifier: Modifier = Modifier,
     userName: String? = null,
     userEmail: String? = null,
-    userAvatarRes: DrawableResource? = null,
+    userAvatarUrl: String? = null,
     co2Saved: String? = null,
     moneySaved: String? = null,
     ecoHeroTitle: String? = null,
@@ -58,19 +68,17 @@ fun MoreHeader(
         verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
     ) {
         if (isLoggedIn) {
-            // Logged in state - show user profile with ecology stats
-            _root_ide_package_.az.less.mobile.presentation.client.main.more.root.components.LoggedInHeader(
+            LoggedInHeader(
                 userName = userName ?: "User",
                 userEmail = userEmail ?: "user@email.com",
-                userAvatarRes = userAvatarRes,
+                userAvatarUrl = userAvatarUrl,
                 co2Saved = co2Saved ?: "0 kg",
                 moneySaved = moneySaved ?: "$0",
                 ecoHeroTitle = ecoHeroTitle,
                 ecoHeroDescription = ecoHeroDescription
             )
         } else {
-            // Not logged in state - show app branding and login prompt
-            _root_ide_package_.az.less.mobile.presentation.client.main.more.root.components.NotLoggedInHeader(
+            NotLoggedInHeader(
                 onLoginClick = onLoginClick
             )
         }
@@ -81,7 +89,7 @@ fun MoreHeader(
 private fun LoggedInHeader(
     userName: String,
     userEmail: String,
-    userAvatarRes: DrawableResource?,
+    userAvatarUrl: String?,
     co2Saved: String,
     moneySaved: String,
     ecoHeroTitle: String?,
@@ -104,13 +112,16 @@ private fun LoggedInHeader(
                 .background(LessTheme.colors.elementsSecondaryElement),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(userAvatarRes ?: Res.drawable.compose_multiplatform),
-                contentDescription = "User Avatar",
+            AsyncImage(
+                model = userAvatarUrl,
+                contentDescription = stringResource(Res.string.cd_user_avatar),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(Res.drawable.person_image_placeholder),
+                error = painterResource(Res.drawable.person_image_placeholder),
+                fallback = painterResource(Res.drawable.person_image_placeholder),
                 modifier = Modifier
-                    .size(96.dp)
-                    .clip(RoundedCornerShape(20.dp)),
-                contentScale = ContentScale.Crop
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(20.dp))
             )
         }
         
@@ -131,14 +142,14 @@ private fun LoggedInHeader(
         Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
         
         // Stats Section (CO2 and Money saved)
-        _root_ide_package_.az.less.mobile.presentation.client.main.more.root.components.EcologyStatsSection(
+        EcologyStatsSection(
             co2Saved = co2Saved,
             moneySaved = moneySaved
         )
-        
+
         // Eco-Hero Card (if available)
         if (ecoHeroTitle != null && ecoHeroDescription != null) {
-            _root_ide_package_.az.less.mobile.presentation.client.main.more.root.components.EcoHeroCard(
+            EcoHeroCard(
                 title = ecoHeroTitle,
                 description = ecoHeroDescription
             )
@@ -173,7 +184,7 @@ private fun EcologyStatsSection(
             )
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxxSmall))
             Text(
-                text = "CO2, saved",
+                text = stringResource(Res.string.more_co2_saved),
                 style = LessTheme.typography.body14Regular,
                 color = LessTheme.colors.textIconsBlack
             )
@@ -199,7 +210,7 @@ private fun EcologyStatsSection(
             )
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxxSmall))
             Text(
-                text = "Saved",
+                text = stringResource(Res.string.more_money_saved),
                 style = LessTheme.typography.body14Regular,
                 color = LessTheme.colors.textIconsBlack
             )
@@ -276,15 +287,15 @@ private fun NotLoggedInHeader(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(Res.drawable.compose_multiplatform),
-                contentDescription = "App Logo",
+                painter = painterResource(Res.drawable.ic_app_logo),
+                contentDescription = stringResource(Res.string.cd_app_logo),
                 modifier = Modifier.size(64.dp)
             )
         }
         
         // Title
         Text(
-            text = "Get more features",
+            text = stringResource(Res.string.more_get_more_features),
             style = LessTheme.typography.title28Bold,
             color = LessTheme.colors.textIconsBlack,
             textAlign = TextAlign.Center
@@ -292,7 +303,7 @@ private fun NotLoggedInHeader(
         
         // Description
         Text(
-            text = "Log in to the application to take advantage of special offers from Less",
+            text = stringResource(Res.string.more_get_more_features_description),
             style = LessTheme.typography.body16Regular,
             color = LessTheme.colors.textIconsGrey,
             textAlign = TextAlign.Center,
@@ -303,7 +314,7 @@ private fun NotLoggedInHeader(
         
         // Login button
         DsButton(
-            text = "Log in or Sign up",
+            text = stringResource(Res.string.more_log_in_or_sign_up),
             onClick = onLoginClick,
             size = ButtonSize.Large,
             modifier = Modifier.fillMaxWidth(0.6f)

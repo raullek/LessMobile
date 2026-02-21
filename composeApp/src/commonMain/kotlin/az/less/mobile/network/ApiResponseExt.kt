@@ -28,8 +28,18 @@ suspend inline fun <reified T> HttpResponse.toNetworkResult(): NetworkResult<T> 
                 )
             }
         } else {
-            val errorResponse = body<ApiError>()
-            NetworkResult.Error(errorResponse)
+            val errorResponse = try {
+                body<ApiError>()
+            } catch (_: Exception) {
+                ApiError(message = "Unknown error")
+            }
+            NetworkResult.Error(
+                errorResponse.copy(
+                    meta = (errorResponse.meta ?: ResponseMeta()).copy(
+                        statusCode = status.value
+                    )
+                )
+            )
         }
     } catch (e: Exception) {
         NetworkResult.Error(
