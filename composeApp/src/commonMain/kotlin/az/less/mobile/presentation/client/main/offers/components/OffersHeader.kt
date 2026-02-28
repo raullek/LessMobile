@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.client.main.offers.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,8 +24,8 @@ import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.cd_messages
 import lessmobile.composeapp.generated.resources.cd_user_avatar
 import lessmobile.composeapp.generated.resources.ic_notification_24dp
+import lessmobile.composeapp.generated.resources.ic_person_image_placeholder_48dp
 import lessmobile.composeapp.generated.resources.offers_greeting
-import lessmobile.composeapp.generated.resources.person_image_placeholder
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -59,8 +58,8 @@ fun OffersHeader(
                         .size(LessTheme.size.xLarge)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop,
-                    error = painterResource(Res.drawable.person_image_placeholder),
-                    placeholder = painterResource(Res.drawable.person_image_placeholder)
+                    error = painterResource(Res.drawable.ic_person_image_placeholder_48dp),
+                    placeholder = painterResource(Res.drawable.ic_person_image_placeholder_48dp)
                 )
         }
 

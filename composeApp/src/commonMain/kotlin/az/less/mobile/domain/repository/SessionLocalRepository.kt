@@ -11,6 +11,7 @@ interface SessionLocalRepository {
     suspend fun getAccessToken(): String?
     suspend fun getRefreshToken(): String?
     suspend fun saveSession(user: User, accessToken: String, refreshToken: String)
+    suspend fun updateUser(user: User)
     suspend fun updateTokens(accessToken: String, refreshToken: String)
     suspend fun clearSession()
 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,10 +34,15 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ic_person_image_placeholder_48dp
 import lessmobile.composeapp.generated.resources.ic_star_24dp
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
+import lessmobile.composeapp.generated.resources.orders_pickup_time
 import lessmobile.composeapp.generated.resources.test_merchant_logo
 import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Vertical offer card component for Top Rated and Top Picks sections
@@ -75,22 +81,15 @@ fun OfferCard(
                     .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
                     .background(Color(0xFFFFF2EB))
             ) {
-                if (offerItem.imageUrl != null) {
                     AsyncImage(
                         model = offerItem.imageUrl,
                         contentDescription = offerItem.title,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(Res.drawable.test_offer_item_image),
-                        contentDescription = offerItem.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        error = painterResource(Res.drawable.ill_box_placeholder),
+                        placeholder = painterResource(Res.drawable.ill_box_placeholder)
                     )
                 }
-            }
 
             // "X left" badge - top left
             if (offerItem.itemsLeft > 0) {
@@ -126,21 +125,16 @@ fun OfferCard(
                         shape = RoundedCornerShape(12.5.dp)
                     )
             ) {
-                if (offerItem.restaurantLogoUrl != null) {
+
                     AsyncImage(
                         model = offerItem.restaurantLogoUrl,
                         contentDescription = "${offerItem.restaurantName} logo",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        error = painterResource(Res.drawable.ill_venue_placeholder),
+                        placeholder = painterResource(Res.drawable.ill_venue_placeholder)
                     )
-                } else {
-                    Image(
-                        painter = painterResource(Res.drawable.test_merchant_logo),
-                        contentDescription = "${offerItem.restaurantName} logo",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+
             }
         }
 
@@ -216,11 +210,13 @@ fun OfferCard(
                 verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
             ) {
                 // Bag type (green text)
-                Text(
-                    text = offerItem.bagType,
-                    style = LessTheme.typography.body14Medium,
-                    color = LessTheme.colors.textIconsBrand
-                )
+                if (offerItem.bagType != null) {
+                    Text(
+                        text = offerItem.bagType,
+                        style = LessTheme.typography.body14Medium,
+                        color = LessTheme.colors.textIconsBrand
+                    )
+                }
 
                 // Category (black text)
                 Text(
@@ -230,8 +226,13 @@ fun OfferCard(
                 )
 
                 // Pickup time (grey text)
+                val pickupParts = offerItem.pickupTime.split(" - ")
                 Text(
-                    text = offerItem.pickupTime,
+                    text = if (pickupParts.size == 2) {
+                        stringResource(Res.string.orders_pickup_time, pickupParts[0], pickupParts[1])
+                    } else {
+                        offerItem.pickupTime
+                    },
                     style = LessTheme.typography.body14Medium,
                     color = LessTheme.colors.textIconsGrey,
                     maxLines = 1,
@@ -265,10 +266,11 @@ fun OfferCard(
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Image(
+                        Icon(
                             painter = painterResource(Res.drawable.ic_star_24dp),
                             contentDescription = "Rating",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
+                            tint = LessTheme.colors.backgroundPrimary
                         )
                     }
 

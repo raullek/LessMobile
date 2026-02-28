@@ -10,7 +10,10 @@ data class UserEntity(
     val email: String,
     val roles: List<String>,
     val status: String,
-    val avatarUrl: String? = null
+    val avatarUrl: String? = null,
+    val phone: String? = null,
+    val gender: String? = null,
+    val birthDay: String? = null
 ) {
     fun toUser(): User = User(
         id = id,
@@ -18,6 +21,9 @@ data class UserEntity(
         email = email,
         roles = roles,
         status = status,
-        avatarUrl = avatarUrl
+        avatarUrl = avatarUrl,
+        phone = phone,
+        gender = gender,
+        birthDay = birthDay
     )
 }

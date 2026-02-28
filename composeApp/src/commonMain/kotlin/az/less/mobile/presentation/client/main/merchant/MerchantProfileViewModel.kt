@@ -2,32 +2,36 @@ package az.less.mobile.presentation.client.main.merchant
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.presentation.client.main.merchant.models.MerchantOfferItem
+import az.less.mobile.domain.repository.MerchantRepository
+import az.less.mobile.utils.formatOneDecimal
+import dev.jordond.compass.geolocation.Geolocator
+import dev.jordond.compass.geolocation.mobile
+import kotlinx.coroutines.withTimeoutOrNull
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
-/**
- * ViewModel for Merchant Profile Screen using Orbit MVI
- */
-class MerchantProfileViewModel : ViewModel(), ContainerHost<MerchantProfileState, MerchantProfileSideEffect> {
+class MerchantProfileViewModel(
+    private val merchantRepository: MerchantRepository
+) : ViewModel(), ContainerHost<MerchantProfileState, MerchantProfileSideEffect> {
 
     override val container: Container<MerchantProfileState, MerchantProfileSideEffect> =
         viewModelScope.container(MerchantProfileState())
 
-    init {
-        loadInitialData()
+    private val geolocator: Geolocator = Geolocator.mobile()
+    private var isInitialized = false
+
+    fun initialize(merchantId: String) {
+        if (isInitialized) return
+        isInitialized = true
+        loadMerchantProfile(merchantId)
     }
 
-    /**
-     * Handle user intents
-     */
     fun onIntent(intent: MerchantProfileIntent) {
         when (intent) {
             is MerchantProfileIntent.OnBackClicked -> handleBackClicked()
             is MerchantProfileIntent.OnFavoriteClicked -> handleFavoriteClicked()
             is MerchantProfileIntent.OnTabSelected -> handleTabSelected(intent.tab)
-            is MerchantProfileIntent.OnOfferClicked -> handleOfferClicked(intent.offerId)
             is MerchantProfileIntent.OnDirectionsClicked -> handleDirectionsClicked()
             is MerchantProfileIntent.OnPhoneClicked -> handlePhoneClicked()
             is MerchantProfileIntent.OnViewLocationClicked -> handleViewLocationClicked()
@@ -35,21 +39,63 @@ class MerchantProfileViewModel : ViewModel(), ContainerHost<MerchantProfileState
         }
     }
 
-    private fun loadInitialData() = intent {
-        reduce {
-            state.copy(
-                merchantId = "merchant_1",
-                merchantName = "Belgian Chocolate & Coffee",
-                merchantDescription = "Indulge in rich Belgian flavors and smooth specialty coffee crafted with care.",
-                rating = 4.9f,
-                distance = "1.2 km",
-                phoneNumber = "+994 55 555 65 78",
-                address = "1 Neftçilər Prospekti, Bakı 1095",
-                latitude = 40.3725,
-                longitude = 49.8533,
-                isFavorite = false,
-                offers = getMockOffers()
-            )
+    private fun loadMerchantProfile(merchantId: String) = intent {
+        reduce { state.copy(isLoading = true, merchantId = merchantId) }
+
+        val location = getUserLocation()
+        val userLat = location?.first
+        val userLng = location?.second
+
+        merchantRepository.getMerchantProfile(
+            merchantId = merchantId,
+            includeReviews = true,
+            latitude = userLat,
+            longitude = userLng
+        )
+            .onSuccess { profile ->
+                reduce {
+                    state.copy(
+                        isLoading = false,
+                        merchantId = profile.id,
+                        merchantName = profile.name,
+                        merchantDescription = profile.businessDescription,
+                        merchantLogoUrl = profile.businessLogo,
+                        heroImageUrl = profile.coverImage,
+                        rating = profile.rating,
+                        ratingCount = profile.ratingCount,
+                        ratingDistribution = profile.ratingDistribution,
+                        distance = profile.distanceKm?.let { formatDistance(it) } ?: "",
+                        phoneNumber = profile.phone,
+                        address = profile.businessAddress,
+                        latitude = profile.latitude,
+                        longitude = profile.longitude,
+                        reviews = profile.reviews,
+                        reviewsTotal = profile.reviewsTotal,
+                        reviewsHasMore = profile.reviewsHasMore
+                    )
+                }
+            }
+            .onError { error ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(MerchantProfileSideEffect.ShowError(error.message))
+            }
+    }
+
+    private suspend fun getUserLocation(): Pair<Double, Double>? {
+        return withTimeoutOrNull(3000L) {
+            if (geolocator.isAvailable()) {
+                geolocator.current().getOrNull()?.let {
+                    Pair(it.coordinates.latitude, it.coordinates.longitude)
+                }
+            } else null
+        }
+    }
+
+    private fun formatDistance(km: Double): String {
+        return if (km < 1.0) {
+            "${(km * 1000).toInt()} m"
+        } else {
+            "${km.formatOneDecimal()} km"
         }
     }
 
@@ -58,19 +104,11 @@ class MerchantProfileViewModel : ViewModel(), ContainerHost<MerchantProfileState
     }
 
     private fun handleFavoriteClicked() = intent {
-        reduce {
-            state.copy(isFavorite = !state.isFavorite)
-        }
+        reduce { state.copy(isFavorite = !state.isFavorite) }
     }
 
     private fun handleTabSelected(tab: MerchantProfileTab) = intent {
-        reduce {
-            state.copy(selectedTab = tab)
-        }
-    }
-
-    private fun handleOfferClicked(offerId: String) = intent {
-        postSideEffect(MerchantProfileSideEffect.NavigateToReserve(offerId))
+        reduce { state.copy(selectedTab = tab) }
     }
 
     private fun handleDirectionsClicked() = intent {
@@ -82,47 +120,10 @@ class MerchantProfileViewModel : ViewModel(), ContainerHost<MerchantProfileState
     }
 
     private fun handleViewLocationClicked() = intent {
-        reduce {
-            state.copy(isMapVisible = true)
-        }
+        reduce { state.copy(isMapVisible = true) }
     }
 
     private fun handleMapBackClicked() = intent {
-        reduce {
-            state.copy(isMapVisible = false)
-        }
-    }
-
-    // Mock data - replace with repository calls in real app
-    private fun getMockOffers(): List<MerchantOfferItem> {
-        return listOf(
-            MerchantOfferItem(
-                id = "1",
-                merchantName = "Belgian Chocolate & Coffee",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                rating = 4.9f,
-                distance = "1.2 km",
-                itemsOnSale = 12,
-                hasActiveDiscount = true
-            ),
-            MerchantOfferItem(
-                id = "2",
-                merchantName = "Belgian Chocolate & Coffee",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                rating = 4.9f,
-                distance = "1.2 km",
-                itemsOnSale = 0,
-                hasActiveDiscount = false
-            ),
-            MerchantOfferItem(
-                id = "3",
-                merchantName = "Belgian Chocolate & Coffee",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                rating = 4.9f,
-                distance = "1.2 km",
-                itemsOnSale = 12,
-                hasActiveDiscount = true
-            )
-        )
+        reduce { state.copy(isMapVisible = false) }
     }
 }

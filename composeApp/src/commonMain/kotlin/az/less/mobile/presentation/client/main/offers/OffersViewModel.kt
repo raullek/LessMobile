@@ -190,6 +190,6 @@ class OffersViewModel(
     }
 
     private fun handleOfferItemClicked(offerId: String) = intent {
-        postSideEffect(OffersSideEffect.NavigateToReserve)
+        postSideEffect(OffersSideEffect.NavigateToReserve(offerId))
     }
 }

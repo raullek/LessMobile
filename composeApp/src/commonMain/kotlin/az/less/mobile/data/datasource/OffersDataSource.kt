@@ -1,5 +1,6 @@
 package az.less.mobile.data.datasource
 
+import az.less.mobile.data.remote.model.BoxDetailDto
 import az.less.mobile.data.remote.model.OffersScreenDto
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.network.safeApiCall
@@ -21,6 +22,12 @@ class OffersDataSource(
                 longitude?.let { parameter("longitude", it) }
                 parameter("limit", limit)
             }
+        }
+    }
+
+    suspend fun getBoxDetail(boxId: String): NetworkResult<BoxDetailDto> {
+        return safeApiCall {
+            httpClient.get("v1/boxes/$boxId")
         }
     }
 }

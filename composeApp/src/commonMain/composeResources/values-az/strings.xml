@@ -109,6 +109,8 @@
     <string name="account_gender_placeholder">Cins</string>
     <string name="account_birthday_placeholder">Doğum tarixi</string>
     <string name="account_delete">Hesabı sil</string>
+    <string name="account_delete_title">Hesabı silmək istəyirsiniz?</string>
+    <string name="account_delete_description">Hesabınızı silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.</string>
     <string name="account_select_gender">Cins seçin</string>
     <string name="account_profile_photo">Profil şəkli</string>
 

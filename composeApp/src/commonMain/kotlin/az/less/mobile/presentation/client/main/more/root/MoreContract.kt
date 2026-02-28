@@ -23,7 +23,12 @@ data class MoreState(
     // Bottom sheets
     val locationPermissionGranted: Boolean = false,
     val showContactUsBottomSheet: Boolean = false,
-    val showTermsBottomSheet: Boolean = false
+    val showTermsBottomSheet: Boolean = false,
+    // Terms content
+    val termsTitle: String? = null,
+    val termsContent: String? = null,
+    val isTermsHtml: Boolean = false,
+    val isTermsLoading: Boolean = false
 )
 
 /**

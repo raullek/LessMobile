@@ -1,10 +1,14 @@
 package az.less.mobile.presentation.client.main.explore
 
+import az.less.mobile.domain.model.SearchBox
+import az.less.mobile.domain.model.SearchVenue
 import az.less.mobile.presentation.client.main.explore.models.ExploreVenueItem
 import az.less.mobile.presentation.client.main.explore.models.FilterData
 import az.less.mobile.presentation.client.main.explore.models.FilterItem
 import az.less.mobile.presentation.client.main.explore.models.FilterType
 import az.less.mobile.presentation.client.main.explore.models.OfferSlot
+import az.less.mobile.presentation.client.main.explore.models.QuickFilter
+import az.less.mobile.presentation.maps.models.LatLong
 import az.less.mobile.presentation.maps.models.Marker
 
 /**
@@ -15,15 +19,23 @@ data class ExploreState(
     val selectedFilterType: FilterType? = null,
     val isLoading: Boolean = false,
     val selectedVenueId: String? = null,
-    val selectedMerchantName: String = "", // Name of selected merchant
-    val selectedMerchantSlots: List<OfferSlot> = emptyList(), // Slots for selected merchant
-    val userLocation: az.less.mobile.presentation.maps.models.LatLong? = null,
+    val selectedMerchantName: String = "",
+    val selectedMerchantSlots: List<OfferSlot> = emptyList(),
+    val userLocation: LatLong? = null,
     val locationPermissionGranted: Boolean = false,
     val filterItems: List<FilterItem> = emptyList(),
     val markers: List<Marker> = emptyList(),
     val isFilterSheetVisible: Boolean = false,
     val filterData: FilterData = FilterData(),
-    val selectedMarkerPosition: az.less.mobile.presentation.maps.models.LatLong? = null // Position to center camera on when marker is clicked
+    val selectedMarkerPosition: LatLong? = null,
+    // API data
+    val venues: List<SearchVenue> = emptyList(),
+    val boxes: List<SearchBox> = emptyList(),
+    val totalResults: Int = 0,
+    val error: String? = null,
+    // Active filter tracking
+    val activeQuickFilters: Set<QuickFilter> = emptySet(),
+    val activeFilters: Map<String, List<String>> = emptyMap()
 )
 
 /**
@@ -48,7 +60,7 @@ sealed interface ExploreIntent {
     data object OnFilterClicked : ExploreIntent
     data class OnFilterTypeSelected(val filterType: FilterType) :
         ExploreIntent
-    data class OnFilterItemClicked(val filterId: String) :
+    data class OnFilterItemClicked(val quickFilter: QuickFilter) :
         ExploreIntent
     data class OnMapMarkerClicked(val venueId: String) :
         ExploreIntent

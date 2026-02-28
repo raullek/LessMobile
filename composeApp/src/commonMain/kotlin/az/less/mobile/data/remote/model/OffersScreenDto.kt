@@ -1,10 +1,11 @@
 package az.less.mobile.data.remote.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  * Offers screen response from API
- * GET /api/v1/offers/home
+ * GET /api/v1/home/mobile
  */
 @Serializable
 data class OffersScreenDto(
@@ -56,17 +57,24 @@ data class OfferDto(
     val quantity: Int,
     val originalPrice: Double,
     val currentPrice: Double,
-    val bagType: String,
+    val bagType: String? = null,
     val category: String,
     val pickupTime: String,
-    val merchant: MerchantDto
+    @SerialName("venue")
+    val venue: VenueDto
 )
 
 @Serializable
-data class MerchantDto(
+data class VenueDto(
     val id: String,
     val name: String,
     val logoUrl: String? = null,
-    val location: String,
+    val location: LocationDto,
     val rating: Double
+)
+
+@Serializable
+data class LocationDto(
+    val type: String,
+    val coordinates: List<Double>
 )
