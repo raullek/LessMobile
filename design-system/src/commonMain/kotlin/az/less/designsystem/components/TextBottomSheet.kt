@@ -2,6 +2,7 @@ package az.less.designsystem.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -53,45 +54,49 @@ fun DsTextBottomSheet(
         containerColor = LessTheme.colors.backgroundPrimary,
         modifier = modifier
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LessTheme.spacing.medium)
-                .padding(bottom = LessTheme.spacing.medium)
-        ) {
-            // Title
-            Text(
-                text = title,
-                style = LessTheme.typography.title24Semibold,
-                color = LessTheme.colors.textIconsBlack
-            )
+        BoxWithConstraints {
+            val maxScrollHeight = maxHeight * 0.7f
 
-            Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-
-            // Scrollable content
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 400.dp)
-                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = LessTheme.spacing.medium)
+                    .padding(bottom = LessTheme.spacing.medium)
             ) {
+                // Title
                 Text(
-                    text = content,
-                    style = LessTheme.typography.body14Regular,
-                    color = LessTheme.colors.textIconsGrey,
-                    modifier = Modifier.fillMaxWidth()
+                    text = title,
+                    style = LessTheme.typography.title24Semibold,
+                    color = LessTheme.colors.textIconsBlack
+                )
+
+                Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+
+                // Scrollable content — wraps small text, caps and scrolls for long text
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = maxScrollHeight)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = content,
+                        style = LessTheme.typography.body14Regular,
+                        color = LessTheme.colors.textIconsGrey,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+
+                // Close button
+                DsButton(
+                    text = closeButtonText,
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    variant = ButtonVariant.Secondary
                 )
             }
-
-            Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-
-            // Close button
-            DsButton(
-                text = closeButtonText,
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth(),
-                variant = ButtonVariant.Secondary
-            )
         }
     }
 }

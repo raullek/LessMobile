@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
 import lessmobile.composeapp.generated.resources.ic_saved_24dp
@@ -32,6 +33,8 @@ import org.jetbrains.compose.resources.painterResource
  */
 @Composable
 fun MerchantProfileHeroSection(
+    heroImageUrl: String?,
+    merchantLogoUrl: String?,
     isFavorite: Boolean,
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
@@ -43,14 +46,25 @@ fun MerchantProfileHeroSection(
             .height(240.dp)
     ) {
         // Hero Image
-        Image(
-            painter = painterResource(Res.drawable.test_offer_item_image),
-            contentDescription = "Merchant hero image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
+        if (heroImageUrl != null) {
+            AsyncImage(
+                model = heroImageUrl,
+                contentDescription = "Merchant hero image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+        } else {
+            Image(
+                painter = painterResource(Res.drawable.test_offer_item_image),
+                contentDescription = "Merchant hero image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+        }
 
         // Back Button
         Box(
@@ -102,14 +116,25 @@ fun MerchantProfileHeroSection(
                 .background(LessTheme.colors.backgroundPrimary),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(Res.drawable.test_merchant_logo),
-                contentDescription = "Merchant logo",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .size(76.dp)
-                    .clip(RoundedCornerShape(LessTheme.radius.medium))
-            )
+            if (merchantLogoUrl != null) {
+                AsyncImage(
+                    model = merchantLogoUrl,
+                    contentDescription = "Merchant logo",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(76.dp)
+                        .clip(RoundedCornerShape(LessTheme.radius.medium))
+                )
+            } else {
+                Image(
+                    painter = painterResource(Res.drawable.test_merchant_logo),
+                    contentDescription = "Merchant logo",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(76.dp)
+                        .clip(RoundedCornerShape(LessTheme.radius.medium))
+                )
+            }
         }
     }
 }

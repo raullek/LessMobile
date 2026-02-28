@@ -50,7 +50,11 @@ class LoginCodeViewModel(
                         name = data.user.name,
                         email = data.user.email,
                         roles = data.user.roles,
-                        status = data.user.status
+                        status = data.user.status,
+                        avatarUrl = data.user.avatar,
+                        phone = data.user.phone,
+                        gender = data.user.gender,
+                        birthDay = data.user.birthDay
                     )
                     userLocalRepository.saveSession(
                         user = user,

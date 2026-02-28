@@ -35,6 +35,7 @@ import lessmobile.composeapp.generated.resources.cd_app_logo
 import lessmobile.composeapp.generated.resources.cd_user_avatar
 import lessmobile.composeapp.generated.resources.ic_app_logo
 import lessmobile.composeapp.generated.resources.ic_eco_leaf_24dp
+import lessmobile.composeapp.generated.resources.ic_person_image_placeholder_48dp
 import lessmobile.composeapp.generated.resources.more_co2_saved
 import lessmobile.composeapp.generated.resources.more_get_more_features
 import lessmobile.composeapp.generated.resources.more_get_more_features_description
@@ -116,9 +117,9 @@ private fun LoggedInHeader(
                 model = userAvatarUrl,
                 contentDescription = stringResource(Res.string.cd_user_avatar),
                 contentScale = ContentScale.Crop,
-                placeholder = painterResource(Res.drawable.person_image_placeholder),
-                error = painterResource(Res.drawable.person_image_placeholder),
-                fallback = painterResource(Res.drawable.person_image_placeholder),
+                placeholder = painterResource(Res.drawable.ic_person_image_placeholder_48dp),
+                error = painterResource(Res.drawable.ic_person_image_placeholder_48dp),
+                fallback = painterResource(Res.drawable.ic_person_image_placeholder_48dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(20.dp))

@@ -3,6 +3,7 @@ package az.less.mobile.presentation.client.main.more.root
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.mobile.domain.repository.AuthorizationRepository
+import az.less.mobile.domain.repository.ContentRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.main.more.root.models.CellId
 import dev.jordond.compass.permissions.LocationPermissionController
@@ -44,7 +45,8 @@ import org.orbitmvi.orbit.container
  */
 class MoreViewModel(
     private val userLocalRepository: SessionLocalRepository,
-    private val authorizationRepository: AuthorizationRepository
+    private val authorizationRepository: AuthorizationRepository,
+    private val contentRepository: ContentRepository
 ) : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
 
     override val container: Container<MoreState, MoreSideEffect> =
@@ -148,11 +150,7 @@ class MoreViewModel(
                 }
             }
             CellId.SignStore -> postSideEffect(MoreSideEffect.NavigateToSignStore)
-            CellId.TermsOfService -> {
-                reduce {
-                    state.copy(showTermsBottomSheet = true)
-                }
-            }
+            CellId.TermsOfService -> fetchTermsAndShow()
             CellId.HowToUse -> postSideEffect(MoreSideEffect.NavigateToHowToUse)
             CellId.Location -> postSideEffect(MoreSideEffect.NavigateToAppSettings)
             CellId.Notification -> {
@@ -171,6 +169,26 @@ class MoreViewModel(
         reduce {
             state.copy(showContactUsBottomSheet = false)
         }
+    }
+
+    private fun fetchTermsAndShow() = intent {
+        reduce { state.copy(showTermsBottomSheet = true, isTermsLoading = true) }
+
+        contentRepository.getTerms()
+            .onSuccess { data ->
+                reduce {
+                    state.copy(
+                        isTermsLoading = false,
+                        termsTitle = data.title,
+                        termsContent = data.body,
+                        isTermsHtml = data.isHtml
+                    )
+                }
+            }
+            .onError { error ->
+                reduce { state.copy(showTermsBottomSheet = false, isTermsLoading = false) }
+                postSideEffect(MoreSideEffect.ShowError(error.message))
+            }
     }
 
     private fun handleTermsDismiss() = intent {

@@ -24,7 +24,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import coil3.compose.AsyncImage
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.graphics.drawable.toBitmap
+import coil3.imageLoader
+import coil3.asDrawable
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.request.SuccessResult
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.test_merchant_logo
@@ -36,6 +48,8 @@ import az.less.mobile.presentation.maps.models.LatLongZoom
 import az.less.mobile.presentation.maps.models.Location
 import az.less.mobile.presentation.maps.models.MapType
 import az.less.mobile.presentation.maps.models.Marker
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
@@ -45,6 +59,7 @@ import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
 import com.google.android.gms.maps.model.CameraPosition as GoogleCameraPosition
 import com.google.maps.android.compose.Marker as GoogleMarker
 
@@ -86,15 +101,32 @@ actual fun GoogleMaps(
     onDidAllowCacheReset: () -> Unit
 ) {
     val cameraPositionState = rememberCameraPositionState {
-        position = shouldSetInitialCameraPosition?.let {
-            GoogleCameraPosition.fromLatLngZoom(
-                LatLng(it.target.latitude, it.target.longitude),
-                it.zoom
+        position = when {
+            isTrackingEnabled && userLocation != null -> GoogleCameraPosition.fromLatLngZoom(
+                LatLng(userLocation.latitude, userLocation.longitude),
+                15f
             )
-        } ?: GoogleCameraPosition.fromLatLngZoom(
-            LatLng(40.4093, 49.8671), // Default to Baku
-            12f
-        )
+            shouldSetInitialCameraPosition != null -> GoogleCameraPosition.fromLatLngZoom(
+                LatLng(shouldSetInitialCameraPosition.target.latitude, shouldSetInitialCameraPosition.target.longitude),
+                shouldSetInitialCameraPosition.zoom
+            )
+            else -> GoogleCameraPosition.fromLatLngZoom(
+                LatLng(40.4093, 49.8671), // Default to Baku
+                12f
+            )
+        }
+    }
+
+    // Center on user location when tracking becomes enabled
+    LaunchedEffect(isTrackingEnabled, userLocation) {
+        if (isTrackingEnabled && userLocation != null) {
+            cameraPositionState.animate(
+                com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom(
+                    LatLng(userLocation.latitude, userLocation.longitude),
+                    15f
+                )
+            )
+        }
     }
 
     // Handle camera position changes
@@ -184,10 +216,31 @@ actual fun GoogleMaps(
                             markerState.position = LatLng(marker.position.latitude, marker.position.longitude)
                         }
 
+                        // Pre-load image outside MarkerComposable so the bitmap is ready
+                        val context = LocalContext.current
+                        var loadedBitmap by remember(marker.iconUrl) { mutableStateOf<ImageBitmap?>(null) }
+
+                        LaunchedEffect(marker.iconUrl) {
+                            val url = marker.iconUrl
+                            if (url != null) {
+                                val request = ImageRequest.Builder(context)
+                                    .data(url)
+                                    .allowHardware(false)
+                                    .build()
+                                val result = context.imageLoader.execute(request)
+                                if (result is SuccessResult) {
+                                    loadedBitmap = result.image.asDrawable(context.resources).toBitmap().asImageBitmap()
+                                }
+                            }
+                        }
+
                         MarkerComposable(
+                            keys = arrayOf<Any>(marker.id, marker.isSelected, loadedBitmap ?: "null"),
                             state = markerState,
                             onClick = {
-                                onMarkerInfoClick?.invoke(marker)
+                                if (marker.itemsCount > 0) {
+                                    onMarkerInfoClick?.invoke(marker)
+                                }
                                 true
                             }
                         ) {
@@ -195,12 +248,10 @@ actual fun GoogleMaps(
                             if (marker.tag == "location_pin") {
                                 LocationPinMarker()
                             } else {
-                                // Custom marker content with downloaded icon from URL
-                                // Read isSelected directly from marker to ensure recomposition
                                 val isSelected = marker.isSelected
                                 val slotCount = marker.itemsCount
                                 CustomMerchantMarker(
-                                    iconUrl = marker.iconUrl,
+                                    logoBitmap = loadedBitmap,
                                     title = marker.title,
                                     snippet = marker.snippet,
                                     isSelected = isSelected,
@@ -239,7 +290,7 @@ actual fun GoogleMaps(
  */
 @Composable
 private fun CustomMerchantMarker(
-    iconUrl: String? = null,
+    logoBitmap: ImageBitmap? = null,
     title: String? = null,
     snippet: String? = null,
     isSelected: Boolean = false,
@@ -248,38 +299,18 @@ private fun CustomMerchantMarker(
     val markerSize = if (isSelected) 40.dp else 36.dp
     val shape = RoundedCornerShape(12.dp)
     val badgeSize = 16.dp
-    
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(markerSize)
     ) {
-        // Merchant logo - download from URL or use placeholder
-        if (iconUrl != null) {
-            AsyncImage(
-                model = iconUrl,
-                contentDescription = title ?: "Merchant marker",
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(Res.drawable.test_merchant_logo),
-                error = painterResource(Res.drawable.test_merchant_logo),
-                modifier = Modifier
-                    .size(markerSize)
-                    .clip(shape)
-                    .then(
-                        if (isSelected) {
-                            Modifier.border(
-                                width = 2.dp,
-                                color = LessTheme.colors.textIconsBrand,
-                                shape = shape
-                            )
-                        } else {
-                            Modifier
-                        }
-                    )
-            )
-        } else {
-            // Fallback to local placeholder
+            val painter = if (logoBitmap != null) {
+                BitmapPainter(logoBitmap)
+            } else {
+                painterResource(Res.drawable.ill_venue_placeholder)
+            }
             Image(
-                painter = painterResource(Res.drawable.test_merchant_logo),
+                painter = painter,
                 contentDescription = title ?: "Merchant marker",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -297,7 +328,6 @@ private fun CustomMerchantMarker(
                         }
                     )
             )
-        }
         
         // Slot count badge in top-right corner (based on Figma design)
         if (slotCount > 1) {

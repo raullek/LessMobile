@@ -30,6 +30,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.explore.components.FilterBottomSheet
 import az.less.mobile.presentation.client.main.explore.components.FilterChip
 import az.less.mobile.presentation.client.main.explore.components.MerchantSlotsRow
+import az.less.mobile.presentation.client.main.explore.models.QuickFilter
 import kotlinx.coroutines.launch
 import az.less.mobile.presentation.maps.GoogleMaps
 import az.less.mobile.presentation.maps.LocationPermissionHandler
@@ -205,15 +206,15 @@ fun ExploreScreenContent(
                         iconType = filterItem.iconType,
                         isSelected = filterItem.isSelected,
                         onClick = {
-                            when (filterItem.id) {
-                                "filter_button" -> {
+                            when (filterItem.quickFilter) {
+                                QuickFilter.FILTER_BUTTON -> {
                                     onIntent(ExploreIntent.OnFilterClicked)
                                 }
 
                                 else -> {
                                     onIntent(
                                         ExploreIntent.OnFilterItemClicked(
-                                            filterItem.id
+                                            filterItem.quickFilter
                                         )
                                     )
                                 }

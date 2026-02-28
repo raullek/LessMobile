@@ -16,9 +16,6 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.merchant.MerchantProfileTab
 
-/**
- * Tabs section (Offers / Reviews)
- */
 @Composable
 fun MerchantProfileTabsSection(
     selectedTab: MerchantProfileTab,

@@ -109,6 +109,8 @@
     <string name="account_gender_placeholder">Gender</string>
     <string name="account_birthday_placeholder">Birth day</string>
     <string name="account_delete">Delete account</string>
+    <string name="account_delete_title">Delete account?</string>
+    <string name="account_delete_description">Are you sure you want to delete your account? This action cannot be undone.</string>
     <string name="account_select_gender">Select Gender</string>
     <string name="account_profile_photo">Profile photo</string>
 

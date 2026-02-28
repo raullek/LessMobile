@@ -1,5 +1,6 @@
 package az.less.mobile.presentation.client.main.offers.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,7 +19,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ill_category_placeholder
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CategoryCard(
@@ -45,12 +49,29 @@ fun CategoryCard(
                 .size(width = 81.dp, height = LessTheme.size.huge),
             contentAlignment = Alignment.Center
         ) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(LessTheme.size.huge)
-            )
+            if (imageUrl != null) {
+                SubcomposeAsyncImage(
+                    model = imageUrl,
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(LessTheme.size.huge),
+                    error = {
+                        Image(
+                            painter = painterResource(Res.drawable.ill_category_placeholder),
+                            contentDescription = title,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(LessTheme.size.huge)
+                        )
+                    }
+                )
+            } else {
+                Image(
+                    painter = painterResource(Res.drawable.ill_category_placeholder),
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(LessTheme.size.huge)
+                )
+            }
         }
 
         Text(

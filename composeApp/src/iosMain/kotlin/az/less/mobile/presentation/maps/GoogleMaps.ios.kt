@@ -93,11 +93,55 @@ private class MapViewDelegate(
     private val onMarkerInfoClick: ((Marker) -> Unit)?
 ) : NSObject(), MKMapViewDelegateProtocol {
 
+    private var mapViewRef: MKMapView? = null
+
+    fun setMapView(mapView: MKMapView) {
+        mapViewRef = mapView
+    }
+
+    /**
+     * Pre-download images for all markers so they're cached before
+     * MapKit calls viewForAnnotation.
+     */
+    fun preloadMarkerImages(markers: List<Marker>?) {
+        markers?.forEach { marker ->
+            val iconUrl = marker.iconUrl ?: return@forEach
+            val url = NSURL.URLWithString(iconUrl) ?: return@forEach
+            if (ImageCache.get(url) != null) return@forEach // Already cached
+
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) {
+                val data = NSData.dataWithContentsOfURL(url)
+                val downloadedImage = data?.let { UIImage.imageWithData(it) }
+                if (downloadedImage != null) {
+                    ImageCache.set(url, downloadedImage)
+                    // Refresh annotation views on main thread
+                    dispatch_async(dispatch_get_main_queue()) {
+                        val mapView = mapViewRef ?: return@dispatch_async
+                        mapView.annotations.filterIsInstance<MarkerAnnotation>()
+                            .filter { it.marker.id == marker.id }
+                            .forEach { annotation ->
+                                val view = mapView.viewForAnnotation(annotation)
+                                if (view != null) {
+                                    // Find the UIImageView in the view hierarchy and update it
+                                    val container = view.subviews.firstOrNull() as? UIView
+                                    val imageView = container?.subviews?.firstOrNull() as? UIImageView
+                                    imageView?.setImage(downloadedImage)
+                                    imageView?.setBackgroundColor(null)
+                                    view.setNeedsDisplay()
+                                    view.setNeedsLayout()
+                                }
+                            }
+                    }
+                }
+            }
+        }
+    }
+
     private fun downloadImageAsync(
         urlString: String,
+        annotationView: MKAnnotationView,
         imageView: UIImageView
     ) {
-        //  https://picsum.photos/200/300 for testing
         val url = NSURL.URLWithString(urlString) ?: return
 
         // Check cache first
@@ -120,6 +164,9 @@ private class MapViewDelegate(
                     ImageCache.set(url, downloadedImage)
                     imageView.setImage(downloadedImage)
                     imageView.setBackgroundColor(null)
+                    // Force MapKit to redraw the annotation view
+                    annotationView.setNeedsDisplay()
+                    annotationView.setNeedsLayout()
                 }
             }
         }
@@ -209,7 +256,7 @@ private class MapViewDelegate(
         // Download icon from URL or show gray background
         val iconUrl = marker.iconUrl
         if (iconUrl != null) {
-            downloadImageAsync(iconUrl, imageView)
+            downloadImageAsync(iconUrl, annotationView, imageView)
         } else {
             // Gray background if no URL
             imageView.setBackgroundColor(UIColor.lightGrayColor)
@@ -219,13 +266,18 @@ private class MapViewDelegate(
         imageView.layer.setCornerRadius(12.0)
         imageView.layer.setMasksToBounds(true)
 
-        // Add border if selected (2dp = 2.0 points)
+        // Add border background if selected (2dp = 2.0 points)
         if (marker.isSelected) {
-            imageView.layer.setBorderWidth(2.0)
-            // Brand color - using systemBlue as approximation
-            imageView.layer.setBorderColor(UIColor.greenColor.CGColor())
-        } else {
-            imageView.layer.setBorderWidth(0.0)
+            val borderInset = 2.0
+            val borderView = UIView()
+            borderView.setFrame(platform.CoreGraphics.CGRectMake(
+                -borderInset, -borderInset,
+                markerSize + borderInset * 2, markerSize + borderInset * 2
+            ))
+            borderView.layer.setCornerRadius(14.0) // 12 + 2 for border
+            borderView.layer.setMasksToBounds(true)
+            borderView.setBackgroundColor(UIColor.greenColor)
+            containerView.insertSubview(borderView, atIndex = 0)
         }
 
         containerView.addSubview(imageView)
@@ -281,7 +333,9 @@ private class MapViewDelegate(
     override fun mapView(mapView: MKMapView, didSelectAnnotationView: MKAnnotationView) {
         val annotation = didSelectAnnotationView.annotation
         if (annotation is MarkerAnnotation) {
-            onMarkerInfoClick?.invoke(annotation.marker)
+            if (annotation.marker.itemsCount > 0) {
+                onMarkerInfoClick?.invoke(annotation.marker)
+            }
             mapView.deselectAnnotation(annotation, animated = false)
         }
     }
@@ -385,41 +439,66 @@ actual fun GoogleMaps(
                 mapView.setShowsUserLocation(isTrackingEnabled)
 
                 // Set initial camera position
-                shouldSetInitialCameraPosition?.let { position ->
-                    val coordinate = CLLocationCoordinate2DMake(
-                        position.target.latitude,
-                        position.target.longitude
-                    )
-                    val region = MKCoordinateRegionMakeWithDistance(
-                        coordinate,
-                        (position.zoom * 1000).toDouble(), // Convert zoom to meters
-                        (position.zoom * 1000).toDouble()
-                    )
-                    mapView.setRegion(region, animated = false)
-                } ?: run {
-                    // Default to Baku
-                    val coordinate = CLLocationCoordinate2DMake(40.4093, 49.8671)
-                    val region = MKCoordinateRegionMakeWithDistance(
-                        coordinate,
-                        12000.0,
-                        12000.0
-                    )
-                    mapView.setRegion(region, animated = false)
+                when {
+                    isTrackingEnabled && userLocation != null -> {
+                        val coordinate = CLLocationCoordinate2DMake(
+                            userLocation.latitude,
+                            userLocation.longitude
+                        )
+                        // ~1.5km radius ≈ Google Maps zoom 15
+                        val region = MKCoordinateRegionMakeWithDistance(
+                            coordinate,
+                            1500.0,
+                            1500.0
+                        )
+                        mapView.setRegion(region, animated = false)
+                    }
+                    shouldSetInitialCameraPosition != null -> {
+                        val coordinate = CLLocationCoordinate2DMake(
+                            shouldSetInitialCameraPosition.target.latitude,
+                            shouldSetInitialCameraPosition.target.longitude
+                        )
+                        val region = MKCoordinateRegionMakeWithDistance(
+                            coordinate,
+                            (shouldSetInitialCameraPosition.zoom * 1000).toDouble(),
+                            (shouldSetInitialCameraPosition.zoom * 1000).toDouble()
+                        )
+                        mapView.setRegion(region, animated = false)
+                    }
+                    else -> {
+                        // Default to Baku
+                        val coordinate = CLLocationCoordinate2DMake(40.4093, 49.8671)
+                        val region = MKCoordinateRegionMakeWithDistance(
+                            coordinate,
+                            12000.0,
+                            12000.0
+                        )
+                        mapView.setRegion(region, animated = false)
+                    }
                 }
 
+                delegate.setMapView(mapView)
                 mapView
             },
             modifier = Modifier.fillMaxSize(),
             update = { mapView ->
-                // Remove only custom marker annotations (not user location)
-                val customAnnotations = mapView.annotations.filterIsInstance<MarkerAnnotation>()
-                mapView.removeAnnotations(customAnnotations)
-                
-                // Add markers
-                markers?.forEach { marker ->
-                    if (marker.isVisible) {
-                        val annotation = MarkerAnnotation(marker)
-                        mapView.addAnnotation(annotation)
+                delegate.setMapView(mapView)
+
+                // Only update annotations when markers actually changed
+                val existingAnnotations = mapView.annotations.filterIsInstance<MarkerAnnotation>()
+                val existingIds = existingAnnotations.map { it.marker.id }.toSet()
+                val newIds = markers?.filter { it.isVisible }?.map { it.id }?.toSet() ?: emptySet()
+
+                // Pre-download images so they're cached before viewForAnnotation
+                delegate.preloadMarkerImages(markers)
+
+                if (existingIds != newIds) {
+                    mapView.removeAnnotations(existingAnnotations)
+                    markers?.forEach { marker ->
+                        if (marker.isVisible) {
+                            val annotation = MarkerAnnotation(marker)
+                            mapView.addAnnotation(annotation)
+                        }
                     }
                 }
 
@@ -458,9 +537,19 @@ actual fun GoogleMaps(
                     mapView.setRegion(region, animated = true)
                 }
 
-                // Update tracking mode
-                if (isTrackingEnabled) {
-                    mapView.setShowsUserLocation(true)
+                // Update tracking mode and center on user location
+                mapView.setShowsUserLocation(isTrackingEnabled)
+                if (isTrackingEnabled && userLocation != null) {
+                    val userCoordinate = CLLocationCoordinate2DMake(
+                        userLocation.latitude,
+                        userLocation.longitude
+                    )
+                    val userRegion = MKCoordinateRegionMakeWithDistance(
+                        userCoordinate,
+                        1500.0,
+                        1500.0
+                    )
+                    mapView.setRegion(userRegion, animated = true)
                 }
             }
         )

@@ -66,6 +66,7 @@ fun OffersScreen(
     val scope = rememberCoroutineScope()
 
     var isReserveBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var selectedOfferId by rememberSaveable { mutableStateOf("") }
     val reserveSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -100,6 +101,7 @@ fun OffersScreen(
             }
 
             is OffersSideEffect.NavigateToReserve -> {
+                selectedOfferId = sideEffect.offerId
                 isReserveBottomSheetVisible = true
                 scope.launch {
                     reserveSheetState.expand()
@@ -120,7 +122,7 @@ fun OffersScreen(
     ReserveScreen(
         isVisible = isReserveBottomSheetVisible,
         sheetState = reserveSheetState,
-        viewModel = koinViewModel(),
+        offerId = selectedOfferId,
         onDismiss = {
             scope.launch {
                 reserveSheetState.hide()

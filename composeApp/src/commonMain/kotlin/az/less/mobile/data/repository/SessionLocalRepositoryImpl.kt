@@ -60,12 +60,32 @@ class SessionLocalRepositoryImpl(
             email = user.email,
             roles = user.roles,
             status = user.status,
-            avatarUrl = user.avatarUrl
+            avatarUrl = user.avatarUrl,
+            phone = user.phone,
+            gender = user.gender,
+            birthDay = user.birthDay
         )
         dataStore.edit { preferences ->
             preferences[USER_JSON] = json.encodeToString(UserEntity.serializer(), entity)
             preferences[ACCESS_TOKEN] = accessToken
             preferences[REFRESH_TOKEN] = refreshToken
+        }
+    }
+
+    override suspend fun updateUser(user: User) {
+        val entity = UserEntity(
+            id = user.id,
+            name = user.name,
+            email = user.email,
+            roles = user.roles,
+            status = user.status,
+            avatarUrl = user.avatarUrl,
+            phone = user.phone,
+            gender = user.gender,
+            birthDay = user.birthDay
+        )
+        dataStore.edit { preferences ->
+            preferences[USER_JSON] = json.encodeToString(UserEntity.serializer(), entity)
         }
     }
 

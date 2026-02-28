@@ -121,7 +121,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_1",
                     name = "Burger House",
-                    location = "0.8 km",
+                    latitude = 40.4093,
+                    longitude = 49.8671,
                     rating = 4.8f
                 )
             ),
@@ -139,7 +140,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_2",
                     name = "Burger King",
-                    location = "1.2 km",
+                    latitude = 40.4047,
+                    longitude = 49.8687,
                     rating = 4.6f
                 )
             ),
@@ -157,7 +159,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_3",
                     name = "Green Burger",
-                    location = "2.1 km",
+                    latitude = 40.4295,
+                    longitude = 49.8535,
                     rating = 4.9f
                 )
             ),
@@ -175,7 +178,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_4",
                     name = "BBQ Place",
-                    location = "1.5 km",
+                    latitude = 40.4436,
+                    longitude = 49.8671,
                     rating = 4.7f
                 )
             ),
@@ -193,7 +197,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_5",
                     name = "Mega Burger",
-                    location = "0.9 km",
+                    latitude = 40.3910,
+                    longitude = 49.8753,
                     rating = 4.5f
                 )
             )
@@ -201,9 +206,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
     }
 
     private fun getNearestOffers(): List<OfferItem> {
-        return getAllOffers().sortedBy {
-            it.merchant.location.replace(" km", "").toFloatOrNull() ?: Float.MAX_VALUE
-        }
+        // TODO: sort by actual distance from user location
+        return getAllOffers()
     }
 
     private fun getTopRatedOffers(): List<OfferItem> {

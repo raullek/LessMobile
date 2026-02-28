@@ -109,6 +109,8 @@
     <string name="account_gender_placeholder">Пол</string>
     <string name="account_birthday_placeholder">Дата рождения</string>
     <string name="account_delete">Удалить аккаунт</string>
+    <string name="account_delete_title">Удалить аккаунт?</string>
+    <string name="account_delete_description">Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.</string>
     <string name="account_select_gender">Выберите пол</string>
     <string name="account_profile_photo">Фото профиля</string>
 

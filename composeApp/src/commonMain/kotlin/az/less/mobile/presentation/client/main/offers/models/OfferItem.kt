@@ -7,7 +7,8 @@ data class OfferMerchant(
     val id: String,
     val name: String,
     val logoUrl: String? = null,
-    val location: String,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
     val rating: Float
 )
 
@@ -23,7 +24,7 @@ data class OfferItem(
     val quantity: Int = 0,
     val originalPrice: String,
     val currentPrice: String,
-    val bagType: String,
+    val bagType: String? = null,
     val category: String,
     val pickupTime: String,
     val merchant: OfferMerchant
@@ -31,7 +32,7 @@ data class OfferItem(
     // Backward compatibility properties
     val restaurantName: String get() = merchant.name
     val restaurantLogoUrl: String? get() = merchant.logoUrl
-    val distance: String get() = merchant.location
+    val distance: String get() = ""
     val rating: Float get() = merchant.rating
     val itemsLeft: Int get() = quantity
 }

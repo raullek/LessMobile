@@ -20,6 +20,10 @@ data class VerifyOtpUser(
     val id: String,
     val email: String,
     val name: String,
+    val phone: String? = null,
+    val avatar: String? = null,
+    val gender: String? = null,
+    val birthDay: String? = null,
     val roles: List<String>,
     val status: String
 )

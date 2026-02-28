@@ -1,5 +1,6 @@
 package az.less.mobile.presentation.client.main.offers.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +24,11 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem
 import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
+import lessmobile.composeapp.generated.resources.ill_category_placeholder
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun SpecialDiscountCard(
@@ -36,11 +43,20 @@ fun SpecialDiscountCard(
             .clip(RoundedCornerShape(LessTheme.radius.medium))
             .clickable { onClick() }
     ) {
-        AsyncImage(
+
+        SubcomposeAsyncImage(
             model = item.imageUrl,
             contentDescription = item.title,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            error = {
+                Image(
+                    painter = painterResource(Res.drawable.ill_box_placeholder),
+                    contentDescription = item.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(LessTheme.size.huge)
+                )
+            }
         )
 
         Column(

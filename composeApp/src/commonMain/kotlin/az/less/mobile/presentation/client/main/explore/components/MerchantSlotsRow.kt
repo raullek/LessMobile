@@ -73,7 +73,6 @@ fun MerchantSlotsRow(
                 merchant = OfferMerchant(
                     id = slot.id,
                     name = merchantName,
-                    location = "",
                     rating = 4.5f
                 )
             )

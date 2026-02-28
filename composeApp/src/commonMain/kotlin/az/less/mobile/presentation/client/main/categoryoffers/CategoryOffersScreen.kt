@@ -94,7 +94,7 @@ fun CategoryOffersScreen(
         ReserveScreen(
             isVisible = isReserveBottomSheetVisible,
             sheetState = reserveSheetState,
-            viewModel = koinViewModel(),
+            offerId = selectedOfferItem?.id ?: "",
             onDismiss = {
                 scope.launch {
                     reserveSheetState.hide()

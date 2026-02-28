@@ -139,8 +139,12 @@ fun NavGraphBuilder.mainGraph(
         )
     }
 
-    composable<ClientRoute.Merchant> {
-        MerchantProfileScreen(navController = navController)
+    composable<ClientRoute.Merchant> { backStackEntry ->
+        val args = backStackEntry.toRoute<ClientRoute.Merchant>()
+        MerchantProfileScreen(
+            merchantId = args.merchantId,
+            navController = navController
+        )
     }
 
     composable<ClientRoute.OrderAccepted> { backStackEntry ->
