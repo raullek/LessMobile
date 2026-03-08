@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 kotlin {
@@ -46,6 +48,10 @@ kotlin {
             implementation(libs.google.maps.compose)
             implementation(libs.google.maps.android.compose.utils)
             implementation(libs.google.play.services.location)
+            implementation(project.dependencies.platform(libs.android.firebase.bom))
+            implementation(libs.android.firebase.analytics)
+            implementation(libs.android.firebase.crashlytics)
+            implementation(libs.android.firebase.config)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -106,6 +112,10 @@ kotlin {
             implementation(libs.compass.geolocation)
             implementation(libs.compass.geolocation.mobile)
             implementation(libs.compass.permissions.mobile)
+
+            implementation(libs.firebase.analytics)
+            implementation(libs.firebase.messaging)
+            implementation(libs.firebase.crashlytics)
         }
 
         iosMain.dependencies {
@@ -149,6 +159,7 @@ android {
             dimension = "variant"
             isDefault = true
             applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
             resValue("string", "app_name", "Config Sample Dev")
         }
 

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "41179851986",
+    "project_id": "less-d7717",
+    "storage_bucket": "less-d7717.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41179851986:android:cd39be2c7f7e103520910b",
+        "android_client_info": {
+          "package_name": "az.less.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVikUOKYL_bM1CMf0fnKz3TE6eFUjU3ZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41179851986:android:b94a2057f6334c8920910b",
+        "android_client_info": {
+          "package_name": "az.less.mobile.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVikUOKYL_bM1CMf0fnKz3TE6eFUjU3ZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

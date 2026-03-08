@@ -1,7 +1,9 @@
 package az.less.mobile.presentation.client.main.offers
 
+import androidx.compose.runtime.key
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.analytics.AnalyticsWrapper
 import az.less.mobile.data.remote.dto.CategoryDto
 import az.less.mobile.data.remote.dto.MerchantDto
 import az.less.mobile.data.remote.dto.OfferDto
@@ -33,7 +35,8 @@ import org.orbitmvi.orbit.container
 /**
  * ViewModel for Offers Screen using Orbit MVI
  */
-class OffersViewModel : ViewModel(), ContainerHost<OffersState, OffersSideEffect> {
+class OffersViewModel(private val analyticsWrapper: AnalyticsWrapper) : ViewModel(),
+    ContainerHost<OffersState, OffersSideEffect> {
 
     override val container: Container<OffersState, OffersSideEffect> =
         viewModelScope.container(OffersState())

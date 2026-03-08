@@ -1,0 +1,15 @@
+//
+//  Dev.xcconfig
+//  iosApp
+//
+//  Created by Raul  on 02.02.26.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+
+TEAM_ID=
+
+APP_ENV=DEV
+PRODUCT_BUNDLE_IDENTIFIER=az.less.mobile.dev
+GOOGLE_SERVICE=$(SRCROOT)/Firebase/GoogleService-Info-Development.plist

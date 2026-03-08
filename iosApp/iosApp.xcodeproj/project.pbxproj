@@ -6,12 +6,38 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C4D03D7D2F40C34300560DFA /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D7C2F40C34300560DFA /* FirebaseAnalytics */; };
+		C4D03D7F2F40C34300560DFA /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D7E2F40C34300560DFA /* FirebaseAnalyticsCore */; };
+		C4D03D812F40C34300560DFA /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D802F40C34300560DFA /* FirebaseCrashlytics */; };
+		C4D03D832F40C34300560DFA /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D822F40C34300560DFA /* FirebaseMessaging */; };
+		C4D03D852F40C34300560DFA /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D842F40C34300560DFA /* FirebaseRemoteConfig */; };
+		C4D03D882F40D81300560DFA /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D872F40D81300560DFA /* FirebaseAnalytics */; };
+		C4D03D8A2F40D81300560DFA /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D892F40D81300560DFA /* FirebaseAnalyticsCore */; };
+		C4D03D8C2F40D81300560DFA /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D8B2F40D81300560DFA /* FirebaseCore */; };
+		C4D03D8E2F40D81300560DFA /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D8D2F40D81300560DFA /* FirebaseCrashlytics */; };
+		C4D03D902F40D81300560DFA /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D8F2F40D81300560DFA /* FirebaseMessaging */; };
+		C4D03D922F40D81300560DFA /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = C4D03D912F40D81300560DFA /* FirebaseRemoteConfig */; };
+		C4FB23212F2E4A7F009DF416 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C4FB23202F2E4A7F009DF416 /* FirebaseAnalytics */; };
+		C4FB23232F2E4A7F009DF416 /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = C4FB23222F2E4A7F009DF416 /* FirebaseAnalyticsCore */; };
+		C4FB23252F2E4A7F009DF416 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C4FB23242F2E4A7F009DF416 /* FirebaseCrashlytics */; };
+		C4FB23272F2E4A7F009DF416 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = C4FB23262F2E4A7F009DF416 /* FirebaseRemoteConfig */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		398CE7308C60E75CA09E3F7C /* LessMobile Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LessMobile Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F1EBF694AEE74BD25447DCD8 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+		C4343EE52F2FEC4800FA96E1 /* Exceptions for "Configuration" folder in "iosApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Dev.xcconfig,
+				Prod.xcconfig,
+			);
+			target = E2F89675DD7E675474BA4107 /* iosApp */;
+		};
+		C4343EF12F313FF400FA96E1 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -23,15 +49,23 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1C558FF107AAAA137BAB085D /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C4343EE52F2FEC4800FA96E1 /* Exceptions for "Configuration" folder in "iosApp" target */,
+			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};
 		B64252988D91B5A91563FA1A /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				F1EBF694AEE74BD25447DCD8 /* Exceptions for "iosApp" folder in "iosApp" target */,
+				C4343EF12F313FF400FA96E1 /* Exceptions for "iosApp" folder in "iosApp" target */,
 			);
 			path = iosApp;
+			sourceTree = "<group>";
+		};
+		C4343EEA2F2FF2F200FA96E1 /* Firebase */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Firebase;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -41,6 +75,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4D03D852F40C34300560DFA /* FirebaseRemoteConfig in Frameworks */,
+				C4D03D832F40C34300560DFA /* FirebaseMessaging in Frameworks */,
+				C4D03D902F40D81300560DFA /* FirebaseMessaging in Frameworks */,
+				C4FB23252F2E4A7F009DF416 /* FirebaseCrashlytics in Frameworks */,
+				C4D03D7F2F40C34300560DFA /* FirebaseAnalyticsCore in Frameworks */,
+				C4FB23212F2E4A7F009DF416 /* FirebaseAnalytics in Frameworks */,
+				C4D03D812F40C34300560DFA /* FirebaseCrashlytics in Frameworks */,
+				C4FB23232F2E4A7F009DF416 /* FirebaseAnalyticsCore in Frameworks */,
+				C4D03D8A2F40D81300560DFA /* FirebaseAnalyticsCore in Frameworks */,
+				C4D03D922F40D81300560DFA /* FirebaseRemoteConfig in Frameworks */,
+				C4D03D7D2F40C34300560DFA /* FirebaseAnalytics in Frameworks */,
+				C4D03D8E2F40D81300560DFA /* FirebaseCrashlytics in Frameworks */,
+				C4D03D882F40D81300560DFA /* FirebaseAnalytics in Frameworks */,
+				C4D03D8C2F40D81300560DFA /* FirebaseCore in Frameworks */,
+				C4FB23272F2E4A7F009DF416 /* FirebaseRemoteConfig in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +110,7 @@
 				1C558FF107AAAA137BAB085D /* Configuration */,
 				B64252988D91B5A91563FA1A /* iosApp */,
 				2586C5FF3E14B12D1BF75E7F /* Products */,
+				C4343EEA2F2FF2F200FA96E1 /* Firebase */,
 			);
 			sourceTree = "<group>";
 			usesTabs = 0;
@@ -76,6 +126,8 @@
 				9ADB8B068CEED73B35E30327 /* Sources */,
 				7E0D92D982455BA61E54E5C3 /* Frameworks */,
 				FA717D53708981BBD6C95A15 /* Resources */,
+				C4343EEF2F31397400FA96E1 /* Google services naming copying for different flavors */,
+				C4D03D862F40D2B800560DFA /* Crashlytics Setup */,
 			);
 			buildRules = (
 			);
@@ -83,6 +135,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				B64252988D91B5A91563FA1A /* iosApp */,
+				C4343EEA2F2FF2F200FA96E1 /* Firebase */,
 			);
 			name = iosApp;
 			productName = iosApp;
@@ -113,6 +166,9 @@
 			);
 			mainGroup = A283EE6BCC9D7FF74A46565E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2586C5FF3E14B12D1BF75E7F /* Products */;
 			projectDirPath = "";
@@ -134,6 +190,47 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		C4343EEF2F31397400FA96E1 /* Google services naming copying for different flavors */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Google services naming copying for different flavors";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n\necho \"🔥 Using Firebase config:\"\necho \"${GOOGLE_SERVICE}\"\n\n# Source plist (resolved from xcconfig)\nFIREBASE_PLIST_SOURCE=\"${GOOGLE_SERVICE}\"\n\n# Destination inside built app bundle\nFIREBASE_PLIST_DESTINATION=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\n# Validate variable exists\nif [ -z \"${GOOGLE_SERVICE}\" ]; then\n  echo \"❌ GOOGLE_SERVICE variable is empty\"\n  exit 1\nfi\n\n# Validate file exists\nif [ ! -f \"$FIREBASE_PLIST_SOURCE\" ]; then\n  echo \"❌ Firebase plist not found at:\"\n  echo \"$FIREBASE_PLIST_SOURCE\"\n  exit 1\nfi\n\necho \"✅ Copying Firebase plist...\"\ncp \"$FIREBASE_PLIST_SOURCE\" \"$FIREBASE_PLIST_DESTINATION\"\n\necho \"✅ Firebase configuration applied\"\n";
+		};
+		C4D03D862F40D2B800560DFA /* Crashlytics Setup */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/$(GOOGLE_SERVICE)",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Crashlytics Setup";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
 		CC33097632150AD7F5A40886 /* Compile Kotlin Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -168,16 +265,21 @@
 /* Begin XCBuildConfiguration section */
 		30FDEB503D7B249589A3730D /* Development Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 1C558FF107AAAA137BAB085D /* Configuration */;
+			baseConfigurationReferenceRelativePath = Dev.xcconfig;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUNDLE_ID = az.less.mobile.dev;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is needed to take photos.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We need your location to show nearby places and provide address suggestions.";
@@ -197,7 +299,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = az.less.mobile.LessMobile.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = az.less.mobile.dev;
 				PRODUCT_NAME = "LessMobile Dev";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -208,16 +310,20 @@
 		};
 		7971D66B5F27214381780AA2 /* Development Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 1C558FF107AAAA137BAB085D /* Configuration */;
+			baseConfigurationReferenceRelativePath = Dev.xcconfig;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUNDLE_ID = az.less.mobile.dev;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is needed to take photos.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We need your location to show nearby places and provide address suggestions.";
@@ -237,7 +343,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = az.less.mobile.LessMobile.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = az.less.mobile.dev;
 				PRODUCT_NAME = "LessMobile Dev";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -439,16 +545,20 @@
 		};
 		C4C3F2252F1CC42C005B40A1 /* Production Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 1C558FF107AAAA137BAB085D /* Configuration */;
+			baseConfigurationReferenceRelativePath = Prod.xcconfig;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is needed to take photos.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We need your location to show nearby places and provide address suggestions.";
@@ -468,7 +578,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = az.less.mobile.LessMobile.prod;
+				PRODUCT_BUNDLE_IDENTIFIER = az.less.mobile;
 				PRODUCT_NAME = "LessMobile Prod";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -545,16 +655,20 @@
 		};
 		C4C3F2272F1CC441005B40A1 /* Production Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 1C558FF107AAAA137BAB085D /* Configuration */;
+			baseConfigurationReferenceRelativePath = Prod.xcconfig;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is needed to take photos.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We need your location to show nearby places and provide address suggestions.";
@@ -574,7 +688,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = az.less.mobile.LessMobile.prod;
+				PRODUCT_BUNDLE_IDENTIFIER = az.less.mobile;
 				PRODUCT_NAME = "LessMobile Prod";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -609,6 +723,89 @@
 			defaultConfigurationName = "Development Debug";
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C4D03D7C2F40C34300560DFA /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		C4D03D7E2F40C34300560DFA /* FirebaseAnalyticsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsCore;
+		};
+		C4D03D802F40C34300560DFA /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		C4D03D822F40C34300560DFA /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		C4D03D842F40C34300560DFA /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
+		};
+		C4D03D872F40D81300560DFA /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseAnalytics;
+		};
+		C4D03D892F40D81300560DFA /* FirebaseAnalyticsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseAnalyticsCore;
+		};
+		C4D03D8B2F40D81300560DFA /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseCore;
+		};
+		C4D03D8D2F40D81300560DFA /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseCrashlytics;
+		};
+		C4D03D8F2F40D81300560DFA /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseMessaging;
+		};
+		C4D03D912F40D81300560DFA /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseRemoteConfig;
+		};
+		C4FB23202F2E4A7F009DF416 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		C4FB23222F2E4A7F009DF416 /* FirebaseAnalyticsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsCore;
+		};
+		C4FB23242F2E4A7F009DF416 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		C4FB23262F2E4A7F009DF416 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4FB231F2F2E4A7F009DF416 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CAF2BAF156F798F66547EC27 /* Project object */;
 }
