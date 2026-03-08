@@ -2,31 +2,30 @@ package az.less.mobile.presentation.client.onboarding.otp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.data.model.User
-import az.less.mobile.data.repository.UserRepository
+import az.less.mobile.domain.model.auth.User
+import az.less.mobile.domain.repository.AuthorizationRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
-import kotlin.random.Random
 
-/**
- * ViewModel for Login Code Screen using Orbit MVI
- */
 class LoginCodeViewModel(
-    private val userRepository: UserRepository
+    private val userLocalRepository: SessionLocalRepository,
+    private val authorizationRepository: AuthorizationRepository
 ) : ViewModel(), ContainerHost<LoginCodeState, LoginCodeSideEffect> {
 
     override val container: Container<LoginCodeState, LoginCodeSideEffect> =
         viewModelScope.container(LoginCodeState())
 
-    /**
-     * Handle user intents
-     */
+    fun setEmail(email: String) = intent {
+        reduce { state.copy(email = email) }
+    }
+
     fun onIntent(intent: LoginCodeIntent) {
         when (intent) {
             is LoginCodeIntent.OnBackClicked -> handleBackClicked()
             is LoginCodeIntent.OnCodeChanged -> handleCodeChanged(intent.code)
-            is LoginCodeIntent.OnVerifyClicked -> handleVerifyClicked()
+            is LoginCodeIntent.OnVerifyClicked -> verifyOtp()
             is LoginCodeIntent.OnResendCodeClicked -> handleResendCodeClicked()
         }
     }
@@ -36,75 +35,57 @@ class LoginCodeViewModel(
     }
 
     private fun handleCodeChanged(code: String) = intent {
-        // Only allow digits, limit to 6 digits
         val digitsOnly = code.filter { it.isDigit() }.take(6)
-        
-        reduce {
-            state.copy(
-                code = digitsOnly,
-                codeError = null // Clear error when user makes changes
-            )
-        }
-        
-        // Auto-verify when all digits are entered
-        if (digitsOnly.length == 6) {
-            handleVerifyClicked()
-        }
+        reduce { state.copy(code = digitsOnly, codeError = null) }
     }
 
-    private fun handleVerifyClicked() = intent {
-        if (state.code.length != 6) {
-            reduce {
-                state.copy(
-                    codeError = "Please enter 6-digit code",
-                    code = "" // Clear input on error
-                )
-            }
-            return@intent
+    private fun verifyOtp() = intent {
+        if (state.isCodeValid) {
+            reduce { state.copy(isLoading = true, codeError = null) }
+
+            authorizationRepository.verifyOtp(state.email, state.code)
+                .onSuccess { data ->
+                    val user = User(
+                        id = data.user.id,
+                        name = data.user.name,
+                        email = data.user.email,
+                        roles = data.user.roles,
+                        status = data.user.status,
+                        avatarUrl = data.user.avatar,
+                        phone = data.user.phone,
+                        gender = data.user.gender,
+                        birthDay = data.user.birthDay
+                    )
+                    userLocalRepository.saveSession(
+                        user = user,
+                        accessToken = data.accessToken,
+                        refreshToken = data.refreshToken
+                    )
+                    reduce { state.copy(isLoading = false) }
+
+                    if (data.user.roles.contains("merchant")) {
+                        postSideEffect(LoginCodeSideEffect.NavigateToMerchant)
+                    } else {
+                        postSideEffect(LoginCodeSideEffect.NavigateToClient)
+                    }
+                }
+                .onError { error ->
+                    reduce { state.copy(isLoading = false, codeError = error.message, code = "") }
+                }
         }
-
-        reduce {
-            state.copy(isLoading = true, codeError = null)
-        }
-
-        // Mock API verification - only "111111" is valid
-        if (state.code != VALID_CODE) {
-            reduce {
-                state.copy(
-                    isLoading = false,
-                    codeError = "Invalid code. Please try again.",
-                    code = "" // Clear input on error
-                )
-            }
-            return@intent
-        }
-
-        // Create mock user and save to DataStore
-        val mockUser = User(
-            id = "user_${Random.nextInt(100000, 999999)}",
-            name = "Maqa",
-            email = state.email.ifEmpty { "maqa@gmail.com" },
-            avatarUrl = null,
-            co2Saved = "60 kg",
-            moneySaved = "$120"
-        )
-
-        userRepository.saveUser(mockUser)
-
-        reduce {
-            state.copy(isLoading = false)
-        }
-
-        postSideEffect(LoginCodeSideEffect.NavigateNext)
-    }
-
-    companion object {
-        private const val VALID_CODE = "111111"
     }
 
     private fun handleResendCodeClicked() = intent {
-        // TODO: Call API to resend code
-        postSideEffect(LoginCodeSideEffect.ShowSuccess("Code resent successfully"))
+        reduce { state.copy(isLoading = true) }
+
+        authorizationRepository.resendOtp(state.email)
+            .onSuccess { data ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(LoginCodeSideEffect.ShowSuccess(data.message))
+            }
+            .onError { error ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(LoginCodeSideEffect.ShowError(error.message))
+            }
     }
 }
-

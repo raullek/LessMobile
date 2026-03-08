@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.client.main.offers.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,17 +18,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.compose_multiplatform
+import lessmobile.composeapp.generated.resources.cd_messages
+import lessmobile.composeapp.generated.resources.cd_user_avatar
 import lessmobile.composeapp.generated.resources.ic_notification_24dp
+import lessmobile.composeapp.generated.resources.ic_person_image_placeholder_48dp
+import lessmobile.composeapp.generated.resources.offers_greeting
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
-/**
- * Header component for Offers screen with user avatar, greeting, and notification buttons
- * Based on Figma design: "Hi, Katheryn!" with two white circular buttons
- */
 @Composable
 fun OffersHeader(
     userName: String,
@@ -47,36 +46,37 @@ fun OffersHeader(
         // User Avatar
         Box(
             modifier = Modifier
-                .size(LessTheme.size.xxLarge)
+                .size(LessTheme.size.xLarge)
                 .clip(CircleShape)
                 .background(LessTheme.colors.elementsSecondaryElement),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(Res.drawable.compose_multiplatform),
-                contentDescription = "User Avatar",
-                modifier = Modifier
-                    .size(LessTheme.size.xxLarge)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
+                AsyncImage(
+                    model = userAvatarUrl,
+                    contentDescription = stringResource(Res.string.cd_user_avatar),
+                    modifier = Modifier
+                        .size(LessTheme.size.xLarge)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(Res.drawable.ic_person_image_placeholder_48dp),
+                    placeholder = painterResource(Res.drawable.ic_person_image_placeholder_48dp)
+                )
         }
-        
+
         Spacer(modifier = Modifier.width(LessTheme.spacing.xSmall))
-        
+
         // User Greeting
         Text(
-            text = "Hi, $userName!",
+            text = stringResource(Res.string.offers_greeting, userName),
             style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsBlack,
             modifier = Modifier.weight(1f)
         )
 
-        
-        // Notification Button 2 (Message/Bell icon)
+        // Notification Button
         Box(
             modifier = Modifier
-                .size(LessTheme.size.xLarge + LessTheme.spacing.xxSmall) // 40 + 4 = 44dp
+                .size(LessTheme.size.xLarge + LessTheme.spacing.xxSmall)
                 .clip(RoundedCornerShape(LessTheme.radius.medium))
                 .background(LessTheme.colors.textIconsNested)
                 .clickable { onMessageClick() },
@@ -84,8 +84,8 @@ fun OffersHeader(
         ) {
             Icon(
                 painter = painterResource(Res.drawable.ic_notification_24dp),
-                contentDescription = "Messages",
-                modifier = Modifier.size(LessTheme.size.small + LessTheme.spacing.xxxSmall), // 20 + 2 = 22dp
+                contentDescription = stringResource(Res.string.cd_messages),
+                modifier = Modifier.size(LessTheme.size.small + LessTheme.spacing.xxxSmall),
                 tint = LessTheme.colors.textIconsBlack
             )
         }

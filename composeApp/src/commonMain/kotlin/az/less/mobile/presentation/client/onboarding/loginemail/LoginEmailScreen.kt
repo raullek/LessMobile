@@ -42,13 +42,8 @@ fun LoginEmailScreen(
             is LoginEmailSideEffect.NavigateBack -> {
                 navController.popBackStack()
             }
-
             is LoginEmailSideEffect.NavigateNext -> {
                 navController.navigate(ClientRoute.LoginCode(email = state.email))
-            }
-
-            is LoginEmailSideEffect.ShowError -> {
-                // TODO: Show error message (e.g., snackbar)
             }
         }
     }
@@ -84,7 +79,6 @@ fun LoginEmailScreenContent(
         ) {
             Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
-            // Email Input Field
             DsTextField(
                 value = state.email,
                 onValueChange = { onIntent(LoginEmailIntent.OnEmailChanged(it)) },
@@ -94,17 +88,18 @@ fun LoginEmailScreenContent(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email
                 ),
-                onEndIconClick = {onIntent(LoginEmailIntent.OnEmailChanged(""))},
+                onEndIconClick = { onIntent(LoginEmailIntent.OnEmailChanged("")) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Next Button
             DsButton(
                 text = stringResource(Res.string.action_next),
                 onClick = { onIntent(LoginEmailIntent.OnNextClicked) },
                 variant = ButtonVariant.Primary,
+                enabled = state.isEmailValid,
+                isLoading = state.isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = LessTheme.spacing.medium)
@@ -112,4 +107,3 @@ fun LoginEmailScreenContent(
         }
     }
 }
-

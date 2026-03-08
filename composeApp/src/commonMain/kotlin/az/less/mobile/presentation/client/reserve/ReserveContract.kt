@@ -16,23 +16,28 @@ data class LotSizeInfo(
  * State of the Reserve Screen
  */
 data class ReserveState(
+    val boxId: String = "",
     val lotName: String = "",
     val pickupTime: String = "",
     val lotDescription: String = "",
     val quantity: Int = 1,
     val itemsLeft: Int = 0,
     val pricePerPiece: Double = 0.0,
-    val serviceFee: Double = 0.0,
+    val originalPrice: Double = 0.0,
     val subtotal: Double = 0.0,
     val paymentMethodDisplay: String = "",
     val selectedPaymentCard: PaymentCard? = null,
     val availablePaymentCards: List<PaymentCard> = emptyList(),
     val isLoading: Boolean = false,
+    val error: String? = null,
     val isLotSizeInfoVisible: Boolean = false,
     val lotSizeInfoList: List<LotSizeInfo> = emptyList(),
     val isVoucherBottomSheetVisible: Boolean = false,
     val availableVouchers: List<Voucher> = emptyList(),
-    val selectedVoucher: Voucher? = null
+    val selectedVoucher: Voucher? = null,
+    val venueName: String = "",
+    val venueId: String = "",
+    val venueLogoUrl: String? = null
 )
 
 
@@ -52,6 +57,7 @@ sealed interface ReserveSideEffect {
  * User Intents/Actions
  */
 sealed interface ReserveIntent {
+    data class Initialize(val boxId: String) : ReserveIntent
     data object OnBackClicked : ReserveIntent
     data object OnPlaceOrderClicked : ReserveIntent
     data object OnPaymentMethodClicked : ReserveIntent
@@ -65,4 +71,3 @@ sealed interface ReserveIntent {
     data class OnVoucherSelected(val voucher: Voucher) : ReserveIntent
     data object OnVoucherBottomSheetDismissed : ReserveIntent
 }
-

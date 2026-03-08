@@ -8,7 +8,7 @@ import az.less.mobile.presentation.client.main.merchant.MerchantProfileViewModel
 import az.less.mobile.presentation.client.main.more.root.MoreViewModel
 import az.less.mobile.presentation.client.main.offers.OffersViewModel
 import az.less.mobile.presentation.client.main.orders.OrdersViewModel
-import az.less.mobile.presentation.client.main.saved.SavedViewModel
+import az.less.mobile.presentation.client.main.favorites.FavoritesViewModel
 import az.less.mobile.presentation.client.main.search.SearchViewModel
 import az.less.mobile.presentation.client.main.voucher.VoucherViewModel
 import az.less.mobile.presentation.client.onboarding.loginemail.LoginEmailViewModel
@@ -45,7 +45,7 @@ val viewModelModule = module {
     viewModelOf(::AddNewCardViewModel)
     viewModelOf(::OffersViewModel)
     viewModelOf(::ExploreViewModel)
-    viewModelOf(::SavedViewModel)
+    viewModelOf(::FavoritesViewModel)
     viewModelOf(::OrdersViewModel)
     viewModelOf(::ReserveViewModel)
     viewModelOf(::SearchViewModel)

@@ -2,7 +2,17 @@ package az.less.mobile.presentation.client.main.orders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.presentation.client.main.orders.models.CartItem
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import az.less.mobile.domain.repository.OrdersRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
+import az.less.mobile.presentation.client.main.orders.models.Order
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -10,13 +20,40 @@ import org.orbitmvi.orbit.container
 /**
  * ViewModel for Orders Screen using Orbit MVI
  */
-class OrdersViewModel : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect> {
+@OptIn(ExperimentalCoroutinesApi::class)
+class OrdersViewModel(
+    private val ordersRepository: OrdersRepository,
+    private val sessionLocalRepository: SessionLocalRepository
+) : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect> {
 
     override val container: Container<OrdersState, OrdersSideEffect> =
         viewModelScope.container(OrdersState())
 
+    private val activeType = MutableStateFlow<String?>(null)
+    private val previousType = MutableStateFlow<String?>(null)
+
+    val activeOrders: Flow<PagingData<Order>> = activeType
+        .flatMapLatest { type ->
+            if (type == null) {
+                flowOf(PagingData.empty())
+            } else {
+                ordersRepository.getOrders(type)
+            }
+        }
+        .cachedIn(viewModelScope)
+
+    val previousOrders: Flow<PagingData<Order>> = previousType
+        .flatMapLatest { type ->
+            if (type == null) {
+                flowOf(PagingData.empty())
+            } else {
+                ordersRepository.getOrders(type)
+            }
+        }
+        .cachedIn(viewModelScope)
+
     init {
-        loadCartItems()
+        observeSession()
     }
 
     /**
@@ -25,107 +62,47 @@ class OrdersViewModel : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect
     fun onIntent(intent: OrdersIntent) {
         when (intent) {
             is OrdersIntent.OnTabSelected -> handleTabSelected(intent.tab)
-            is OrdersIntent.OnCartItemClicked -> handleCartItemClicked(intent.itemId)
+            is OrdersIntent.OnOrderClicked -> handleOrderClicked(intent.order)
             is OrdersIntent.OnCheckoutClicked -> handleCheckoutClicked()
             is OrdersIntent.OnBackClicked -> handleBackClicked()
+            is OrdersIntent.OnExploreOffersClicked -> handleExploreOffersClicked()
+            is OrdersIntent.OnSignInClicked -> handleSignInClicked()
         }
     }
 
-    private fun loadCartItems() = intent {
-       reduce {
-           state.copy(
-                cartItems = getMockCartItems(),
-                historyItems = getMockHistoryItems()
-            )
+    private fun observeSession() {
+        viewModelScope.launch {
+            sessionLocalRepository.isLoggedIn.collect { loggedIn ->
+                intent { reduce { state.copy(isLoggedIn = loggedIn) } }
+                if (loggedIn) {
+                    activeType.value = "active"
+                    previousType.value = "previous"
+                }
+            }
         }
     }
 
-    private fun handleTabSelected(tab: OrderTab) =
-        intent {
-           reduce {
-               state.copy(selectedTab = tab)
-            }
-        }
+    private fun handleTabSelected(tab: OrderTab) = intent {
+        reduce { state.copy(selectedTab = tab) }
+    }
 
-    private fun handleCartItemClicked(itemId: String) =
-        intent {
-            // Find the cart item and show reserve info
-            val cartItem =
-               state.cartItems.find { it.id == itemId }
-                    ?:state.historyItems.find { it.id == itemId }
+    private fun handleOrderClicked(order: Order) = intent {
+        postSideEffect(OrdersSideEffect.ShowReserveInfo(order))
+    }
 
-            if (cartItem != null) {
-               postSideEffect(
-                    OrdersSideEffect.ShowReserveInfo(
-                        cartItem
-                    )
-                )
-            }
-        }
-
-    private fun handleCheckoutClicked() =
-        intent {
-            if (state.cartItems.isNotEmpty()) {
-               postSideEffect(
-                    OrdersSideEffect.NavigateToCheckout
-                )
-            }
-        }
+    private fun handleCheckoutClicked() = intent {
+        postSideEffect(OrdersSideEffect.NavigateToCheckout)
+    }
 
     private fun handleBackClicked() = intent {
-       postSideEffect(OrdersSideEffect.NavigateBack)
+        postSideEffect(OrdersSideEffect.NavigateBack)
     }
 
-    // Mock data - replace with repository calls in real app
-    private fun getMockCartItems(): List<CartItem> {
-        return listOf(
-            CartItem(
-                id = "1",
-                title = "Small Surprise Bag",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99",
-                reserveNumber = "234529"
-            ),
-            CartItem(
-                id = "2",
-                title = "Mixed donut bag",
-                pickupTime = "Pick up from 14:00 to 18:00",
-                price = "8.50",
-                reserveNumber = "234530"
-            )
-        )
+    private fun handleExploreOffersClicked() = intent {
+        postSideEffect(OrdersSideEffect.NavigateToOffers)
     }
 
-    private fun getMockHistoryItems(): List<CartItem> {
-        return listOf(
-            CartItem(
-                id = "h1",
-                title = "Small Surprise Bag",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                price = "12.99",
-                reserveNumber = "234529",
-                isCompleted = true,
-                completedDate = "12 November"
-            ),
-            CartItem(
-                id = "h2",
-                title = "Mixed donut bag",
-                pickupTime = "Pick up from 14:00 to 18:00",
-                price = "8.50",
-                reserveNumber = "234528",
-                isCompleted = true,
-                completedDate = "10 November"
-            ),
-            CartItem(
-                id = "h3",
-                title = "Coffee & Pastry Set",
-                pickupTime = "Pick up from 09:00 to 12:00",
-                price = "15.00",
-                reserveNumber = "234527",
-                isCompleted = true,
-                completedDate = "5 November"
-            )
-        )
+    private fun handleSignInClicked() = intent {
+        postSideEffect(OrdersSideEffect.NavigateToMore)
     }
 }
-

@@ -1,0 +1,29 @@
+package az.less.mobile.data.datasource
+
+import az.less.mobile.data.remote.model.MerchantProfileDto
+import az.less.mobile.network.NetworkResult
+import az.less.mobile.network.safeApiCall
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+
+class MerchantDataSource(
+    private val httpClient: HttpClient
+) {
+    suspend fun getMerchantProfile(
+        merchantId: String,
+        includeReviews: Boolean = false,
+        reviewsLimit: Int? = null,
+        latitude: Double? = null,
+        longitude: Double? = null
+    ): NetworkResult<MerchantProfileDto> {
+        return safeApiCall {
+            httpClient.get("v1/venues/$merchantId") {
+                if (includeReviews) parameter("includeReviews", true)
+                reviewsLimit?.let { parameter("reviewsLimit", it) }
+                latitude?.let { parameter("latitude", it) }
+                longitude?.let { parameter("longitude", it) }
+            }
+        }
+    }
+}

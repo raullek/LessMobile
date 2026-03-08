@@ -2,14 +2,19 @@ package az.less.mobile.presentation.client.main.more.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.data.repository.UserRepository
+import az.less.mobile.domain.repository.AuthorizationRepository
+import az.less.mobile.domain.repository.ContentRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.main.more.root.models.CellId
+import dev.jordond.compass.permissions.LocationPermissionController
+import dev.jordond.compass.permissions.mobile
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellModel
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellType
 import az.less.mobile.presentation.client.main.more.root.models.MoreSection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ic_map_24dp
 import lessmobile.composeapp.generated.resources.ic_account_24dp
 import lessmobile.composeapp.generated.resources.ic_bubble_question_24dp
 import lessmobile.composeapp.generated.resources.ic_clock_24dp
@@ -18,6 +23,19 @@ import lessmobile.composeapp.generated.resources.ic_notification_24dp
 import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
 import lessmobile.composeapp.generated.resources.ic_terms_file_24dp
 import lessmobile.composeapp.generated.resources.ic_voucher_24dp
+import lessmobile.composeapp.generated.resources.more_account
+import lessmobile.composeapp.generated.resources.more_contact_us
+import lessmobile.composeapp.generated.resources.more_history
+import lessmobile.composeapp.generated.resources.more_how_to_use
+import lessmobile.composeapp.generated.resources.more_location
+import lessmobile.composeapp.generated.resources.more_location_granted
+import lessmobile.composeapp.generated.resources.more_location_not_granted
+import lessmobile.composeapp.generated.resources.more_notification
+import lessmobile.composeapp.generated.resources.more_payment_methods
+import lessmobile.composeapp.generated.resources.more_section_application
+import lessmobile.composeapp.generated.resources.more_section_support
+import lessmobile.composeapp.generated.resources.more_terms_of_service
+import lessmobile.composeapp.generated.resources.more_vouchers
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -26,19 +44,42 @@ import org.orbitmvi.orbit.container
  * ViewModel for More Screen using Orbit MVI
  */
 class MoreViewModel(
-    private val userRepository: UserRepository
+    private val userLocalRepository: SessionLocalRepository,
+    private val authorizationRepository: AuthorizationRepository,
+    private val contentRepository: ContentRepository
 ) : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
 
     override val container: Container<MoreState, MoreSideEffect> =
         viewModelScope.container(MoreState())
 
+    private val permissionController: LocationPermissionController = LocationPermissionController.mobile()
+
     init {
+        checkLocationPermission()
         observeUserState()
+    }
+
+    private fun checkLocationPermission() {
+        viewModelScope.launch {
+            val hasPermission = permissionController.hasPermission()
+            intent {
+                reduce {
+                    state.copy(
+                        locationPermissionGranted = hasPermission,
+                        sections = if (state.isLoggedIn) {
+                            buildAuthSections(state.notificationEnabled, hasPermission)
+                        } else {
+                            buildNonAuthSections(state.notificationEnabled, hasPermission)
+                        }
+                    )
+                }
+            }
+        }
     }
 
     private fun observeUserState() {
         viewModelScope.launch {
-            userRepository.currentUser.collectLatest { user ->
+            userLocalRepository.currentUser.collectLatest { user ->
                 intent {
                     if (user != null) {
                         reduce {
@@ -47,11 +88,7 @@ class MoreViewModel(
                                 userName = user.name,
                                 userEmail = user.email,
                                 userAvatarUrl = user.avatarUrl,
-                                co2Saved = user.co2Saved,
-                                moneySaved = user.moneySaved,
-                                ecoHeroTitle = "Eco-hero",
-                                ecoHeroDescription = "You saved 2 meals!",
-                                sections = buildAuthSections(state.notificationEnabled)
+                                sections = buildAuthSections(state.notificationEnabled, state.locationPermissionGranted)
                             )
                         }
                     } else {
@@ -61,11 +98,7 @@ class MoreViewModel(
                                 userName = null,
                                 userEmail = null,
                                 userAvatarUrl = null,
-                                co2Saved = null,
-                                moneySaved = null,
-                                ecoHeroTitle = null,
-                                ecoHeroDescription = null,
-                                sections = buildNonAuthSections(state.notificationEnabled)
+                                sections = buildNonAuthSections(state.notificationEnabled, state.locationPermissionGranted)
                             )
                         }
                     }
@@ -90,14 +123,18 @@ class MoreViewModel(
     }
 
     private fun handleLoginClicked() = intent {
-        // Navigate to onboarding/login flow
         postSideEffect(MoreSideEffect.NavigateToLogin)
     }
 
     private fun handleLogoutClicked() = intent {
-        // Clear user data from DataStore
-        userRepository.clearUser()
-        // State will be updated automatically via observeUserState()
+        reduce { state.copy(isLoading = true) }
+
+        val refreshToken = userLocalRepository.getRefreshToken()
+        if (refreshToken != null) {
+            authorizationRepository.logout(refreshToken)
+        }
+
+        userLocalRepository.clearSession()
     }
 
     private fun handleCellClick(cellId: CellId) = intent {
@@ -113,12 +150,9 @@ class MoreViewModel(
                 }
             }
             CellId.SignStore -> postSideEffect(MoreSideEffect.NavigateToSignStore)
-            CellId.TermsOfService -> {
-                reduce {
-                    state.copy(showTermsBottomSheet = true)
-                }
-            }
+            CellId.TermsOfService -> fetchTermsAndShow()
             CellId.HowToUse -> postSideEffect(MoreSideEffect.NavigateToHowToUse)
+            CellId.Location -> postSideEffect(MoreSideEffect.NavigateToAppSettings)
             CellId.Notification -> {
                 // Notification is handled separately via toggle
             }
@@ -132,11 +166,29 @@ class MoreViewModel(
     }
 
     private fun handleContactUsItemClick(itemId: String) = intent {
-        // TODO: Handle contact item click (open Instagram, TikTok, etc.)
-        // For now, just close the bottom sheet
         reduce {
             state.copy(showContactUsBottomSheet = false)
         }
+    }
+
+    private fun fetchTermsAndShow() = intent {
+        reduce { state.copy(showTermsBottomSheet = true, isTermsLoading = true) }
+
+        contentRepository.getTerms()
+            .onSuccess { data ->
+                reduce {
+                    state.copy(
+                        isTermsLoading = false,
+                        termsTitle = data.title,
+                        termsContent = data.body,
+                        isTermsHtml = data.isHtml
+                    )
+                }
+            }
+            .onError { error ->
+                reduce { state.copy(showTermsBottomSheet = false, isTermsLoading = false) }
+                postSideEffect(MoreSideEffect.ShowError(error.message))
+            }
     }
 
     private fun handleTermsDismiss() = intent {
@@ -151,50 +203,56 @@ class MoreViewModel(
             state.copy(
                 notificationEnabled = newEnabled,
                 sections = if (state.isLoggedIn) {
-                    buildAuthSections(newEnabled)
+                    buildAuthSections(newEnabled, state.locationPermissionGranted)
                 } else {
-                    buildNonAuthSections(newEnabled)
+                    buildNonAuthSections(newEnabled, state.locationPermissionGranted)
                 }
             )
         }
-        // In real app, save preference to repository
     }
 
     /**
      * Build sections for authenticated users
      */
-    private fun buildAuthSections(notificationEnabled: Boolean): List<MoreSection> {
+    private fun buildAuthSections(notificationEnabled: Boolean, locationGranted: Boolean): List<MoreSection> {
         return listOf(
             MoreSection(
-                title = "Application",
+                titleRes = Res.string.more_section_application,
                 cells = listOf(
                     MoreCellModel(
                         id = CellId.Account,
-                        title = "Account",
+                        titleRes = Res.string.more_account,
                         icon = Res.drawable.ic_account_24dp,
                         type = MoreCellType.Navigation
                     ),
                     MoreCellModel(
                         id = CellId.PaymentMethods,
-                        title = "Payment methods",
+                        titleRes = Res.string.more_payment_methods,
                         icon = Res.drawable.ic_payment_card_24dp,
                         type = MoreCellType.Navigation
                     ),
                     MoreCellModel(
                         id = CellId.Voucher,
-                        title = "Vouchers",
+                        titleRes = Res.string.more_vouchers,
                         icon = Res.drawable.ic_voucher_24dp,
                         type = MoreCellType.Navigation
                     ),
                     MoreCellModel(
                         id = CellId.History,
-                        title = "History?",
+                        titleRes = Res.string.more_history,
                         icon = Res.drawable.ic_clock_24dp,
                         type = MoreCellType.Navigation,
                     ),
                     MoreCellModel(
+                        id = CellId.Location,
+                        titleRes = Res.string.more_location,
+                        subtitleRes = if (locationGranted) Res.string.more_location_granted else Res.string.more_location_not_granted,
+                        icon = Res.drawable.ic_map_24dp,
+                        type = MoreCellType.Navigation
+                    ),
+                    MoreCellModel(
                         id = CellId.Notification,
-                        title = "Notification",
+                        titleRes = Res.string.more_notification,
                         icon = Res.drawable.ic_notification_24dp,
                         type = MoreCellType.Toggle(notificationEnabled),
                         showDivider = false
@@ -202,23 +260,23 @@ class MoreViewModel(
                 )
             ),
             MoreSection(
-                title = "Support",
+                titleRes = Res.string.more_section_support,
                 cells = listOf(
                     MoreCellModel(
                         id = CellId.ContactUs,
-                        title = "Contact us",
+                        titleRes = Res.string.more_contact_us,
                         icon = Res.drawable.ic_customer_support_24dp,
                         type = MoreCellType.Navigation
                     ),
                     MoreCellModel(
                         id = CellId.TermsOfService,
-                        title = "Terms of Service",
+                        titleRes = Res.string.more_terms_of_service,
                         icon = Res.drawable.ic_account_24dp,
                         type = MoreCellType.Navigation
                     ),
                     MoreCellModel(
                         id = CellId.HowToUse,
-                        title = "How to use",
+                        titleRes = Res.string.more_how_to_use,
                         icon = Res.drawable.ic_bubble_question_24dp,
                         type = MoreCellType.Navigation,
                         showDivider = false
@@ -231,14 +289,21 @@ class MoreViewModel(
     /**
      * Build sections for non-authenticated users
      */
-    private fun buildNonAuthSections(notificationEnabled: Boolean): List<MoreSection> {
+    private fun buildNonAuthSections(notificationEnabled: Boolean, locationGranted: Boolean): List<MoreSection> {
         return listOf(
             MoreSection(
-                title = "Application",
+                titleRes = Res.string.more_section_application,
                 cells = listOf(
                     MoreCellModel(
+                        id = CellId.Location,
+                        titleRes = Res.string.more_location,
+                        subtitleRes = if (locationGranted) Res.string.more_location_granted else Res.string.more_location_not_granted,
+                        icon = Res.drawable.ic_map_24dp,
+                        type = MoreCellType.Navigation
+                    ),
+                    MoreCellModel(
                         id = CellId.Notification,
-                        title = "Notification",
+                        titleRes = Res.string.more_notification,
                         icon = Res.drawable.ic_notification_24dp,
                         type = MoreCellType.Toggle(notificationEnabled),
                         showDivider = false
@@ -246,23 +311,23 @@ class MoreViewModel(
                 )
             ),
             MoreSection(
-                title = "Support",
+                titleRes = Res.string.more_section_support,
                 cells = listOf(
                     MoreCellModel(
                         id = CellId.ContactUs,
-                        title = "Contact us",
+                        titleRes = Res.string.more_contact_us,
                         icon = Res.drawable.ic_account_24dp,
                         type = MoreCellType.Navigation
                     ),
                     MoreCellModel(
                         id = CellId.TermsOfService,
-                        title = "Terms of Service",
+                        titleRes = Res.string.more_terms_of_service,
                         icon = Res.drawable.ic_terms_file_24dp,
                         type = MoreCellType.Navigation
                     ),
                     MoreCellModel(
                         id = CellId.HowToUse,
-                        title = "How to use",
+                        titleRes = Res.string.more_how_to_use,
                         icon = Res.drawable.ic_bubble_question_24dp,
                         type = MoreCellType.Navigation,
                         showDivider = false

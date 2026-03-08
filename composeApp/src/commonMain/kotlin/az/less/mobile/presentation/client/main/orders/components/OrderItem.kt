@@ -27,24 +27,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.presentation.client.main.orders.models.CartItem
+import az.less.mobile.presentation.client.main.orders.models.Order
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.cd_completed
 import lessmobile.composeapp.generated.resources.ic_check_rounded_36dp
+import lessmobile.composeapp.generated.resources.orders_picked_up_on
+import lessmobile.composeapp.generated.resources.orders_pickup_time
+import lessmobile.composeapp.generated.resources.orders_reserve_number
 import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 /**
  * Stateless OrderItem component for displaying cart/history items
- * Based on Figma design: https://www.figma.com/design/LfrtpXNQmOc01fJRhY6Iwq/Less-App---EDU?node-id=2796-8682&m=dev
  *
- * @param item CartItem data to display
+ * @param item Order data to display
  * @param onClick Callback when item is clicked
  * @param modifier Modifier to be applied to the component
  */
 @Composable
 fun OrderItem(
-    item: CartItem,
+    item: Order,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -62,12 +67,21 @@ fun OrderItem(
                 .clip(RoundedCornerShape(LessTheme.radius.small))
                 .background(LessTheme.colors.elementsThirdElement)
         ) {
-            Image(
-                painter = painterResource(Res.drawable.test_offer_item_image),
-                contentDescription = item.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+            if (item.imageUrl != null) {
+                AsyncImage(
+                    model = item.imageUrl,
+                    contentDescription = item.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Image(
+                    painter = painterResource(Res.drawable.test_offer_item_image),
+                    contentDescription = item.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
             // Dark overlay and checkmark for completed orders
             if (item.isCompleted) {
@@ -81,7 +95,7 @@ fun OrderItem(
                 // Checkmark icon
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_check_rounded_36dp),
-                    contentDescription = "Completed",
+                    contentDescription = stringResource(Res.string.cd_completed),
                     tint = Color.White,
                     modifier = Modifier
                         .size(36.dp)
@@ -117,7 +131,7 @@ fun OrderItem(
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(color = LessTheme.colors.textIconsGrey)) {
-                            append("Reserve number: ")
+                            append(stringResource(Res.string.orders_reserve_number))
                         }
                         withStyle(style = SpanStyle(color = LessTheme.colors.textIconsBlack)) {
                             append(item.reserveNumber)
@@ -131,15 +145,15 @@ fun OrderItem(
                 // Pickup time or completed date
                 if (item.isCompleted && item.completedDate != null) {
                     Text(
-                        text = "Picked up on ${item.completedDate}",
+                        text = stringResource(Res.string.orders_picked_up_on, item.completedDate ?: ""),
                         style = LessTheme.typography.body14Medium,
                         color = LessTheme.colors.textIconsBrand,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                } else {
+                } else if (item.pickupTimeStart != null && item.pickupTimeEnd != null) {
                     Text(
-                        text = item.pickupTime,
+                        text = stringResource(Res.string.orders_pickup_time, item.pickupTimeStart, item.pickupTimeEnd),
                         style = LessTheme.typography.body14Medium,
                         color = LessTheme.colors.textIconsGrey,
                         maxLines = 1,
@@ -159,7 +173,7 @@ fun OrderItem(
                     color = LessTheme.colors.textIconsBrand
                 )
                 Text(
-                    text = "₼",
+                    text = "\u20BC",
                     style = LessTheme.typography.body16Semibold,
                     color = LessTheme.colors.textIconsBrand
                 )

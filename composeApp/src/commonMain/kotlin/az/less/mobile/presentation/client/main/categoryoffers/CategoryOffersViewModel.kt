@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
 import az.less.mobile.presentation.client.main.offers.models.OfferMerchant
 import az.less.mobile.presentation.client.main.offers.models.SegmentedCategory
-import az.less.mobile.presentation.client.main.offers.models.SegmentedCategoryType
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.ic_mark_16dp
@@ -14,9 +13,6 @@ import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
-/**
- * ViewModel for Category Offers Screen using Orbit MVI
- */
 class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, CategoryOffersSideEffect> {
 
     override val container: Container<CategoryOffersState, CategoryOffersSideEffect> =
@@ -24,9 +20,6 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
 
     private var isInitialized = false
 
-    /**
-     * Initialize ViewModel with navigation parameters
-     */
     fun initialize(categoryId: String, categoryType: String, categoryTitle: String) {
         if (isInitialized) return
         isInitialized = true
@@ -54,9 +47,6 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
         }
     }
 
-    /**
-     * Handle user intents
-     */
     fun onIntent(intent: CategoryOffersIntent) {
         when (intent) {
             is CategoryOffersIntent.OnBackClicked -> handleBackClicked()
@@ -86,30 +76,21 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
         }
     }
 
-    // ==================== Mock Data ====================
+    // ==================== Mock Data (TODO: replace with API) ====================
 
     private fun getMockSegmentedCategories(): List<SegmentedCategory> {
         return listOf(
             SegmentedCategory(
-                id = "nearest",
-                type = SegmentedCategoryType.NEAREST,
-                title = "Nearest",
-                icon = Res.drawable.ic_explore_24dp,
-                iconTint = 0xFFFF8B38L
+                id = "nearest", type = "NEAREST", title = "Nearest",
+                icon = Res.drawable.ic_explore_24dp, iconTint = 0xFFFF8B38L
             ),
             SegmentedCategory(
-                id = "top_rated",
-                type = SegmentedCategoryType.TOP_RATED,
-                title = "Top rated",
-                icon = Res.drawable.ic_star_16dp,
-                iconTint = 0xFF5AA9E7L
+                id = "top_rated", type = "TOP_RATED", title = "Top rated",
+                icon = Res.drawable.ic_star_16dp, iconTint = 0xFF5AA9E7L
             ),
             SegmentedCategory(
-                id = "hot_deals",
-                type = SegmentedCategoryType.HOT_DEALS,
-                title = "Hot deals",
-                icon = Res.drawable.ic_mark_16dp,
-                iconTint = 0xFFAD3CDAL
+                id = "hot_deals", type = "HOT_DEALS", title = "Hot deals",
+                icon = Res.drawable.ic_mark_16dp, iconTint = 0xFFAD3CDAL
             )
         )
     }
@@ -121,7 +102,6 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
             "hot_deals" -> getHotDealsOffers()
             else -> getAllOffers()
         }
-        // In real app, filter by categoryId from repository
         return baseOffers
     }
 
@@ -141,7 +121,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_1",
                     name = "Burger House",
-                    location = "0.8 km",
+                    latitude = 40.4093,
+                    longitude = 49.8671,
                     rating = 4.8f
                 )
             ),
@@ -159,7 +140,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_2",
                     name = "Burger King",
-                    location = "1.2 km",
+                    latitude = 40.4047,
+                    longitude = 49.8687,
                     rating = 4.6f
                 )
             ),
@@ -177,7 +159,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_3",
                     name = "Green Burger",
-                    location = "2.1 km",
+                    latitude = 40.4295,
+                    longitude = 49.8535,
                     rating = 4.9f
                 )
             ),
@@ -195,7 +178,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_4",
                     name = "BBQ Place",
-                    location = "1.5 km",
+                    latitude = 40.4436,
+                    longitude = 49.8671,
                     rating = 4.7f
                 )
             ),
@@ -213,7 +197,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
                 merchant = OfferMerchant(
                     id = "merchant_5",
                     name = "Mega Burger",
-                    location = "0.9 km",
+                    latitude = 40.3910,
+                    longitude = 49.8753,
                     rating = 4.5f
                 )
             )
@@ -221,9 +206,8 @@ class CategoryOffersViewModel : ViewModel(), ContainerHost<CategoryOffersState, 
     }
 
     private fun getNearestOffers(): List<OfferItem> {
-        return getAllOffers().sortedBy {
-            it.merchant.location.replace(" km", "").toFloatOrNull() ?: Float.MAX_VALUE
-        }
+        // TODO: sort by actual distance from user location
+        return getAllOffers()
     }
 
     private fun getTopRatedOffers(): List<OfferItem> {

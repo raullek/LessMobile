@@ -10,5 +10,6 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) = startKoin {
         cacheModule,
         viewModelModule,
         toolsModule
+        dataModule,
     )
 }

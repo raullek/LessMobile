@@ -30,9 +30,11 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.compose_multiplatform
+import lessmobile.composeapp.generated.resources.orders_pickup_time
 import lessmobile.composeapp.generated.resources.test_merchant_logo
 import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Vertical offer card component for Category Offers screen
@@ -179,8 +181,13 @@ fun VerticalOfferCard(
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
             
             // Pickup time
+            val pickupParts = item.pickupTime.split(" - ")
             Text(
-                text = item.pickupTime,
+                text = if (pickupParts.size == 2) {
+                    stringResource(Res.string.orders_pickup_time, pickupParts[0], pickupParts[1])
+                } else {
+                    item.pickupTime
+                },
                 style = LessTheme.typography.body14Medium,
                 color = LessTheme.colors.textIconsGrey,
                 maxLines = 1,

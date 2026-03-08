@@ -194,8 +194,8 @@ fun DsTextField(
                         innerTextField()
                     }
 
-                    // End Icon - only visible when text is not empty
-                    if (value.isNotEmpty()) {
+                    // End Icon - only visible when text is not empty and field is enabled
+                    if (value.isNotEmpty() && enabled) {
                         Box(
                             modifier = Modifier.align(Alignment.CenterEnd)
                         ) {

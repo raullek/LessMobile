@@ -32,7 +32,7 @@ import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import org.jetbrains.compose.resources.painterResource
 import az.less.mobile.presentation.client.main.more.root.components.MoreHeader
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellType
-
+import az.less.mobile.utils.openAppSettings
 import lessmobile.composeapp.generated.resources.more_contact_us
 import lessmobile.composeapp.generated.resources.contact_instagram
 import lessmobile.composeapp.generated.resources.contact_tiktok
@@ -91,6 +91,9 @@ fun MoreScreen(
             is MoreSideEffect.NavigateToHowToUse -> {
                 navController.navigate(ClientRoute.Welcome)
             }
+            is MoreSideEffect.NavigateToAppSettings -> {
+                openAppSettings()
+            }
             is MoreSideEffect.ShowError -> {
                 // Show error snackbar or dialog
             }
@@ -148,21 +151,19 @@ fun MoreScreen(
     
     // Terms & Conditions Bottom Sheet
     if (state.showTermsBottomSheet) {
-        val termsContent = """
-            1 Header
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            
-            1.1 Header
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-            
-            Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-        """.trimIndent()
-        
+        val displayContent = if (state.isTermsLoading) {
+            ""
+        } else {
+            if (state.isTermsHtml) {
+                stripHtmlTags(state.termsContent.orEmpty())
+            } else {
+                state.termsContent.orEmpty()
+            }
+        }
+
         DsTextBottomSheet(
-            title = stringResource(Res.string.terms_title),
-            content = termsContent,
+            title = state.termsTitle ?: stringResource(Res.string.terms_title),
+            content = displayContent,
             onDismiss = {
                 viewModel.onIntent(MoreIntent.OnTermsDismiss)
             }
@@ -201,6 +202,7 @@ fun MoreScreenContent(
                 onLoginClick = { onIntent(MoreIntent.OnLoginClicked) },
                 userName = state.userName,
                 userEmail = state.userEmail,
+                userAvatarUrl = state.userAvatarUrl,
                 co2Saved = state.co2Saved,
                 moneySaved = state.moneySaved,
                 ecoHeroTitle = state.ecoHeroTitle,
@@ -214,19 +216,20 @@ fun MoreScreenContent(
         }
         
         // Sections
-        state.sections.forEach { section ->
+        state.sections.forEachIndexed { index, section ->
             // Section header
-            item(key = "header_${section.title}") {
-                DsSectionHeader(title = section.title)
+            item(key = "header_$index") {
+                DsSectionHeader(title = stringResource(section.titleRes))
             }
-            
+
             // Section cells
             items(
                 items = section.cells,
                 key = { cell -> cell.id }
             ) { cell ->
                 DsCell(
-                    title = cell.title,
+                    title = stringResource(cell.titleRes),
+                    subtitle = cell.subtitleRes?.let { stringResource(it) },
                     leadingContent = cell.icon?.let { CellLeadingContent(icon = it) },
                     type = when (cell.type) {
                         is MoreCellType.Navigation -> CellType.Navigation(
@@ -242,9 +245,9 @@ fun MoreScreenContent(
                     modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
                 )
             }
-            
+
             // Spacing after section
-            item(key = "spacing_${section.title}") {
+            item(key = "spacing_$index") {
                 Spacer(modifier = Modifier.height(LessTheme.spacing.large).background(LessTheme.colors.backgroundPrimary))
             }
         }
@@ -268,4 +271,21 @@ fun MoreScreenContent(
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxLarge))
         }
     }
+}
+
+private fun stripHtmlTags(html: String): String {
+    return html
+        .replace(Regex("<br\\s*/?>"), "\n")
+        .replace(Regex("</p>"), "\n\n")
+        .replace(Regex("</div>"), "\n")
+        .replace(Regex("</li>"), "\n")
+        .replace(Regex("<li[^>]*>"), "- ")
+        .replace(Regex("<[^>]+>"), "")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&nbsp;", " ")
+        .replace(Regex("\n{3,}"), "\n\n")
+        .trim()
 }

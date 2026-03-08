@@ -41,18 +41,32 @@
     <string name="login_code_resend">Kod gəlmədi?</string>
 
     <!-- Offers Screen -->
+    <string name="offers_greeting_guest">Əziz istifadəçi</string>
+    <string name="offers_greeting">Salam, %1$s!</string>
     <string name="offers_search_placeholder">İçkilər, şokoladlar və qəlyanaltılar</string>
 
     <!-- Orders Screen -->
     <string name="orders_title">Sifarişlər</string>
     <string name="orders_tab_active">Aktiv</string>
     <string name="orders_tab_previous">Əvvəlki sifarişlər</string>
+    <string name="orders_not_logged_in_title">Sifarişlərinizi görmək üçün daxil olun</string>
+    <string name="orders_not_logged_in_description">Sifarişlərinizi görmək və idarə etmək üçün daxil olun</string>
+    <string name="orders_sign_in">Daxil ol</string>
+    <string name="orders_empty_title">Sifarişiniz yoxdur</string>
+    <string name="orders_empty_description">Alış-veriş etdikdən sonra sifarişləriniz burada görünəcək</string>
+    <string name="orders_explore_offers">Təklifləri kəşf et</string>
+    <string name="orders_reserve_number">Rezerv nömrəsi: </string>
+    <string name="orders_picked_up_on">%1$s tarixində götürüldü</string>
+    <string name="orders_pickup_time">%1$s-dən %2$s-dək götür</string>
 
     <!-- Saved/Favorites Screen -->
     <string name="saved_title">Sevimlilər</string>
     <string name="saved_empty_title">Sevimliləriniz yoxdur</string>
     <string name="saved_empty_description">Bütün kateqoriyalardan saxladığınız elementlər burada görünəcək. Onları istənilən vaxt silə və ya istifadə edə bilərsiniz</string>
     <string name="saved_explore_venues">Yeni məkanları kəşf et</string>
+    <string name="saved_not_logged_in_title">Sevimlilərinizi görmək üçün daxil olun</string>
+    <string name="saved_not_logged_in_description">Sevimli məkanlarınızı saxlamaq və görmək üçün daxil olun</string>
+    <string name="saved_sign_in">Daxil ol</string>
 
     <!-- More Screen -->
     <string name="more_section_application">Tətbiq</string>
@@ -67,6 +81,14 @@
     <string name="more_how_to_use">Necə istifadə etməli</string>
     <string name="more_eco_hero">Eko-qəhrəman</string>
     <string name="more_eco_hero_description">Siz %1$d yemək xilas etdiniz!</string>
+    <string name="more_location">Yer</string>
+    <string name="more_location_granted">İcazə verildi</string>
+    <string name="more_location_not_granted">İcazə verilməyib</string>
+    <string name="more_get_more_features">Xoş gəlmisiniz</string>
+    <string name="more_get_more_features_description">Less-in xüsusi təkliflərindən yararlanmaq üçün tətbiqə daxil olun</string>
+    <string name="more_log_in_or_sign_up">Daxil ol</string>
+    <string name="more_co2_saved">CO2, qənaət</string>
+    <string name="more_money_saved">Qənaət</string>
 
     <!-- Contact Us Bottom Sheet -->
     <string name="contact_instagram">Instagram</string>
@@ -87,6 +109,8 @@
     <string name="account_gender_placeholder">Cins</string>
     <string name="account_birthday_placeholder">Doğum tarixi</string>
     <string name="account_delete">Hesabı sil</string>
+    <string name="account_delete_title">Hesabı silmək istəyirsiniz?</string>
+    <string name="account_delete_description">Hesabınızı silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.</string>
     <string name="account_select_gender">Cins seçin</string>
     <string name="account_profile_photo">Profil şəkli</string>
 

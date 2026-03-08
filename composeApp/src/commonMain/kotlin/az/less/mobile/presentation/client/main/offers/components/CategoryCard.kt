@@ -19,50 +19,61 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import org.jetbrains.compose.resources.DrawableResource
+import coil3.compose.SubcomposeAsyncImage
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ill_category_placeholder
 import org.jetbrains.compose.resources.painterResource
 
-/**
- * Category card component with image and title
- * Based on Figma design: White card with food image (64px height) and category name
- */
 @Composable
 fun CategoryCard(
     title: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    imageUrl: String? = null,
-    //Temporary for testing
-    testImage: DrawableResource
+    imageUrl: String? = null
 ) {
     Column(
         modifier = modifier
-            .width(81.dp) // Fixed width to match image width and ensure consistency
+            .width(81.dp)
             .height(102.dp)
             .clip(RoundedCornerShape(LessTheme.radius.small))
             .background(LessTheme.colors.elementsPrimaryElement)
             .clickable { onClick() }
             .padding(
                 top = LessTheme.spacing.xxSmall,
-                bottom = LessTheme.spacing.small + LessTheme.spacing.xxxSmall // 12 + 2 = 14dp
+                bottom = LessTheme.spacing.small + LessTheme.spacing.xxxSmall
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Image Container
         Box(
             modifier = Modifier
-                .size(width = 81.dp, height = LessTheme.size.huge), // Keep width as design-specific, height 64dp
+                .size(width = 81.dp, height = LessTheme.size.huge),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(testImage),
-                contentDescription = title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(LessTheme.size.huge)
-            )
+            if (imageUrl != null) {
+                SubcomposeAsyncImage(
+                    model = imageUrl,
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(LessTheme.size.huge),
+                    error = {
+                        Image(
+                            painter = painterResource(Res.drawable.ill_category_placeholder),
+                            contentDescription = title,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(LessTheme.size.huge)
+                        )
+                    }
+                )
+            } else {
+                Image(
+                    painter = painterResource(Res.drawable.ill_category_placeholder),
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(LessTheme.size.huge)
+                )
+            }
         }
-        
-        // Category Title
+
         Text(
             text = title,
             style = LessTheme.typography.body14Semibold,
@@ -71,4 +82,3 @@ fun CategoryCard(
         )
     }
 }
-

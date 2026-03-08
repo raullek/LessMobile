@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,14 +23,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem
+import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.test_offer_item_image
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
+import lessmobile.composeapp.generated.resources.ill_category_placeholder
 import org.jetbrains.compose.resources.painterResource
 
-/**
- * Special Discount Card component
- * Based on Figma design with background image, gradient overlay, title and subtitle
- */
 @Composable
 fun SpecialDiscountCard(
     item: SpecialDiscountItem,
@@ -39,22 +39,26 @@ fun SpecialDiscountCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(173.dp) // Specific height from design
+            .height(173.dp)
             .clip(RoundedCornerShape(LessTheme.radius.medium))
             .clickable { onClick() }
     ) {
-        // Background Image or Placeholder
-        if (item.testImage != null) {
-            Image(
-                painter = painterResource(Res.drawable.test_offer_item_image),
-                contentDescription = item.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
 
-        
-        // Content Overlay
+        SubcomposeAsyncImage(
+            model = item.imageUrl,
+            contentDescription = item.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+            error = {
+                Image(
+                    painter = painterResource(Res.drawable.ill_box_placeholder),
+                    contentDescription = item.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(LessTheme.size.huge)
+                )
+            }
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,24 +74,21 @@ fun SpecialDiscountCard(
                 .padding(
                     start = LessTheme.spacing.medium,
                     end = LessTheme.spacing.medium,
-                    bottom = LessTheme.spacing.large // 28dp
+                    bottom = LessTheme.spacing.large
                 ),
             verticalArrangement = Arrangement.Bottom
         ) {
-            // Title
             Text(
                 text = item.title,
                 style = LessTheme.typography.body16Semibold,
                 color = Color.White
             )
-            
-            // Subtitle
+
             Text(
                 text = item.description,
                 style = LessTheme.typography.body14Regular,
-                color = Color.White.copy(alpha = 0.8f) // 80% opacity
+                color = Color.White.copy(alpha = 0.8f)
             )
         }
     }
 }
-

@@ -18,39 +18,37 @@ import az.less.mobile.presentation.client.main.offers.models.OfferSection
 import az.less.mobile.presentation.client.main.offers.models.SegmentedCategory
 import az.less.mobile.presentation.client.main.offers.models.SegmentedCategoryType
 import az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem
+import az.less.mobile.domain.repository.OffersRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.main.offers.models.UserInfo
-import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.ic_explore_24dp
-import lessmobile.composeapp.generated.resources.ic_mark_16dp
-import lessmobile.composeapp.generated.resources.ic_star_16dp
-import lessmobile.composeapp.generated.resources.test_offer_category_burger
-import lessmobile.composeapp.generated.resources.test_offer_category_pasta
-import lessmobile.composeapp.generated.resources.test_offer_category_pizza
-import lessmobile.composeapp.generated.resources.test_offer_category_sushi
-import lessmobile.composeapp.generated.resources.test_offer_item_image
+import dev.jordond.compass.geolocation.Geolocator
+import dev.jordond.compass.geolocation.mobile
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
-/**
- * ViewModel for Offers Screen using Orbit MVI
- */
-class OffersViewModel(private val analyticsWrapper: AnalyticsWrapper) : ViewModel(),
-    ContainerHost<OffersState, OffersSideEffect> {
+class OffersViewModel(
+    private val offersRepository: OffersRepository,
+    private val sessionLocalRepository: SessionLocalRepository,
+    private val analyticsWrapper: AnalyticsWrapper
+) : ViewModel(), ContainerHost<OffersState, OffersSideEffect> {
 
     override val container: Container<OffersState, OffersSideEffect> =
         viewModelScope.container(OffersState())
 
+    private val geolocator: Geolocator = Geolocator.mobile()
+
     init {
-        loadUserInfo()
-        loadScreenData()
+        observeUserInfo()
+        loadOffers()
     }
 
-    /**
-     * Handle user intents
-     */
     fun onIntent(intent: OffersIntent) {
         when (intent) {
+            is OffersIntent.OnLocationPermissionChanged -> handleLocationPermissionChanged(intent.granted)
             is OffersIntent.OnSearchQueryChanged -> handleSearchQueryChanged(intent.query)
             is OffersIntent.OnSearchClicked -> handleSearchClicked()
             is OffersIntent.OnCategorySelected -> handleCategorySelected(intent.categoryId)
@@ -58,50 +56,67 @@ class OffersViewModel(private val analyticsWrapper: AnalyticsWrapper) : ViewMode
             is OffersIntent.OnSegmentSelected -> handleSegmentSelected(intent.segmentId)
             is OffersIntent.OnOfferItemClicked -> handleOfferItemClicked(intent.offerId)
             is OffersIntent.OnSeeAllClicked -> handleSeeAllClicked(intent.sectionId)
+            is OffersIntent.OnRefresh -> handleRefresh()
         }
     }
 
-    // ==================== Data Loading ====================
-
-    /**
-     * Load user info (separate request)
-     * GET /api/v1/user/me
-     */
-    private fun loadUserInfo() = intent {
-        reduce { state.copy(isUserLoading = true) }
-        // TODO: Replace with actual API call
-        val userInfo = getMockUserInfo()
-        reduce {
-            state.copy(
-                userInfo = userInfo,
-                isUserLoading = false
-            )
+    private fun observeUserInfo() {
+        viewModelScope.launch {
+            sessionLocalRepository.currentUser.collectLatest { user ->
+                intent {
+                    reduce {
+                        state.copy(
+                            userInfo = user?.let {
+                                UserInfo(
+                                    id = it.id,
+                                    name = it.name,
+                                    avatarUrl = null
+                                )
+                            },
+                            isUserLoading = false
+                        )
+                    }
+                }
+            }
         }
     }
 
-    /**
-     * Load screen data (single request)
-     * GET /api/v1/offers/home
-     */
-    private fun loadScreenData() = intent {
-        reduce { state.copy(isLoading = true) }
-
-        // TODO: Replace with actual API call
-        val response = getOffers()
-
-        // Map DTO to domain models
-        reduce {
-            state.copy(
-                categories = response.categories.map { it.toDomain() },
-                specialCategories = response.specialCategories.map { it.toDomain() },
-                segmentedCategories = response.segmentedCategories.map { it.toDomain() },
-                offerSections = response.offerSections.map { it.toDomain() },
-                isLoading = false
-            )
+    private fun handleLocationPermissionChanged(granted: Boolean) = intent {
+        reduce { state.copy(locationPermissionGranted = granted) }
+        if (granted) {
+            loadOffers()
         }
     }
 
-    // ==================== Intent Handlers ====================
+    private suspend fun getLocation() = withTimeoutOrNull(3000L) {
+        if (geolocator.isAvailable()) geolocator.current().getOrNull() else null
+    }
+
+    private fun loadOffers() = intent {
+        val location = if (state.locationPermissionGranted) getLocation() else null
+        val latitude = location?.coordinates?.latitude
+        val longitude = location?.coordinates?.longitude
+
+        offersRepository.getHomeOffers(
+            latitude = latitude,
+            longitude = longitude
+        )
+            .onSuccess { data ->
+                reduce {
+                    state.copy(
+                        categories = data.categories,
+                        specialCategories = data.specialCategories,
+                        segmentedCategories = data.segmentedCategories,
+                        offerSections = data.offerSections,
+                        isLoading = false
+                    )
+                }
+            }
+            .onError { error ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(OffersSideEffect.ShowError(error.message))
+            }
+    }
 
     private fun handleSearchQueryChanged(query: String) = intent {
         reduce { state.copy(searchQuery = query) }
@@ -143,7 +158,7 @@ class OffersViewModel(private val analyticsWrapper: AnalyticsWrapper) : ViewMode
             postSideEffect(
                 OffersSideEffect.NavigateToCategoryOffers(
                     categoryId = segment.id,
-                    categoryType = segment.type.name,
+                    categoryType = segment.type,
                     categoryTitle = segment.title
                 )
             )
@@ -163,280 +178,35 @@ class OffersViewModel(private val analyticsWrapper: AnalyticsWrapper) : ViewMode
         }
     }
 
+    private fun handleRefresh() = intent {
+        reduce { state.copy(isRefreshing = true) }
+
+        val location = if (state.locationPermissionGranted) getLocation() else null
+        val latitude = location?.coordinates?.latitude
+        val longitude = location?.coordinates?.longitude
+
+        offersRepository.getHomeOffers(
+            latitude = latitude,
+            longitude = longitude
+        )
+            .onSuccess { data ->
+                reduce {
+                    state.copy(
+                        categories = data.categories,
+                        specialCategories = data.specialCategories,
+                        segmentedCategories = data.segmentedCategories,
+                        offerSections = data.offerSections,
+                        isRefreshing = false
+                    )
+                }
+            }
+            .onError { error ->
+                reduce { state.copy(isRefreshing = false) }
+                postSideEffect(OffersSideEffect.ShowError(error.message))
+            }
+    }
+
     private fun handleOfferItemClicked(offerId: String) = intent {
-        postSideEffect(OffersSideEffect.NavigateToReserve)
-    }
-
-    // ==================== Mock Data ====================
-
-    private fun getMockUserInfo(): UserInfo {
-        return UserInfo(
-            id = "user_123",
-            name = "Katheryn",
-            avatarUrl = null
-        )
-    }
-
-    /**
-     * Mock API request: GET /api/v1/offers/home
-     * Returns all screen data in a single response
-     */
-    private fun getOffers(): OffersScreenDto {
-        return OffersScreenDto(
-            categories = listOf(
-                CategoryDto(id = "cat_1", type = "FOOD_CATEGORY", title = "Burger", imageUrl = ""),
-                CategoryDto(id = "cat_2", type = "FOOD_CATEGORY", title = "Pizza", imageUrl = ""),
-                CategoryDto(id = "cat_3", type = "FOOD_CATEGORY", title = "Asian", imageUrl = ""),
-                CategoryDto(id = "cat_4", type = "FOOD_CATEGORY", title = "Italian", imageUrl = ""),
-                CategoryDto(id = "cat_5", type = "FOOD_CATEGORY", title = "Bakery", imageUrl = ""),
-                CategoryDto(id = "cat_6", type = "FOOD_CATEGORY", title = "Desserts", imageUrl = "")
-            ),
-            specialCategories = listOf(
-                SpecialCategoryDto(
-                    id = "special_1",
-                    type = "DISCOUNT",
-                    title = "Special discount for Desserts",
-                    description = "Hurry to pick up from 22:00",
-                    imageUrl = ""
-                ),
-                SpecialCategoryDto(
-                    id = "special_2",
-                    type = "DISCOUNT",
-                    title = "Special discount for Pizza",
-                    description = "Hurry to pick up from 20:00",
-                    imageUrl = ""
-                ),
-                SpecialCategoryDto(
-                    id = "special_3",
-                    type = "DISCOUNT",
-                    title = "Special discount for Burgers",
-                    description = "Hurry to pick up from 19:00",
-                    imageUrl = ""
-                ),
-                SpecialCategoryDto(
-                    id = "special_4",
-                    type = "DISCOUNT",
-                    title = "Special discount for Sushi",
-                    description = "Hurry to pick up from 21:00",
-                    imageUrl = ""
-                ),
-                SpecialCategoryDto(
-                    id = "special_5",
-                    type = "DISCOUNT",
-                    title = "Special discount for Pasta",
-                    description = "Hurry to pick up from 18:00",
-                    imageUrl = ""
-                )
-            ),
-            segmentedCategories = listOf(
-                SegmentedCategoryDto(id = "nearest", type = "NEAREST", title = "Nearest"),
-                SegmentedCategoryDto(id = "top_rated", type = "TOP_RATED", title = "Top rated"),
-                SegmentedCategoryDto(id = "hot_deals", type = "HOT_DEALS", title = "Hot deals")
-            ),
-            offerSections = listOf(
-                OfferSectionDto(
-                    id = "section_top_rated",
-                    type = "TOP_RATED",
-                    title = "Top rated",
-                    offers = listOf(
-                        OfferDto(
-                            id = "offer_1",
-                            title = "Belgian Coffee",
-                            description = "Snacks and Drinks",
-                            imageUrl = null,
-                            imageBgColor = "#fff2eb",
-                            quantity = 12,
-                            originalPrice = 22.99,
-                            currentPrice = 12.99,
-                            bagType = "Small Bag",
-                            category = "Snacks and Drinks",
-                            pickupTime = "17:00 - 23:00",
-                            merchant = MerchantDto(
-                                id = "merchant_1",
-                                name = "Belgian Chocolate & Coffee",
-                                logoUrl = null,
-                                location = "1.2 km",
-                                rating = 4.9
-                            )
-                        ),
-                        OfferDto(
-                            id = "offer_2",
-                            title = "Belgian Chocolate",
-                            description = "Desserts",
-                            imageUrl = null,
-                            imageBgColor = "#fff2eb",
-                            quantity = 5,
-                            originalPrice = 18.99,
-                            currentPrice = 10.99,
-                            bagType = "Medium Bag",
-                            category = "Desserts",
-                            pickupTime = "17:00 - 23:00",
-                            merchant = MerchantDto(
-                                id = "merchant_1",
-                                name = "Belgian Chocolate & Coffee",
-                                logoUrl = null,
-                                location = "1.2 km",
-                                rating = 4.9
-                            )
-                        ),
-                        OfferDto(
-                            id = "offer_3",
-                            title = "Surprise Mix",
-                            description = "Mixed",
-                            imageUrl = null,
-                            imageBgColor = "#fff2eb",
-                            quantity = 3,
-                            originalPrice = 25.99,
-                            currentPrice = 15.99,
-                            bagType = "Large Bag",
-                            category = "Mixed",
-                            pickupTime = "17:00 - 23:00",
-                            merchant = MerchantDto(
-                                id = "merchant_1",
-                                name = "Belgian Chocolate & Coffee",
-                                logoUrl = null,
-                                location = "1.2 km",
-                                rating = 4.9
-                            )
-                        )
-                    )
-                ),
-                OfferSectionDto(
-                    id = "section_late_dinner",
-                    type = "RECOMMENDATION",
-                    title = "Top picks for late dinner",
-                    offers = listOf(
-                        OfferDto(
-                            id = "offer_4",
-                            title = "Late Night Pizza",
-                            description = "Italian",
-                            imageUrl = null,
-                            imageBgColor = "#fff2eb",
-                            quantity = 8,
-                            originalPrice = 19.99,
-                            currentPrice = 14.99,
-                            bagType = "Medium Bag",
-                            category = "Pizza",
-                            pickupTime = "21:00 - 23:30",
-                            merchant = MerchantDto(
-                                id = "merchant_2",
-                                name = "Pizza Palace",
-                                logoUrl = null,
-                                location = "0.8 km",
-                                rating = 4.7
-                            )
-                        ),
-                        OfferDto(
-                            id = "offer_5",
-                            title = "Sushi Combo",
-                            description = "Japanese",
-                            imageUrl = null,
-                            imageBgColor = "#fff2eb",
-                            quantity = 4,
-                            originalPrice = 32.99,
-                            currentPrice = 22.99,
-                            bagType = "Large Bag",
-                            category = "Sushi",
-                            pickupTime = "20:00 - 22:00",
-                            merchant = MerchantDto(
-                                id = "merchant_3",
-                                name = "Sushi Master",
-                                logoUrl = null,
-                                location = "1.5 km",
-                                rating = 4.8
-                            )
-                        )
-                    )
-                )
-            )
-        )
-    }
-
-    // ==================== DTO to Domain Mappers ====================
-
-    private fun CategoryDto.toDomain(): Category {
-        // Map imageUrl to testImage based on category title for mock
-        val testImage = when (title.lowercase()) {
-            "burger" -> Res.drawable.test_offer_category_burger
-            "pizza" -> Res.drawable.test_offer_category_pizza
-            "asian" -> Res.drawable.test_offer_category_sushi
-            else -> Res.drawable.test_offer_category_pasta
-        }
-        return Category(
-            id = id,
-            type = type,
-            title = title,
-            imageUrl = imageUrl.ifEmpty { null },
-            testImage = testImage
-        )
-    }
-
-    private fun SpecialCategoryDto.toDomain(): SpecialDiscountItem {
-        return SpecialDiscountItem(
-            id = id,
-            type = type,
-            title = title,
-            description = description,
-            imageUrl = imageUrl.ifEmpty { null },
-            testImage = Res.drawable.test_offer_item_image
-        )
-    }
-
-    private fun SegmentedCategoryDto.toDomain(): SegmentedCategory {
-        val segmentType = when (type) {
-            "NEAREST" -> SegmentedCategoryType.NEAREST
-            "TOP_RATED" -> SegmentedCategoryType.TOP_RATED
-            "HOT_DEALS" -> SegmentedCategoryType.HOT_DEALS
-            else -> SegmentedCategoryType.NEAREST
-        }
-        val (icon, iconTint) = when (segmentType) {
-            SegmentedCategoryType.NEAREST -> Res.drawable.ic_explore_24dp to 0xFFFF8B38L
-            SegmentedCategoryType.TOP_RATED -> Res.drawable.ic_star_16dp to 0xFF5AA9E7L
-            SegmentedCategoryType.HOT_DEALS -> Res.drawable.ic_mark_16dp to 0xFFAD3CDAL
-        }
-        return SegmentedCategory(
-            id = id,
-            type = segmentType,
-            title = title,
-            icon = icon,
-            iconTint = iconTint
-        )
-    }
-
-    private fun OfferSectionDto.toDomain(): OfferSection {
-        return OfferSection(
-            id = id,
-            type = type,
-            title = title,
-            offers = offers.map { it.toDomain() },
-            showSeeAll = true
-        )
-    }
-
-    private fun OfferDto.toDomain(): OfferItem {
-        return OfferItem(
-            id = id,
-            title = title,
-            description = description,
-            imageUrl = imageUrl,
-            imageBgColor = imageBgColor ?: "#fff2eb",
-            quantity = quantity,
-            originalPrice = originalPrice.toString(),
-            currentPrice = currentPrice.toString(),
-            bagType = bagType,
-            category = category,
-            pickupTime = pickupTime,
-            merchant = merchant.toDomain()
-        )
-    }
-
-    private fun MerchantDto.toDomain(): OfferMerchant {
-        return OfferMerchant(
-            id = id,
-            name = name,
-            logoUrl = logoUrl,
-            location = location,
-            rating = rating.toFloat()
-        )
+        postSideEffect(OffersSideEffect.NavigateToReserve(offerId))
     }
 }

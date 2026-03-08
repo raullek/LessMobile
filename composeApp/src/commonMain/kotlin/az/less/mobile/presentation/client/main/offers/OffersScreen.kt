@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,12 +35,20 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.ClientRoute
+import az.less.mobile.presentation.client.main.offers.components.CategoryCard
+import az.less.mobile.presentation.client.main.offers.components.FilterCategoryItem
+import az.less.mobile.presentation.client.main.offers.components.OfferCard
+import az.less.mobile.presentation.client.main.offers.components.OffersHeader
+import az.less.mobile.presentation.client.main.offers.components.OffersScreenShimmer
+import az.less.mobile.presentation.client.main.offers.components.SearchFilterBar
 import az.less.mobile.presentation.client.main.offers.components.SpecialDiscountPager
 import az.less.mobile.presentation.client.reserve.ReserveScreen
+import az.less.mobile.presentation.maps.LocationPermissionHandler
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import lessmobile.composeapp.generated.resources.action_see_all
+import lessmobile.composeapp.generated.resources.offers_greeting_guest
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -47,10 +56,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-/**
- * Stateful OffersScreen that connects to ViewModel
- * This is the entry point used by navigation
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OffersScreen(
@@ -60,13 +65,21 @@ fun OffersScreen(
     val state by viewModel.collectAsState()
     val scope = rememberCoroutineScope()
 
-    // Reserve bottom sheet state
     var isReserveBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var selectedOfferId by rememberSaveable { mutableStateOf("") }
     val reserveSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
 
-    // Collect side effects for navigation
+    LocationPermissionHandler(
+        onPermissionGranted = {
+            viewModel.onIntent(OffersIntent.OnLocationPermissionChanged(granted = true))
+        },
+        onPermissionDenied = {
+            viewModel.onIntent(OffersIntent.OnLocationPermissionChanged(granted = false))
+        }
+    ) {}
+
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is OffersSideEffect.NavigateToOfferDetail -> {
@@ -88,6 +101,7 @@ fun OffersScreen(
             }
 
             is OffersSideEffect.NavigateToReserve -> {
+                selectedOfferId = sideEffect.offerId
                 isReserveBottomSheetVisible = true
                 scope.launch {
                     reserveSheetState.expand()
@@ -97,21 +111,18 @@ fun OffersScreen(
             is OffersSideEffect.ShowError -> {
                 // Show error snackbar
             }
-            // }
         }
     }
 
-    // Render the stateless UI
     OffersScreenContent(
         state = state,
         onIntent = viewModel::onIntent
     )
 
-    // Reserve Bottom Sheet
     ReserveScreen(
         isVisible = isReserveBottomSheetVisible,
         sheetState = reserveSheetState,
-        viewModel = koinViewModel (),
+        offerId = selectedOfferId,
         onDismiss = {
             scope.launch {
                 reserveSheetState.hide()
@@ -120,7 +131,6 @@ fun OffersScreen(
             }
         },
         onOrderPlaced = { orderInfo ->
-            // Navigate to Order Accepted screen
             navController.navigate(
                 ClientRoute.OrderAccepted(
                     orderNumber = orderInfo.orderNumber,
@@ -130,16 +140,11 @@ fun OffersScreen(
             )
         },
         onNavigateToMerchant = { merchantId ->
-            // Navigate to Merchant screen
             navController.navigate(ClientRoute.Merchant(merchantId = merchantId))
         }
     )
 }
 
-/**
- * Stateless OffersScreen UI implementation
- * Pure UI that receives state and emits intents
- */
 @Composable
 fun OffersScreenContent(
     state: OffersState,
@@ -152,105 +157,103 @@ fun OffersScreenContent(
             .background(LessTheme.colors.backgroundSecond)
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(bottom = LessTheme.size.large) // Space for bottom nav bar
+            .padding(bottom = LessTheme.size.large)
     ) {
-        // Fixed Header Section
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
-        // Header with User Avatar, Name, and Notification Buttons
-        _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.OffersHeader(
-            userName = state.userName,
-            onNotificationClick = { /* Handle notification */ },
-            onMessageClick = { /* Handle message */ },
+        OffersHeader(
+            userName = state.userName ?: stringResource(Res.string.offers_greeting_guest),
+            onNotificationClick = { },
+            onMessageClick = { },
             userAvatarUrl = state.userAvatarUrl
         )
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
-        // Search and Filter Bar
-        _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.SearchFilterBar(
+        SearchFilterBar(
             searchQuery = state.searchQuery,
             onSearchClick = {
                 onIntent(OffersIntent.OnSearchClicked)
             },
-            onFilterClick = { /* Handle filter */ }
+            onFilterClick = { }
         )
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
-        // Scrollable Content
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Horizontal Categories Section
-            item(key = "categories") {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(start = LessTheme.spacing.medium),
-                    horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
-                ) {
-                    items(
-                        items = state.categories,
-                        key = { category -> category.id }
-                    ) { category ->
-                        _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.CategoryCard(
-                            title = category.title,
-                            onClick = {
-                                onIntent(
-                                    OffersIntent.OnCategorySelected(
-                                        category.id
-                                    )
+        if (state.isLoading) {
+            OffersScreenShimmer(
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onIntent(OffersIntent.OnRefresh) },
+                modifier = Modifier.fillMaxSize()
+            ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Categories Section
+                if (state.categories.isNotEmpty()) {
+                    item(key = "categories") {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(start = LessTheme.spacing.medium),
+                            horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
+                        ) {
+                            items(
+                                items = state.categories,
+                                key = { category -> category.id }
+                            ) { category ->
+                                CategoryCard(
+                                    title = category.title,
+                                    onClick = {
+                                        onIntent(OffersIntent.OnCategorySelected(category.id))
+                                    },
+                                    imageUrl = category.imageUrl
                                 )
-                            },
-                            imageUrl = category.imageUrl,
-                            testImage = category.testImage
-                        )
+                            }
+                        }
+                    }
+
+                    item(key = "categories_spacing") {
+                        Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
                     }
                 }
-            }
 
-            item(key = "categories_spacing") {
-                Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge)) // 32 + 12 = 44dp
-            }
+                // Special Discounts Section
+                if (state.specialCategories.isNotEmpty()) {
+                    item(key = "special_discounts") {
+                        SpecialDiscountPager(
+                            items = state.specialCategories,
+                            onItemClick = { item ->
+                                onIntent(OffersIntent.OnSpecialCategoryClicked(item.id))
+                            }
+                        )
+                    }
 
-            // Special Discounts Section with Horizontal Pager
-            if (state.specialDiscounts.isNotEmpty()) {
-                item(key = "special_discounts") {
-                    SpecialDiscountPager(
-                        items = state.specialDiscounts,
-                        onItemClick = { item ->
-                            onIntent(
-                                OffersIntent.OnSpecialCategoryClicked(
-                                    item.id
-                                )
-                            )
-                        }
-                    )
+                    item(key = "special_discounts_spacing") {
+                        Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+                    }
                 }
-                
-                item(key = "special_discounts_spacing") {
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-                }
-            }
 
-            // Segmented Categories Section (Filter Segments)
-            if (state.segmentedCategories.isNotEmpty()) {
-                item(key = "segmented_categories") {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = LessTheme.spacing.medium),
-                        horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
-                    ) {
-                        state.segmentedCategories.forEach { segment ->
-                            segment.icon?.let { icon ->
-                                _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.FilterCategoryItem(
+                // Segmented Categories Section
+                if (state.segmentedCategories.isNotEmpty()) {
+                    item(key = "segmented_categories") {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = LessTheme.spacing.medium),
+                            horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
+                        ) {
+                            state.segmentedCategories.forEach { segment ->
+                                FilterCategoryItem(
                                     modifier = Modifier.weight(1f),
                                     text = segment.title,
-                                    icon = vectorResource(icon),
-                                    iconTint = _root_ide_package_.androidx.compose.ui.graphics.Color(
-                                        segment.iconTint ?: 0xFF000000L
-                                    ),
+                                    icon = segment.icon?.let { vectorResource(it) },
+                                    iconTint = segment.iconTint?.let {
+                                        androidx.compose.ui.graphics.Color(it)
+                                    } ?: LessTheme.colors.textIconsBrand,
                                     onItemClick = {
                                         onIntent(OffersIntent.OnSegmentSelected(segment.id))
                                     }
@@ -258,97 +261,91 @@ fun OffersScreenContent(
                             }
                         }
                     }
+
+                    item(key = "segmented_categories_spacing") {
+                        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
+                    }
                 }
 
-                item(key = "segmented_categories_spacing") {
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-                }
-            }
-
-            // Dynamic Offer Sections (Top rated, Top picks, etc.)
-            state.offerSections.forEach { section ->
-                // Section Header
-                item(key = "${section.id}_header") {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = LessTheme.spacing.medium)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = section.title,
-                                style = LessTheme.typography.body16Semibold,
-                                color = LessTheme.colors.textIconsBlack
-                            )
-
-                            if (section.showSeeAll) {
+                // Dynamic Offer Sections
+                state.offerSections.forEach { section ->
+                    if (section.offers.isNotEmpty()) {
+                        item(key = "${section.id}_header") {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = LessTheme.spacing.medium)
+                            ) {
                                 Row(
+                                    modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.clickable {
-                                        onIntent(OffersIntent.OnSeeAllClicked(section.id))
-                                    }
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Text(
-                                        text = stringResource(Res.string.action_see_all),
+                                        text = section.title,
                                         style = LessTheme.typography.body16Semibold,
-                                        color = LessTheme.colors.textIconsBrand
+                                        color = LessTheme.colors.textIconsBlack
                                     )
-                                    Icon(
-                                        painter = painterResource(Res.drawable.ic_chevron_right_24dp),
-                                        contentDescription = stringResource(Res.string.action_see_all),
-                                        tint = LessTheme.colors.textIconsBrand,
-                                        modifier = Modifier.padding(start = LessTheme.spacing.xxxSmall)
+
+                                    if (section.showSeeAll) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.clickable {
+                                                onIntent(OffersIntent.OnSeeAllClicked(section.id))
+                                            }
+                                        ) {
+                                            Text(
+                                                text = stringResource(Res.string.action_see_all),
+                                                style = LessTheme.typography.body16Semibold,
+                                                color = LessTheme.colors.textIconsBrand
+                                            )
+                                            Icon(
+                                                painter = painterResource(Res.drawable.ic_chevron_right_24dp),
+                                                contentDescription = stringResource(Res.string.action_see_all),
+                                                tint = LessTheme.colors.textIconsBrand,
+                                                modifier = Modifier.padding(start = LessTheme.spacing.xxxSmall)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        item(key = "${section.id}_spacing") {
+                            Spacer(modifier = Modifier.height(LessTheme.spacing.small + LessTheme.spacing.xSmall))
+                        }
+
+                        item(key = "${section.id}_items") {
+                            LazyRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium),
+                                contentPadding = PaddingValues(horizontal = LessTheme.spacing.medium)
+                            ) {
+                                items(
+                                    items = section.items,
+                                    key = { item -> "${section.id}_${item.id}" }
+                                ) { offerItem ->
+                                    OfferCard(
+                                        offerItem = offerItem,
+                                        onClick = {
+                                            onIntent(OffersIntent.OnOfferItemClicked(offerItem.id))
+                                        }
                                     )
                                 }
                             }
                         }
-                    }
-                }
 
-                item(key = "${section.id}_spacing") {
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.small + LessTheme.spacing.xSmall)) // 12 + 8 = 20dp
-                }
-
-                // Section Items - Horizontal Scrolling Cards
-                item(key = "${section.id}_items") {
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium),
-                        contentPadding = PaddingValues(horizontal = LessTheme.spacing.medium)
-                    ) {
-                        items(
-                            items = section.items,
-                            key = { item -> "${section.id}_${item.id}" }
-                        ) { offerItem ->
-                            _root_ide_package_.az.less.mobile.presentation.client.main.offers.components.OfferCard(
-                                offerItem = offerItem,
-                                onClick = {
-                                    onIntent(
-                                        OffersIntent.OnOfferItemClicked(
-                                            offerItem.id
-                                        )
-                                    )
-                                }
-                            )
+                        item(key = "${section.id}_bottom_spacing") {
+                            Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge + LessTheme.spacing.small))
                         }
                     }
                 }
 
-                item(key = "${section.id}_bottom_spacing") {
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge + LessTheme.spacing.small)) // 32 + 12 = 44dp
+                item(key = "bottom_spacing") {
+                    Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
                 }
             }
-
-            // Bottom spacing
-            item(key = "bottom_spacing") {
-                Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
             }
         }
     }
 }
-
-

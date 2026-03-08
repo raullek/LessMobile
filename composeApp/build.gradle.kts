@@ -68,6 +68,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.auth)
             implementation(libs.ktor.serialization.kotlinx.json)
 
             // Sandwich - API Response Handling
@@ -103,6 +104,10 @@ kotlin {
 
             // ImagePickerKMP - Cross-platform Image Picker & Camera
             implementation(libs.imagepickerkmp)
+
+            // Paging 3 - Pagination
+            implementation(libs.paging.common)
+            implementation(libs.paging.compose)
 
             // Compass - Geocoding, Location, Autocomplete
             implementation(libs.compass.autocomplete)
@@ -159,7 +164,6 @@ android {
             dimension = "variant"
             isDefault = true
             applicationIdSuffix = ".dev"
-            versionNameSuffix = "-dev"
             resValue("string", "app_name", "Config Sample Dev")
         }
 

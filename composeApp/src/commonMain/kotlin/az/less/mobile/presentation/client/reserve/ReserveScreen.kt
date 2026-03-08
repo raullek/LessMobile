@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.client.reserve
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +25,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,17 +35,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
-import az.less.mobile.presentation.client.reserve.components.SelectPaymentMethodBottomSheet
-import az.less.mobile.presentation.client.reserve.models.OrderAccepted
-import kotlinx.coroutines.launch
+import az.less.mobile.utils.formatPrice
 import az.less.mobile.presentation.client.reserve.components.LotSizeInfoBottomSheet
+import az.less.mobile.presentation.client.reserve.components.ReserveScreenShimmer
+import az.less.mobile.presentation.client.reserve.components.SelectPaymentMethodBottomSheet
 import az.less.mobile.presentation.client.reserve.components.SelectVoucherBottomSheet
+import az.less.mobile.presentation.client.reserve.models.OrderAccepted
+import coil3.compose.AsyncImage
+import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_down24dp
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
@@ -54,7 +58,6 @@ import lessmobile.composeapp.generated.resources.ic_gift_24dp
 import lessmobile.composeapp.generated.resources.ic_info_24dp
 import lessmobile.composeapp.generated.resources.ic_minus_24dp
 import lessmobile.composeapp.generated.resources.ic_plus_24dp
-import lessmobile.composeapp.generated.resources.test_merchant_logo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -70,6 +73,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun ReserveScreen(
     isVisible: Boolean,
     sheetState: SheetState,
+    offerId: String,
     onDismiss: () -> Unit,
     onOrderPlaced: (OrderAccepted) -> Unit = {},
     onNavigateToMerchant: (String) -> Unit = {},
@@ -77,7 +81,14 @@ fun ReserveScreen(
 ) {
     val state by viewModel.collectAsState()
     val scope = rememberCoroutineScope()
-    
+
+    // Initialize with offerId
+    LaunchedEffect(offerId) {
+        if (offerId.isNotEmpty()) {
+            viewModel.onIntent(ReserveIntent.Initialize(offerId))
+        }
+    }
+
     // Payment method selection bottom sheet state
     var isPaymentBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     val paymentSheetState = rememberModalBottomSheetState(
@@ -93,7 +104,7 @@ fun ReserveScreen(
     val voucherSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    
+
     // Collect side effects
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -124,7 +135,7 @@ fun ReserveScreen(
             }
         }
     }
-    
+
     // Only render ModalBottomSheet when visible
     if (isVisible) {
         ModalBottomSheet(
@@ -165,17 +176,21 @@ fun ReserveScreen(
                         contentDescription ="")
                 }
             }
-            
-            ReserveScreenContent(
-                state = state,
-                onIntent = viewModel::onIntent,
-                onBackClicked = {
-                    viewModel.onIntent(ReserveIntent.OnBackClicked)
-                }
-            )
+
+            if (state.isLoading) {
+                ReserveScreenShimmer()
+            } else {
+                ReserveScreenContent(
+                    state = state,
+                    onIntent = viewModel::onIntent,
+                    onBackClicked = {
+                        viewModel.onIntent(ReserveIntent.OnBackClicked)
+                    }
+                )
+            }
         }
     }
-    
+
     // Payment Method Selection Bottom Sheet
     SelectPaymentMethodBottomSheet(
         isVisible = isPaymentBottomSheetVisible,
@@ -236,7 +251,7 @@ private fun ReserveScreenContent(
             .fillMaxWidth()
             .padding(LessTheme.spacing.medium) // Inner padding
     ) {
-        
+
         // Header with venue info
         Column(
             modifier = Modifier
@@ -273,9 +288,9 @@ private fun ReserveScreenContent(
                 color = LessTheme.colors.textIconsBlack
             )
         }
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-        
+
         // Divider
         Box(
             modifier = Modifier
@@ -283,9 +298,9 @@ private fun ReserveScreenContent(
                 .height(1.dp)
                 .background(LessTheme.colors.elementsSecondaryElement)
         )
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-        
+
         // Quantity selector
         Column(
             modifier = Modifier
@@ -310,20 +325,21 @@ private fun ReserveScreenContent(
                        tint = LessTheme.colors.textIconsBrand,
                        contentDescription = "back_icon")
                 }
-                
+
                 Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
-                
+
                 // Quantity display
                 Text(
+                    modifier = Modifier.width(48.dp),
                     text = state.quantity.toString(),
                     style = LessTheme.typography.display36Semibold,
                     color = LessTheme.colors.textIconsBlack,
-                    modifier = Modifier.width(30.dp),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
                 )
-                
+
                 Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
-                
+
                 // Increment button
                 FilledIconButton(
                     onClick = { onIntent(ReserveIntent.OnIncrementQuantity) },
@@ -338,9 +354,9 @@ private fun ReserveScreenContent(
                       contentDescription = "plus")
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-            
+
             // Items left text
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -353,9 +369,9 @@ private fun ReserveScreenContent(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-        
+
         // Divider
         Box(
             modifier = Modifier
@@ -363,9 +379,9 @@ private fun ReserveScreenContent(
                 .height(1.dp)
                 .background(LessTheme.colors.elementsSecondaryElement)
         )
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-        
+
         // See more deals section
         Row(
             modifier = Modifier
@@ -373,24 +389,26 @@ private fun ReserveScreenContent(
                 .clickable { onIntent(ReserveIntent.OnSeeMoreDealsClicked) },
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Venue image placeholder
+            // Venue image
             Box(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(LessTheme.radius.small))
                     .background(LessTheme.colors.elementsSecondaryElement)
             ){
-                Image(
-                    painter = painterResource(Res.drawable.test_merchant_logo),
+                AsyncImage(
+                    model = state.venueLogoUrl,
+                    contentDescription = state.venueName,
                     modifier = Modifier.fillMaxSize(),
-                    contentDescription = "")
+                    contentScale = ContentScale.Crop
+                )
             }
-            
+
             Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Belgian Coffee",
+                    text = state.venueName,
                     style = LessTheme.typography.body16Semibold,
                     color = LessTheme.colors.textIconsBlack
                 )
@@ -401,7 +419,7 @@ private fun ReserveScreenContent(
                     color = LessTheme.colors.textIconsGrey
                 )
             }
-            
+
             Icon(
                 imageVector = vectorResource(Res.drawable.ic_chevron_right_24dp),
                 contentDescription = "See more",
@@ -409,7 +427,7 @@ private fun ReserveScreenContent(
                 modifier = Modifier.size(24.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
 
         Row(
@@ -451,7 +469,7 @@ private fun ReserveScreenContent(
         }
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-        
+
         // Price breakdown
         Column(
             modifier = Modifier
@@ -460,28 +478,20 @@ private fun ReserveScreenContent(
             // Price per piece
             PriceRow(
                 label = "Price per piece",
-                value = "${state.pricePerPiece} ₼"
+                value = "${state.pricePerPiece.formatPrice()} ₼"
             )
-            
+
             Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-            
-            // Service fee
-            PriceRow(
-                label = "Service fee",
-                value = "${state.serviceFee} ₼"
-            )
-            
-            Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-            
+
             // Subtotal
             PriceRow(
                 label = "Subtotal",
-                value = "${state.subtotal} ₼",
+                value = "${state.subtotal.formatPrice()} ₼",
             )
         }
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-        
+
         // Payment method selector
         Box(
             modifier = Modifier
@@ -506,16 +516,16 @@ private fun ReserveScreenContent(
                             .clip(RoundedCornerShape(LessTheme.radius.small))
                             .background(LessTheme.colors.elementsSecondaryElement)
                     )
-                    
+
                     Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
-                    
+
                     Text(
                         text = state.paymentMethodDisplay.ifEmpty { "Select payment method" },
                         style = LessTheme.typography.body16Regular,
                         color = LessTheme.colors.textIconsBlack
                     )
                 }
-                
+
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_chevron_down24dp),
                     contentDescription = "Select payment",
@@ -524,9 +534,9 @@ private fun ReserveScreenContent(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-        
+
         // Reserve and pay button
         DsButton(
             text = "Reserve and pay",
@@ -536,7 +546,7 @@ private fun ReserveScreenContent(
             variant = ButtonVariant.Primary,
             size = ButtonSize.Large
         )
-        
+
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
     }
 }
