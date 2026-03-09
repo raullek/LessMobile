@@ -21,7 +21,12 @@ data class MerchMoreState(
     val sections: List<MerchMoreSection> = emptyList(),
     // Bottom sheets
     val showContactUsBottomSheet: Boolean = false,
-    val showTermsBottomSheet: Boolean = false
+    val showTermsBottomSheet: Boolean = false,
+    // Terms content
+    val termsTitle: String? = null,
+    val termsContent: String? = null,
+    val isTermsHtml: Boolean = false,
+    val isTermsLoading: Boolean = false
 )
 
 /**
@@ -29,6 +34,7 @@ data class MerchMoreState(
  */
 sealed interface MerchMoreSideEffect {
     data object NavigateToPlaces : MerchMoreSideEffect
+    data object NavigateToClientFlow : MerchMoreSideEffect
     data object Logout : MerchMoreSideEffect
     data class ShowError(val message: String) : MerchMoreSideEffect
 }

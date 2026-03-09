@@ -64,8 +64,10 @@ fun MerchMoreScreen(
             is MerchMoreSideEffect.NavigateToPlaces -> {
                 navController.navigate(MerchantRoute.Places)
             }
+            is MerchMoreSideEffect.NavigateToClientFlow -> {
+                navigateToClientFlow.invoke()
+            }
             is MerchMoreSideEffect.Logout -> {
-                // TODO: Handle logout - clear session and navigate to login
                 navigateToClientFlow.invoke()
             }
             is MerchMoreSideEffect.ShowError -> {
@@ -125,21 +127,19 @@ fun MerchMoreScreen(
 
     // Terms & Conditions Bottom Sheet
     if (state.showTermsBottomSheet) {
-        val termsContent = """
-            1 Header
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-
-            1.1 Header
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-
-            Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-        """.trimIndent()
+        val displayContent = if (state.isTermsLoading) {
+            ""
+        } else {
+            if (state.isTermsHtml) {
+                stripHtmlTags(state.termsContent.orEmpty())
+            } else {
+                state.termsContent.orEmpty()
+            }
+        }
 
         DsTextBottomSheet(
-            title = stringResource(Res.string.terms_title),
-            content = termsContent,
+            title = state.termsTitle ?: stringResource(Res.string.terms_title),
+            content = displayContent,
             onDismiss = {
                 viewModel.onIntent(MerchMoreIntent.OnTermsDismiss)
             }
@@ -234,4 +234,21 @@ fun MerchMoreScreenContent(
             Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
         }
     }
+}
+
+private fun stripHtmlTags(html: String): String {
+    return html
+        .replace(Regex("<br\\s*/?>"), "\n")
+        .replace(Regex("</p>"), "\n\n")
+        .replace(Regex("</div>"), "\n")
+        .replace(Regex("</li>"), "\n")
+        .replace(Regex("<li[^>]*>"), "- ")
+        .replace(Regex("<[^>]+>"), "")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&nbsp;", " ")
+        .replace(Regex("\n{3,}"), "\n\n")
+        .trim()
 }

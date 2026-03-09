@@ -29,6 +29,10 @@ data class ReserveState(
     val selectedPaymentCard: PaymentCard? = null,
     val availablePaymentCards: List<PaymentCard> = emptyList(),
     val isLoading: Boolean = false,
+    val isPaymentLoading: Boolean = false,
+    val isPaymentCardsLoading: Boolean = false,
+    val isRegisterCardLoading: Boolean = false,
+    val isPaymentSheetVisible: Boolean = false,
     val error: String? = null,
     val isLotSizeInfoVisible: Boolean = false,
     val lotSizeInfoList: List<LotSizeInfo> = emptyList(),
@@ -46,7 +50,7 @@ data class ReserveState(
  */
 sealed interface ReserveSideEffect {
     data object NavigateBack : ReserveSideEffect
-    data object NavigateToPaymentMethods : ReserveSideEffect
+    data class OpenRedirectUrl(val url: String) : ReserveSideEffect
     data object NavigateToAddressSelection : ReserveSideEffect
     data class ShowError(val message: String) : ReserveSideEffect
     data class OrderPlaced(val orderInfo: OrderAccepted) : ReserveSideEffect
@@ -70,4 +74,6 @@ sealed interface ReserveIntent {
     data object OnSelectVoucherClicked : ReserveIntent
     data class OnVoucherSelected(val voucher: Voucher) : ReserveIntent
     data object OnVoucherBottomSheetDismissed : ReserveIntent
+    data object OnAddNewCardClicked : ReserveIntent
+    data object OnPaymentSheetDismissed : ReserveIntent
 }

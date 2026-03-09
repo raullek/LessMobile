@@ -72,3 +72,17 @@ data class FavoritesPaginationDto(
     val hasNext: Boolean = false,
     val hasPrev: Boolean = false
 )
+
+@Serializable
+data class AddFavoriteRequest(val venueId: String)
+
+@Serializable
+data class AddFavoriteResponse(
+    val id: String,
+    val type: String,
+    val itemId: String,
+    val createdAt: String? = null
+)
+
+@Serializable
+data class RemoveFavoriteResponse(val message: String)

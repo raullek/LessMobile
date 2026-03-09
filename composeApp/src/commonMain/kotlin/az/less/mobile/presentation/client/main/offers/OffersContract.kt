@@ -1,8 +1,8 @@
 package az.less.mobile.presentation.client.main.offers
 
 import az.less.mobile.presentation.client.main.offers.models.Category
+import az.less.mobile.presentation.client.main.offers.models.HomepageButton
 import az.less.mobile.presentation.client.main.offers.models.OfferSection
-import az.less.mobile.presentation.client.main.offers.models.SegmentedCategory
 import az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem
 import az.less.mobile.presentation.client.main.offers.models.UserInfo
 
@@ -12,8 +12,8 @@ data class OffersState(
 
     val categories: List<Category> = emptyList(),
     val specialCategories: List<SpecialDiscountItem> = emptyList(),
-    val segmentedCategories: List<SegmentedCategory> = emptyList(),
-    val offerSections: List<OfferSection> = emptyList(),
+    val homepageButtons: List<HomepageButton> = emptyList(),
+    val specialSegments: List<OfferSection> = emptyList(),
     val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
 
@@ -34,7 +34,8 @@ sealed interface OffersSideEffect {
     data class NavigateToCategoryOffers(
         val categoryId: String,
         val categoryType: String,
-        val categoryTitle: String
+        val categoryTitle: String,
+        val filtersJson: String
     ) : OffersSideEffect
 }
 
@@ -44,7 +45,7 @@ sealed interface OffersIntent {
     data object OnSearchClicked : OffersIntent
     data class OnCategorySelected(val categoryId: String) : OffersIntent
     data class OnSpecialCategoryClicked(val specialCategoryId: String) : OffersIntent
-    data class OnSegmentSelected(val segmentId: String) : OffersIntent
+    data class OnHomepageButtonClicked(val buttonId: String) : OffersIntent
     data class OnOfferItemClicked(val offerId: String) : OffersIntent
     data class OnSeeAllClicked(val sectionId: String) : OffersIntent
     data object OnRefresh : OffersIntent

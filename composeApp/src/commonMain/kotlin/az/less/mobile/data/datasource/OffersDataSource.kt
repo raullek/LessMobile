@@ -1,12 +1,19 @@
 package az.less.mobile.data.datasource
 
 import az.less.mobile.data.remote.model.BoxDetailDto
+import az.less.mobile.data.remote.model.DefaultPaymentDto
 import az.less.mobile.data.remote.model.OffersScreenDto
+import az.less.mobile.data.remote.model.PaymentMethodsDto
+import az.less.mobile.data.remote.model.RegisterCardDto
+import az.less.mobile.network.ApiError
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.network.safeApiCall
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.url
+import io.ktor.http.isSuccess
 
 class OffersDataSource(
     private val httpClient: HttpClient
@@ -28,6 +35,39 @@ class OffersDataSource(
     suspend fun getBoxDetail(boxId: String): NetworkResult<BoxDetailDto> {
         return safeApiCall {
             httpClient.get("v1/boxes/$boxId")
+        }
+    }
+
+    suspend fun getDefaultPayment(): NetworkResult<DefaultPaymentDto> {
+        return safeApiCall {
+            httpClient.get("v1/payments/default")
+        }
+    }
+
+    suspend fun getPaymentMethods(): NetworkResult<PaymentMethodsDto> {
+        return safeApiCall {
+            httpClient.get("v1/payments/methods")
+        }
+    }
+
+    suspend fun registerCard(): NetworkResult<RegisterCardDto> {
+        return safeApiCall {
+            httpClient.post("v1/payments/cards/register")
+        }
+    }
+
+    suspend fun verifyCard(callbackUrl: String): NetworkResult<Boolean> {
+        return try {
+            val response = httpClient.get {
+                url(callbackUrl)
+            }
+            if (response.status.isSuccess()) {
+                NetworkResult.Success(data = true, message = "Card verified")
+            } else {
+                NetworkResult.Error(ApiError(message = "Card verification failed"))
+            }
+        } catch (e: Exception) {
+            NetworkResult.Error(ApiError(message = e.message ?: "Network error"))
         }
     }
 }

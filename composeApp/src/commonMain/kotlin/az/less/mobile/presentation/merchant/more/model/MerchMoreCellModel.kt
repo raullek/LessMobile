@@ -11,7 +11,8 @@ enum class MerchCellId {
     Notification,
     DarkMode,
     ContactUs,
-    TermsOfService
+    TermsOfService,
+    SwitchToClient
 }
 
 /**

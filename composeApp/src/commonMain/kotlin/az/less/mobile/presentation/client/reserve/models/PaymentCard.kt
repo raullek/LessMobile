@@ -7,6 +7,8 @@ data class PaymentCard(
     val id: String,
     val type: CardType,
     val lastFourDigits: String,
+    val brand: String = "",
+    val displayName: String = "",
     val isSelected: Boolean = false
 )
 
@@ -18,5 +20,3 @@ enum class CardType {
     VISA,
     ADD_NEW
 }
-
-

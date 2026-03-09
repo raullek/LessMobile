@@ -298,54 +298,51 @@ private fun CustomMerchantMarker(
 ) {
     val markerSize = if (isSelected) 40.dp else 36.dp
     val shape = RoundedCornerShape(12.dp)
-    val badgeSize = 16.dp
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.size(markerSize)
-    ) {
-            val painter = if (logoBitmap != null) {
-                BitmapPainter(logoBitmap)
-            } else {
-                painterResource(Res.drawable.ill_venue_placeholder)
-            }
-            Image(
-                painter = painter,
-                contentDescription = title ?: "Merchant marker",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(markerSize)
-                    .clip(shape)
-                    .then(
-                        if (isSelected) {
-                            Modifier.border(
-                                width = 2.dp,
-                                color = LessTheme.colors.textIconsBrand,
-                                shape = shape
-                            )
-                        } else {
-                            Modifier
-                        }
-                    )
-            )
-        
+    Box {
+        val painter = if (logoBitmap != null) {
+            BitmapPainter(logoBitmap)
+        } else {
+            painterResource(Res.drawable.ill_venue_placeholder)
+        }
+        Image(
+            painter = painter,
+            contentDescription = title ?: "Merchant marker",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .padding(top = 8.dp, end = 8.dp)
+                .size(markerSize)
+                .clip(shape)
+                .then(
+                    if (isSelected) {
+                        Modifier.border(
+                            width = 2.dp,
+                            color = LessTheme.colors.textIconsBrand,
+                            shape = shape
+                        )
+                    } else {
+                        Modifier
+                    }
+                )
+        )
+
         // Slot count badge in top-right corner (based on Figma design)
         if (slotCount > 1) {
             Box(
                 modifier = Modifier
-                    .size(badgeSize)
-                    .offset(x = (12).dp, y = (-12).dp) // Position in top-right
+                    .align(Alignment.TopEnd)
                     .background(
                         color = LessTheme.colors.textIconsBrand,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .padding(horizontal = 4.dp),
+                    .padding(horizontal = 4.dp, vertical = 1.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = slotCount.toString(),
                     style = LessTheme.typography.caption12Regular,
-                    color = LessTheme.colors.textIconsNested
+                    color = LessTheme.colors.textIconsNested,
+                    maxLines = 1
                 )
             }
         }

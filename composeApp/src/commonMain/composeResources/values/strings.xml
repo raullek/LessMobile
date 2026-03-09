@@ -130,6 +130,7 @@
     <string name="payment_delete_google_pay">Delete Google Pay</string>
     <string name="payment_delete_card">Delete Card</string>
     <string name="payment_delete_confirmation">Are you sure to delete this card from app, after deleting you should select other card for payment</string>
+    <string name="payment_continue">Continue</string>
 
     <!-- Add New Card Screen -->
     <string name="add_card_title">Add new card</string>
@@ -141,6 +142,10 @@
 
     <!-- Voucher Screen -->
     <string name="voucher_title">Voucher</string>
+
+    <!-- Search Screen -->
+    <string name="search_items_on_sale">%1$d items on sale</string>
+    <string name="search_no_active_offer">No active offer</string>
 
     <!-- Category Offers Screen -->
     <string name="category_offers_empty">No offers available</string>
@@ -229,6 +234,8 @@
     <!-- Merchant More Screen -->
     <string name="merch_more_places">Places</string>
     <string name="merch_more_dark_mode">Dark mode</string>
+    <string name="more_switch_to_merchant">Switch to Merchant</string>
+    <string name="more_switch_to_client">Switch to Client</string>
 
     <!-- Merchant Orders Screen -->
     <string name="merch_orders_awaiting_pickup">Awaiting Pickup</string>

@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,28 +24,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.navOptions
+import androidx.paging.compose.collectAsLazyPagingItems
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.offers.components.CategoryCard
 import az.less.mobile.presentation.client.main.search.components.SearchHeader
 import az.less.mobile.presentation.client.main.search.components.SearchInputBar
-import az.less.mobile.presentation.client.main.search.components.SearchOfferCard
+import az.less.mobile.presentation.client.main.search.components.SearchVenueCard
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-/**
- * Stateful SearchScreen that connects to ViewModel
- * This is the entry point used by navigation
- */
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel(),
     navController: NavController
 ) {
     val state by viewModel.collectAsState()
-    
-    // Collect side effects for navigation
+    val lazyPagingItems = viewModel.searchResults.collectAsLazyPagingItems()
+
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is SearchSideEffect.NavigateToCategoryOffers -> {
@@ -74,71 +70,48 @@ fun SearchScreen(
                     }
                 )
             }
+            is SearchSideEffect.NavigateToMerchantProfile -> {
+                navController.navigate(
+                    ClientRoute.Merchant(merchantId = sideEffect.merchantId)
+                )
+            }
         }
     }
-    
-    // Render the stateless UI
-    SearchScreenContent(
-        state = state,
-        onIntent = viewModel::onIntent,
-        onBackClick = { navController.popBackStack() }
-    )
-}
 
-/**
- * Stateless SearchScreen UI implementation
- * Pure UI that receives state and emits intents
- */
-@Composable
-fun SearchScreenContent(
-    state: SearchState,
-    onIntent: (SearchIntent) -> Unit,
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(LessTheme.colors.backgroundSecond)
             .windowInsetsPadding(WindowInsets.statusBars)
             .clip(RoundedCornerShape(36.dp))
     ) {
-        // Header Section - matching OffersScreen spacing
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
         SearchHeader(
-            onBackClick = {
-                onIntent(SearchIntent.OnBackClicked)
-            },
+            onBackClick = { viewModel.onIntent(SearchIntent.OnBackClicked) },
             modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
         )
-        
-        Spacer(modifier = Modifier.height(LessTheme.spacing.medium+LessTheme.spacing.xxSmall))
-        
-        // Search Input Bar
+
+        Spacer(modifier = Modifier.height(LessTheme.spacing.medium + LessTheme.spacing.xxSmall))
+
         SearchInputBar(
             searchQuery = state.searchQuery,
             onSearchQueryChanged = { query ->
-                onIntent(
-                    SearchIntent.OnSearchQueryChanged(
-                        query
-                    )
-                )
+                viewModel.onIntent(SearchIntent.OnSearchQueryChanged(query))
             },
-            onMapClicked = {
-                onIntent(SearchIntent.OnMapClicked)
-            },
+            onMapClicked = { viewModel.onIntent(SearchIntent.OnMapClicked) },
             modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
         )
-        
-        // Show categories only when there are no search results (offers list is empty)
-        if (state.offers.isEmpty()) {
-            // Categories Grid - Fixed 2 rows
+
+        val hasResults = state.searchQuery.isNotBlank() && lazyPagingItems.itemCount > 0
+
+        if (!hasResults) {
+            // Categories Grid
             LazyVerticalGrid(
                 columns = GridCells.Fixed(4),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = LessTheme.spacing.medium), // Adjust height to fit 2 rows
+                    .padding(top = LessTheme.spacing.medium),
                 horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small),
                 verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall),
                 contentPadding = PaddingValues(horizontal = LessTheme.spacing.medium)
@@ -151,22 +124,17 @@ fun SearchScreenContent(
                         CategoryCard(
                             title = category.title,
                             onClick = {
-                                onIntent(
-                                    SearchIntent.OnCategorySelected(
-                                        category.id
-                                    )
-                                )
+                                viewModel.onIntent(SearchIntent.OnCategorySelected(category.id))
                             },
                         )
                     }
                 }
             }
         }
-        
-        // Search Results - LazyColumn for offers
-        if (state.offers.isNotEmpty()) {
+
+        if (state.searchQuery.isNotBlank()) {
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
-            
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,22 +147,20 @@ fun SearchScreenContent(
                 verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
             ) {
                 items(
-                    items = state.offers,
-                    key = { offer -> offer.id }
-                ) { offer ->
-                    SearchOfferCard(
-                        offer = offer,
-                        onClick = {
-                            onIntent(
-                                SearchIntent.OnOfferClicked(
-                                    offer.id
-                                )
-                            )
-                        }
-                    )
+                    count = lazyPagingItems.itemCount,
+                    key = { index -> lazyPagingItems[index]?.id ?: index }
+                ) { index ->
+                    val venue = lazyPagingItems[index]
+                    if (venue != null) {
+                        SearchVenueCard(
+                            venue = venue,
+                            onClick = {
+                                viewModel.onIntent(SearchIntent.OnVenueClicked(venue.id))
+                            }
+                        )
+                    }
                 }
             }
         }
     }
 }
-

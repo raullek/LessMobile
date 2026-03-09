@@ -2,10 +2,15 @@ package az.less.mobile.presentation.merchant.more
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.domain.repository.AuthorizationRepository
+import az.less.mobile.domain.repository.ContentRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.merchant.more.model.MerchCellId
 import az.less.mobile.presentation.merchant.more.model.MerchMoreCellModel
 import az.less.mobile.presentation.merchant.more.model.MerchMoreCellType
 import az.less.mobile.presentation.merchant.more.model.MerchMoreSection
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_customer_support_24dp
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
@@ -18,40 +23,43 @@ import lessmobile.composeapp.generated.resources.more_contact_us
 import lessmobile.composeapp.generated.resources.more_notification
 import lessmobile.composeapp.generated.resources.more_section_application
 import lessmobile.composeapp.generated.resources.more_section_support
+import lessmobile.composeapp.generated.resources.more_switch_to_client
 import lessmobile.composeapp.generated.resources.more_terms_of_service
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
-/**
- * ViewModel for MerchMore Screen using Orbit MVI
- */
-class MerchMoreViewModel : ViewModel(), ContainerHost<MerchMoreState, MerchMoreSideEffect> {
+class MerchMoreViewModel(
+    private val sessionLocalRepository: SessionLocalRepository,
+    private val authorizationRepository: AuthorizationRepository,
+    private val contentRepository: ContentRepository
+) : ViewModel(), ContainerHost<MerchMoreState, MerchMoreSideEffect> {
 
     override val container: Container<MerchMoreState, MerchMoreSideEffect> =
         viewModelScope.container(MerchMoreState())
 
     init {
-        loadMerchantData()
+        observeUserState()
     }
 
-    private fun loadMerchantData() = intent {
-        // TODO: Load merchant data from repository
-        // For now, using mock data
-        reduce {
-            state.copy(
-                merchantName = "McDonald's",
-                merchantEmail = "Ahmadli@mcdonald.az",
-                rating = "4.9",
-                reviewCount = "28+",
-                sections = buildSections(state.notificationEnabled, state.darkModeEnabled)
-            )
+    private fun observeUserState() {
+        viewModelScope.launch {
+            sessionLocalRepository.currentUser.collectLatest { user ->
+                intent {
+                    if (user != null) {
+                        reduce {
+                            state.copy(
+                                merchantName = user.name,
+                                merchantEmail = user.email,
+                                sections = buildSections(state.notificationEnabled, state.darkModeEnabled)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
-    /**
-     * Handle user intents
-     */
     fun onIntent(intent: MerchMoreIntent) {
         when (intent) {
             is MerchMoreIntent.OnCellClick -> handleCellClick(intent.cellId)
@@ -68,41 +76,45 @@ class MerchMoreViewModel : ViewModel(), ContainerHost<MerchMoreState, MerchMoreS
         when (cellId) {
             MerchCellId.Places -> postSideEffect(MerchMoreSideEffect.NavigateToPlaces)
             MerchCellId.ContactUs -> {
-                reduce {
-                    state.copy(showContactUsBottomSheet = true)
-                }
+                reduce { state.copy(showContactUsBottomSheet = true) }
             }
-            MerchCellId.TermsOfService -> {
-                reduce {
-                    state.copy(showTermsBottomSheet = true)
-                }
-            }
-            MerchCellId.Notification -> {
-                // Notification is handled separately via toggle
-            }
-            MerchCellId.DarkMode -> {
-                // Dark mode is handled separately via toggle
-            }
+            MerchCellId.TermsOfService -> fetchTermsAndShow()
+            MerchCellId.Notification -> { }
+            MerchCellId.DarkMode -> { }
+            MerchCellId.SwitchToClient -> postSideEffect(MerchMoreSideEffect.NavigateToClientFlow)
         }
     }
 
     private fun handleContactUsDismiss() = intent {
-        reduce {
-            state.copy(showContactUsBottomSheet = false)
-        }
+        reduce { state.copy(showContactUsBottomSheet = false) }
     }
 
     private fun handleContactUsItemClick(itemId: String) = intent {
-        // TODO: Handle contact item click (open Instagram, TikTok, etc.)
-        reduce {
-            state.copy(showContactUsBottomSheet = false)
-        }
+        reduce { state.copy(showContactUsBottomSheet = false) }
+    }
+
+    private fun fetchTermsAndShow() = intent {
+        reduce { state.copy(showTermsBottomSheet = true, isTermsLoading = true) }
+
+        contentRepository.getTerms()
+            .onSuccess { data ->
+                reduce {
+                    state.copy(
+                        isTermsLoading = false,
+                        termsTitle = data.title,
+                        termsContent = data.body,
+                        isTermsHtml = data.isHtml
+                    )
+                }
+            }
+            .onError { error ->
+                reduce { state.copy(showTermsBottomSheet = false, isTermsLoading = false) }
+                postSideEffect(MerchMoreSideEffect.ShowError(error.message))
+            }
     }
 
     private fun handleTermsDismiss() = intent {
-        reduce {
-            state.copy(showTermsBottomSheet = false)
-        }
+        reduce { state.copy(showTermsBottomSheet = false) }
     }
 
     private fun handleNotificationToggleClick() = intent {
@@ -126,14 +138,17 @@ class MerchMoreViewModel : ViewModel(), ContainerHost<MerchMoreState, MerchMoreS
     }
 
     private fun handleLogoutClicked() = intent {
+        reduce { state.copy(isLoading = true) }
+
+        val refreshToken = sessionLocalRepository.getRefreshToken()
+        if (refreshToken != null) {
+            authorizationRepository.logout(refreshToken)
+        }
+
+        sessionLocalRepository.clearSession()
         postSideEffect(MerchMoreSideEffect.Logout)
     }
 
-    /**
-     * Build sections for merchant More screen
-     * Application: Places, Notification, Dark mode
-     * Support: Contact us, Terms of Service
-     */
     private fun buildSections(notificationEnabled: Boolean, darkModeEnabled: Boolean): List<MerchMoreSection> {
         return listOf(
             MerchMoreSection(
@@ -155,7 +170,13 @@ class MerchMoreViewModel : ViewModel(), ContainerHost<MerchMoreState, MerchMoreS
                         id = MerchCellId.DarkMode,
                         titleRes = Res.string.merch_more_dark_mode,
                         icon = Res.drawable.ic_more_24dp,
-                        type = MerchMoreCellType.Toggle(darkModeEnabled),
+                        type = MerchMoreCellType.Toggle(darkModeEnabled)
+                    ),
+                    MerchMoreCellModel(
+                        id = MerchCellId.SwitchToClient,
+                        titleRes = Res.string.more_switch_to_client,
+                        icon = Res.drawable.ic_explore_24dp,
+                        type = MerchMoreCellType.Navigation,
                         showDivider = false
                     )
                 )

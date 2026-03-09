@@ -44,6 +44,7 @@ import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.mobile.utils.formatPrice
 import az.less.mobile.presentation.client.reserve.components.LotSizeInfoBottomSheet
+import az.less.mobile.presentation.client.reserve.components.PaymentMethodShimmer
 import az.less.mobile.presentation.client.reserve.components.ReserveScreenShimmer
 import az.less.mobile.presentation.client.reserve.components.SelectPaymentMethodBottomSheet
 import az.less.mobile.presentation.client.reserve.components.SelectVoucherBottomSheet
@@ -77,6 +78,7 @@ fun ReserveScreen(
     onDismiss: () -> Unit,
     onOrderPlaced: (OrderAccepted) -> Unit = {},
     onNavigateToMerchant: (String) -> Unit = {},
+    onNavigateToAddCardWebView: (String) -> Unit = {},
     viewModel: ReserveViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
@@ -88,12 +90,6 @@ fun ReserveScreen(
             viewModel.onIntent(ReserveIntent.Initialize(offerId))
         }
     }
-
-    // Payment method selection bottom sheet state
-    var isPaymentBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
-    val paymentSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
 
     // Lot size info bottom sheet state
     val lotSizeInfoSheetState = rememberModalBottomSheetState(
@@ -111,11 +107,8 @@ fun ReserveScreen(
             is ReserveSideEffect.NavigateBack -> {
                 onDismiss()
             }
-            is ReserveSideEffect.NavigateToPaymentMethods -> {
-                isPaymentBottomSheetVisible = true
-                scope.launch {
-                    paymentSheetState.expand()
-                }
+            is ReserveSideEffect.OpenRedirectUrl -> {
+                onNavigateToAddCardWebView(sideEffect.url)
             }
             is ReserveSideEffect.NavigateToAddressSelection -> {
                 // Handle navigation to address selection
@@ -191,23 +184,6 @@ fun ReserveScreen(
         }
     }
 
-    // Payment Method Selection Bottom Sheet
-    SelectPaymentMethodBottomSheet(
-        isVisible = isPaymentBottomSheetVisible,
-        sheetState = paymentSheetState,
-        paymentCards = state.availablePaymentCards,
-        onCardSelected = { card ->
-            viewModel.onIntent(ReserveIntent.OnPaymentCardSelected(card))
-        },
-        onDismiss = {
-            scope.launch {
-                paymentSheetState.hide()
-            }.invokeOnCompletion {
-                isPaymentBottomSheetVisible = false
-            }
-        }
-    )
-
     // Lot Size Info Bottom Sheet
     LotSizeInfoBottomSheet(
         isVisible = state.isLotSizeInfoVisible,
@@ -228,6 +204,24 @@ fun ReserveScreen(
         },
         onDismiss = {
             viewModel.onIntent(ReserveIntent.OnVoucherBottomSheetDismissed)
+        }
+    )
+
+    // Select Payment Method Bottom Sheet
+    val paymentSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    SelectPaymentMethodBottomSheet(
+        isVisible = state.isPaymentSheetVisible,
+        sheetState = paymentSheetState,
+        paymentCards = state.availablePaymentCards,
+        isRegisterCardLoading = state.isRegisterCardLoading,
+        onCardSelected = { card ->
+            viewModel.onIntent(ReserveIntent.OnPaymentCardSelected(card))
+        },
+        onAddNewCard = {
+            viewModel.onIntent(ReserveIntent.OnAddNewCardClicked)
+        },
+        onDismiss = {
+            viewModel.onIntent(ReserveIntent.OnPaymentSheetDismissed)
         }
     )
 }
@@ -493,45 +487,49 @@ private fun ReserveScreenContent(
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
 
         // Payment method selector
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .clip(RoundedCornerShape(LessTheme.radius.small))
-                .background(LessTheme.colors.elementsPrimaryElement)
-                .clickable { onIntent(ReserveIntent.OnPaymentMethodClicked) }
-                .padding(horizontal = LessTheme.spacing.medium),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        if (state.isPaymentLoading) {
+            PaymentMethodShimmer()
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(LessTheme.radius.small))
+                    .background(LessTheme.colors.elementsPrimaryElement)
+                    .clickable { onIntent(ReserveIntent.OnPaymentMethodClicked) }
+                    .padding(horizontal = LessTheme.spacing.medium),
+                contentAlignment = Alignment.CenterStart
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Payment icon placeholder
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(LessTheme.radius.small))
-                            .background(LessTheme.colors.elementsSecondaryElement)
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Payment icon placeholder
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(LessTheme.radius.small))
+                                .background(LessTheme.colors.elementsSecondaryElement)
+                        )
 
-                    Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
+                        Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
 
-                    Text(
-                        text = state.paymentMethodDisplay.ifEmpty { "Select payment method" },
-                        style = LessTheme.typography.body16Regular,
-                        color = LessTheme.colors.textIconsBlack
+                        Text(
+                            text = state.paymentMethodDisplay.ifEmpty { "Select payment method" },
+                            style = LessTheme.typography.body16Regular,
+                            color = LessTheme.colors.textIconsBlack
+                        )
+                    }
+
+                    Icon(
+                        imageVector = vectorResource(Res.drawable.ic_chevron_down24dp),
+                        contentDescription = "Select payment",
+                        tint = LessTheme.colors.textIconsBrand,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
-
-                Icon(
-                    imageVector = vectorResource(Res.drawable.ic_chevron_down24dp),
-                    contentDescription = "Select payment",
-                    tint = LessTheme.colors.textIconsBrand,
-                    modifier = Modifier.size(24.dp)
-                )
             }
         }
 

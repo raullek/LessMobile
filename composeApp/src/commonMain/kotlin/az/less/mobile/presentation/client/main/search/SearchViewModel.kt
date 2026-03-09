@@ -2,15 +2,24 @@ package az.less.mobile.presentation.client.main.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import az.less.mobile.domain.model.SearchVenue
+import az.less.mobile.domain.repository.ExploreRepository
 import az.less.mobile.presentation.client.main.search.models.SearchCategory
-import az.less.mobile.presentation.client.main.search.models.SearchOffer
+import dev.jordond.compass.geolocation.Geolocator
+import dev.jordond.compass.geolocation.mobile
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.test_offer_category_burger
 import lessmobile.composeapp.generated.resources.test_offer_category_pasta
@@ -20,108 +29,74 @@ import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
-/**
- * ViewModel for Search Screen using Orbit MVI
- */
-@OptIn(FlowPreview::class)
-class SearchViewModel : ViewModel(), ContainerHost<SearchState, SearchSideEffect> {
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+class SearchViewModel(
+    private val exploreRepository: ExploreRepository
+) : ViewModel(), ContainerHost<SearchState, SearchSideEffect> {
 
     override val container: Container<SearchState, SearchSideEffect> =
         viewModelScope.container(SearchState())
-    
+
+    private val geolocator: Geolocator = Geolocator.mobile()
+
     private val searchQueryFlow = MutableStateFlow("")
-    
+    private val locationFlow = MutableStateFlow<LocationParams?>(null)
+
+    val searchResults: Flow<PagingData<SearchVenue>> = searchQueryFlow
+        .debounce(500L)
+        .distinctUntilChanged()
+        .combine(locationFlow) { query, location -> Pair(query, location) }
+        .flatMapLatest { (query, location) ->
+            if (query.isBlank()) {
+                flowOf(PagingData.empty())
+            } else {
+                exploreRepository.searchVenues(
+                    query = query,
+                    latitude = location?.latitude,
+                    longitude = location?.longitude
+                )
+            }
+        }
+        .cachedIn(viewModelScope)
+
     init {
         loadInitialData()
-        setupSearchFlow()
+        fetchLocation()
     }
-    
-    /**
-     * Setup search flow with debounce and distinctUntilChanged
-     */
-    private fun setupSearchFlow() {
-        searchQueryFlow
-            .debounce(500L) // 500ms delay after user stops typing
-            .distinctUntilChanged()
-            .onEach { query ->
-                if (query.isNotEmpty()) {
-                    performSearch(query)
-                } else {
-                    // Clear offers when search query is empty
-                    intent {
-                       reduce {
-                           state.copy(
-                                offers = emptyList(),
-                                isLoading = false
-                            )
-                        }
-                    }
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-    
-    /**
-     * Handle user intents
-     */
+
     fun onIntent(intent: SearchIntent) {
         when (intent) {
             is SearchIntent.OnSearchQueryChanged -> handleSearchQueryChanged(intent.query)
             is SearchIntent.OnCategorySelected -> handleCategorySelected(intent.categoryId)
-            is SearchIntent.OnOfferClicked -> handleOfferClicked(intent.offerId)
+            is SearchIntent.OnVenueClicked -> handleVenueClicked(intent.venueId)
             is SearchIntent.OnBackClicked -> handleBackClicked()
             is SearchIntent.OnMapClicked -> handleOnMapClicked()
         }
     }
-    
+
     private fun loadInitialData() = intent {
-       reduce {
-           state.copy(
-                categories = getMockCategories()
+        reduce {
+            state.copy(categories = getMockCategories())
+        }
+    }
+
+    private fun fetchLocation() {
+        viewModelScope.launch {
+            val location = withTimeoutOrNull(3000L) {
+                if (geolocator.isAvailable()) geolocator.current().getOrNull() else null
+            }
+            locationFlow.value = LocationParams(
+                latitude = location?.coordinates?.latitude,
+                longitude = location?.coordinates?.longitude
             )
         }
     }
-    
-    private fun handleSearchQueryChanged(query: String) =
-        intent {
-           reduce {
-               state.copy(
-                    searchQuery = query,
-                    isLoading = query.isNotEmpty()
-                )
-            }
-            // Emit to search flow which will handle debouncing
-            searchQueryFlow.value = query
-        }
-    
-    /**
-     * Perform search with mock delay to simulate API call
-     */
-    private fun performSearch(query: String) =
-        intent {
-           reduce {
-               state.copy(
-                    isLoading = true
-                )
-            }
 
-            // Simulate API delay
-            delay(300L)
+    private fun handleSearchQueryChanged(query: String) = intent {
+        reduce { state.copy(searchQuery = query) }
+        searchQueryFlow.value = query
+    }
 
-            // Mock search - filter offers by query
-            val searchResults = getMockOffers().filter { offer ->
-                offer.title.contains(query, ignoreCase = true) ||
-                        offer.pickupTime.contains(query, ignoreCase = true)
-            }
-
-           reduce {
-               state.copy(
-                    offers = searchResults,
-                    isLoading = false
-                )
-            }
-        }
-    
     private fun handleCategorySelected(categoryId: String) = intent {
         val category = state.categories.find { it.id == categoryId }
         if (category != null) {
@@ -134,7 +109,7 @@ class SearchViewModel : ViewModel(), ContainerHost<SearchState, SearchSideEffect
             )
         }
     }
-    
+
     private fun handleBackClicked() = intent {
         postSideEffect(SearchSideEffect.NavigateBack)
     }
@@ -142,14 +117,11 @@ class SearchViewModel : ViewModel(), ContainerHost<SearchState, SearchSideEffect
     private fun handleOnMapClicked() = intent {
         postSideEffect(SearchSideEffect.NavigateToMap)
     }
-    
-    private fun handleOfferClicked(offerId: String) =
-        intent {
-            // In real app, navigate to offer detail screen
-            // postSideEffect(SearchSideEffect.NavigateToOffer(offerId))
-        }
-    
-    // Mock data - replace with repository calls in real app
+
+    private fun handleVenueClicked(venueId: String) = intent {
+        postSideEffect(SearchSideEffect.NavigateToMerchantProfile(venueId))
+    }
+
     private fun getMockCategories(): List<SearchCategory> {
         return listOf(
             SearchCategory(
@@ -196,68 +168,9 @@ class SearchViewModel : ViewModel(), ContainerHost<SearchState, SearchSideEffect
             )
         )
     }
-    
-    /**
-     * Mock offers data for search results
-     */
-    private fun getMockOffers(): List<SearchOffer> {
-        return listOf(
-            SearchOffer(
-                id = "1",
-                title = "Belgian Waffle Breakfast Box",
-                price = "12.99",
-                pickupTime = "Pick up from 08:00 to 12:00",
-                rating = 4.5f,
-                reviewCount = "120+",
-                distance = "0.8 km away"
-            ),
-            SearchOffer(
-                id = "2",
-                title = "Belgian Chocolate Surprise",
-                price = "8.50",
-                pickupTime = "Pick up from 14:00 to 20:00",
-                rating = 4.7f,
-                reviewCount = "85+",
-                distance = "1.2 km away"
-            ),
-            SearchOffer(
-                id = "3",
-                title = "Fresh Bakery Box",
-                price = "6.99",
-                pickupTime = "Pick up from 17:00 to 23:00",
-                rating = 4.3f,
-                reviewCount = "45+",
-                distance = "2.1 km away"
-            ),
-            SearchOffer(
-                id = "4",
-                title = "Gourmet Pizza Deal",
-                price = "15.99",
-                pickupTime = "Pick up from 12:00 to 22:00",
-                rating = 4.8f,
-                reviewCount = "200+",
-                distance = "0.5 km away"
-            ),
-            SearchOffer(
-                id = "5",
-                title = "Sushi Combo Box",
-                price = "18.50",
-                pickupTime = "Pick up from 11:00 to 21:00",
-                rating = 4.6f,
-                reviewCount = "150+",
-                distance = "1.5 km away"
-            ),
-            SearchOffer(
-                id = "6",
-                title = "Healthy Lunch Box",
-                price = "10.99",
-                pickupTime = "Pick up from 10:00 to 16:00",
-                rating = 4.4f,
-                reviewCount = "95+",
-                distance = "1.8 km away"
-            )
-        )
-    }
 }
 
-
+private data class LocationParams(
+    val latitude: Double? = null,
+    val longitude: Double? = null
+)

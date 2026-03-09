@@ -8,6 +8,7 @@ import az.less.mobile.presentation.client.main.more.root.models.MoreSection
  */
 data class MoreState(
     val isLoggedIn: Boolean = false,
+    val hasMerchantRole: Boolean = false,
     val userName: String? = null,
     val userEmail: String? = null,
     val userAvatarUrl: String? = null,
@@ -52,6 +53,8 @@ sealed interface MoreSideEffect {
     data object NavigateToHowToUse :
         az.less.mobile.presentation.client.main.more.root.MoreSideEffect
     data object NavigateToAppSettings :
+        az.less.mobile.presentation.client.main.more.root.MoreSideEffect
+    data object NavigateToMerchantFlow :
         az.less.mobile.presentation.client.main.more.root.MoreSideEffect
     data class ShowError(val message: String) :
         az.less.mobile.presentation.client.main.more.root.MoreSideEffect

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -32,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.ClientRoute
@@ -95,7 +97,8 @@ fun OffersScreen(
                     ClientRoute.CategoryOffers(
                         categoryId = sideEffect.categoryId,
                         categoryType = sideEffect.categoryType,
-                        categoryTitle = sideEffect.categoryTitle
+                        categoryTitle = sideEffect.categoryTitle,
+                        filtersJson = sideEffect.filtersJson
                     )
                 )
             }
@@ -141,6 +144,11 @@ fun OffersScreen(
         },
         onNavigateToMerchant = { merchantId ->
             navController.navigate(ClientRoute.Merchant(merchantId = merchantId))
+        },
+        onNavigateToAddCardWebView = { url ->
+            navController.navigate(
+                ClientRoute.AddCardWebView(url = url, title = "Add Card")
+            )
         }
     )
 }
@@ -237,38 +245,38 @@ fun OffersScreenContent(
                     }
                 }
 
-                // Segmented Categories Section
-                if (state.segmentedCategories.isNotEmpty()) {
-                    item(key = "segmented_categories") {
+                // Homepage Buttons Section
+                if (state.homepageButtons.isNotEmpty()) {
+                    item(key = "homepage_buttons") {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = LessTheme.spacing.medium),
                             horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
                         ) {
-                            state.segmentedCategories.forEach { segment ->
+                            state.homepageButtons.forEach { button ->
                                 FilterCategoryItem(
                                     modifier = Modifier.weight(1f),
-                                    text = segment.title,
-                                    icon = segment.icon?.let { vectorResource(it) },
-                                    iconTint = segment.iconTint?.let {
+                                    text = button.title,
+                                    icon = button.icon?.let { vectorResource(it) },
+                                    iconTint = button.iconTint?.let {
                                         androidx.compose.ui.graphics.Color(it)
                                     } ?: LessTheme.colors.textIconsBrand,
                                     onItemClick = {
-                                        onIntent(OffersIntent.OnSegmentSelected(segment.id))
+                                        onIntent(OffersIntent.OnHomepageButtonClicked(button.id))
                                     }
                                 )
                             }
                         }
                     }
 
-                    item(key = "segmented_categories_spacing") {
+                    item(key = "homepage_buttons_spacing") {
                         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
                     }
                 }
 
-                // Dynamic Offer Sections
-                state.offerSections.forEach { section ->
+                // Special Segments (Offer Sections)
+                state.specialSegments.forEach { section ->
                     if (section.offers.isNotEmpty()) {
                         item(key = "${section.id}_header") {
                             Box(
@@ -329,7 +337,8 @@ fun OffersScreenContent(
                                         offerItem = offerItem,
                                         onClick = {
                                             onIntent(OffersIntent.OnOfferItemClicked(offerItem.id))
-                                        }
+                                        },
+                                        modifier = Modifier.width(277.dp)
                                     )
                                 }
                             }

@@ -94,6 +94,9 @@ fun MoreScreen(
             is MoreSideEffect.NavigateToAppSettings -> {
                 openAppSettings()
             }
+            is MoreSideEffect.NavigateToMerchantFlow -> {
+                navigateToMerchant.invoke()
+            }
             is MoreSideEffect.ShowError -> {
                 // Show error snackbar or dialog
             }
