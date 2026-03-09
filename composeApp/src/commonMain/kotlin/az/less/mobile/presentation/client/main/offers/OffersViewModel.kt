@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.mobile.domain.repository.OffersRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import az.less.mobile.presentation.client.main.offers.models.CategoryFilter
 import az.less.mobile.presentation.client.main.offers.models.UserInfo
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import dev.jordond.compass.geolocation.Geolocator
 import dev.jordond.compass.geolocation.mobile
 import kotlinx.coroutines.flow.collectLatest
@@ -36,7 +39,7 @@ class OffersViewModel(
             is OffersIntent.OnSearchClicked -> handleSearchClicked()
             is OffersIntent.OnCategorySelected -> handleCategorySelected(intent.categoryId)
             is OffersIntent.OnSpecialCategoryClicked -> handleSpecialCategoryClicked(intent.specialCategoryId)
-            is OffersIntent.OnSegmentSelected -> handleSegmentSelected(intent.segmentId)
+            is OffersIntent.OnHomepageButtonClicked -> handleHomepageButtonClicked(intent.buttonId)
             is OffersIntent.OnOfferItemClicked -> handleOfferItemClicked(intent.offerId)
             is OffersIntent.OnSeeAllClicked -> handleSeeAllClicked(intent.sectionId)
             is OffersIntent.OnRefresh -> handleRefresh()
@@ -89,8 +92,8 @@ class OffersViewModel(
                     state.copy(
                         categories = data.categories,
                         specialCategories = data.specialCategories,
-                        segmentedCategories = data.segmentedCategories,
-                        offerSections = data.offerSections,
+                        homepageButtons = data.homepageButtons,
+                        specialSegments = data.specialSegments,
                         isLoading = false
                     )
                 }
@@ -109,6 +112,10 @@ class OffersViewModel(
         postSideEffect(OffersSideEffect.NavigateToSearch)
     }
 
+    private fun serializeFilters(filters: List<CategoryFilter>): String {
+        return Json.encodeToString(filters)
+    }
+
     private fun handleCategorySelected(categoryId: String) = intent {
         val category = state.categories.find { it.id == categoryId }
         if (category != null) {
@@ -116,7 +123,8 @@ class OffersViewModel(
                 OffersSideEffect.NavigateToCategoryOffers(
                     categoryId = category.id,
                     categoryType = category.type,
-                    categoryTitle = category.title
+                    categoryTitle = category.title,
+                    filtersJson = serializeFilters(category.filters)
                 )
             )
         }
@@ -129,33 +137,36 @@ class OffersViewModel(
                 OffersSideEffect.NavigateToCategoryOffers(
                     categoryId = specialCategory.id,
                     categoryType = specialCategory.type,
-                    categoryTitle = specialCategory.title
+                    categoryTitle = specialCategory.title,
+                    filtersJson = serializeFilters(specialCategory.filters)
                 )
             )
         }
     }
 
-    private fun handleSegmentSelected(segmentId: String) = intent {
-        val segment = state.segmentedCategories.find { it.id == segmentId }
-        if (segment != null) {
+    private fun handleHomepageButtonClicked(buttonId: String) = intent {
+        val button = state.homepageButtons.find { it.id == buttonId }
+        if (button != null) {
             postSideEffect(
                 OffersSideEffect.NavigateToCategoryOffers(
-                    categoryId = segment.id,
-                    categoryType = segment.type,
-                    categoryTitle = segment.title
+                    categoryId = button.id,
+                    categoryType = button.type,
+                    categoryTitle = button.title,
+                    filtersJson = serializeFilters(emptyList())
                 )
             )
         }
     }
 
     private fun handleSeeAllClicked(sectionId: String) = intent {
-        val section = state.offerSections.find { it.id == sectionId }
+        val section = state.specialSegments.find { it.id == sectionId }
         if (section != null) {
             postSideEffect(
                 OffersSideEffect.NavigateToCategoryOffers(
                     categoryId = section.id,
-                    categoryType = section.type,
-                    categoryTitle = section.title
+                    categoryType = section.id,
+                    categoryTitle = section.title,
+                    filtersJson = serializeFilters(section.filters)
                 )
             )
         }
@@ -177,8 +188,8 @@ class OffersViewModel(
                     state.copy(
                         categories = data.categories,
                         specialCategories = data.specialCategories,
-                        segmentedCategories = data.segmentedCategories,
-                        offerSections = data.offerSections,
+                        homepageButtons = data.homepageButtons,
+                        specialSegments = data.specialSegments,
                         isRefreshing = false
                     )
                 }

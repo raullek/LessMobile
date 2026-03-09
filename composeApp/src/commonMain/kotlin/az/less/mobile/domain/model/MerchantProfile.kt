@@ -20,7 +20,23 @@ data class MerchantProfile(
     val reviews: List<MerchantReview>,
     val reviewsTotal: Int,
     val reviewsHasMore: Boolean,
-    val status: String
+    val offers: List<MerchantOffer>,
+    val status: String,
+    val isFavorite: Boolean = false,
+    val favoriteId: String? = null
+)
+
+data class MerchantOffer(
+    val id: String,
+    val title: String,
+    val description: String?,
+    val images: List<String>,
+    val originalPrice: Double,
+    val discountedPrice: Double,
+    val availableItems: Int,
+    val pickupTimeStart: String?,
+    val pickupTimeEnd: String?,
+    val category: String?
 )
 
 data class MerchantReview(

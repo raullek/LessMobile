@@ -3,23 +3,28 @@ package az.less.mobile.data.repository
 import az.less.mobile.data.datasource.OffersDataSource
 import az.less.mobile.data.remote.model.BoxDetailDto
 import az.less.mobile.data.remote.model.BoxVenueDto
+import az.less.mobile.data.remote.model.DefaultPaymentDto
+import az.less.mobile.data.remote.model.PaymentMethodsDto
+import az.less.mobile.data.remote.model.RegisterCardDto
 import az.less.mobile.data.remote.model.CategoryDto
+import az.less.mobile.data.remote.model.HomepageButtonDto
 import az.less.mobile.data.remote.model.OfferDto
 import az.less.mobile.data.remote.model.VenueDto
-import az.less.mobile.data.remote.model.OfferSectionDto
 import az.less.mobile.data.remote.model.OffersScreenDto
-import az.less.mobile.data.remote.model.SegmentedCategoryDto
 import az.less.mobile.data.remote.model.SpecialCategoryDto
+import az.less.mobile.data.remote.model.SpecialSegmentDto
 import az.less.mobile.domain.model.BoxDetail
+import az.less.mobile.utils.extractTime
 import az.less.mobile.domain.model.BoxVenue
 import az.less.mobile.domain.model.OffersHomeData
 import az.less.mobile.domain.repository.OffersRepository
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.presentation.client.main.offers.models.Category
+import az.less.mobile.presentation.client.main.offers.models.CategoryFilter
+import az.less.mobile.presentation.client.main.offers.models.HomepageButton
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
 import az.less.mobile.presentation.client.main.offers.models.OfferMerchant
 import az.less.mobile.presentation.client.main.offers.models.OfferSection
-import az.less.mobile.presentation.client.main.offers.models.SegmentedCategory
 import az.less.mobile.presentation.client.main.offers.models.SpecialDiscountItem
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
@@ -43,20 +48,38 @@ class OffersRepositoryImpl(
         return offersDataSource.getBoxDetail(boxId)
             .map { it.toDomain() }
     }
+
+    override suspend fun getDefaultPayment(): NetworkResult<DefaultPaymentDto> {
+        return offersDataSource.getDefaultPayment()
+    }
+
+    override suspend fun getPaymentMethods(): NetworkResult<PaymentMethodsDto> {
+        return offersDataSource.getPaymentMethods()
+    }
+
+    override suspend fun registerCard(): NetworkResult<RegisterCardDto> {
+        return offersDataSource.registerCard()
+    }
+
+    override suspend fun verifyCard(callbackUrl: String): NetworkResult<Boolean> {
+        return offersDataSource.verifyCard(callbackUrl)
+    }
 }
 
 private fun OffersScreenDto.toDomain() = OffersHomeData(
     categories = categories.map { it.toDomain() },
     specialCategories = specialCategories.map { it.toDomain() },
-    segmentedCategories = segmentedCategories.mapIndexed { index, dto -> dto.toDomain(index) },
-    offerSections = offerSections.map { it.toDomain() }
+    specialSegments = specialSegments.map { it.toDomain() },
+    homepageButtons = homepageButtons.mapIndexed { index, dto -> dto.toDomain(index) }
 )
 
 private fun CategoryDto.toDomain() = Category(
     id = id,
     type = type,
     title = title,
-    imageUrl = imageUrl
+    imageUrl = imageUrl,
+    filters = filters.map { CategoryFilter(searchFilterId = it.searchFilterId, values = it.values) },
+    searchUrl = searchUrl
 )
 
 private fun SpecialCategoryDto.toDomain() = SpecialDiscountItem(
@@ -64,31 +87,34 @@ private fun SpecialCategoryDto.toDomain() = SpecialDiscountItem(
     type = type,
     title = title,
     description = description,
-    imageUrl = imageUrl
+    imageUrl = imageUrl,
+    filters = filters.map { CategoryFilter(searchFilterId = it.searchFilterId, values = it.values) }
 )
 
-private fun SegmentedCategoryDto.toDomain(index: Int): SegmentedCategory {
+private fun SpecialSegmentDto.toDomain() = OfferSection(
+    id = id,
+    title = title,
+    offers = boxes.map { it.toDomain() },
+    searchUrl = searchUrl,
+    filters = filters.map { CategoryFilter(searchFilterId = it.searchFilterId, values = it.values) }
+)
+
+private fun HomepageButtonDto.toDomain(index: Int): HomepageButton {
     val (icon, iconTint) = when (index) {
         0 -> Res.drawable.ic_explore_24dp to 0xFFFF8B38L
         1 -> Res.drawable.ic_star_16dp to 0xFF5AA9E7L
         2 -> Res.drawable.ic_mark_16dp to 0xFFAD3CDAL
         else -> null to null
     }
-    return SegmentedCategory(
+    return HomepageButton(
         id = id,
         type = type,
         title = title,
+        searchUrl = searchUrl,
         icon = icon,
         iconTint = iconTint
     )
 }
-
-private fun OfferSectionDto.toDomain() = OfferSection(
-    id = id,
-    type = type,
-    title = title,
-    offers = offers.map { it.toDomain() }
-)
 
 private fun OfferDto.toDomain() = OfferItem(
     id = id,
@@ -144,14 +170,7 @@ private fun BoxVenueDto.toDomain() = BoxVenue(
 
 private fun formatPickupTime(start: String?, end: String?): String {
     if (start == null || end == null) return ""
-    val startTime = extractTime(start)
-    val endTime = extractTime(end)
+    val startTime = start.extractTime() ?: return ""
+    val endTime = end.extractTime() ?: return ""
     return "Pick up from $startTime to $endTime"
-}
-
-private fun extractTime(isoString: String): String {
-    // Extract HH:mm from ISO datetime like "2026-02-22T17:00:00Z" or just "17:00"
-    val timeIndex = isoString.indexOf('T')
-    val timePart = if (timeIndex >= 0) isoString.substring(timeIndex + 1) else isoString
-    return timePart.take(5) // "HH:mm"
 }

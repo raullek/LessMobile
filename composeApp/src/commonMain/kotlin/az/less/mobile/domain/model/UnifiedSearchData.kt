@@ -1,13 +1,24 @@
 package az.less.mobile.domain.model
 
-import az.less.mobile.data.remote.model.SearchBoxDto
+import az.less.mobile.data.remote.model.FilterBoxDto
+import az.less.mobile.data.remote.model.SearchByFilterBoxesDto
+import az.less.mobile.data.remote.model.SearchByFilterVenuesDto
 import az.less.mobile.data.remote.model.SearchVenueDto
-import az.less.mobile.data.remote.model.UnifiedSearchDto
+import az.less.mobile.presentation.client.main.offers.models.OfferItem
+import az.less.mobile.presentation.client.main.offers.models.OfferMerchant
 
-data class UnifiedSearchData(
+data class SearchVenuesResult(
     val venues: List<SearchVenue> = emptyList(),
-    val boxes: List<SearchBox> = emptyList(),
-    val total: Int = 0
+    val total: Int = 0,
+    val page: Int = 1,
+    val limit: Int = 20
+)
+
+data class SearchBoxesResult(
+    val boxes: List<FilterBox> = emptyList(),
+    val total: Int = 0,
+    val page: Int = 1,
+    val limit: Int = 20
 )
 
 data class SearchVenue(
@@ -28,27 +39,86 @@ data class SearchVenue(
     val ratingAndDistance: String? = null
 )
 
-data class SearchBox(
+data class FilterBox(
     val id: String,
     val title: String,
     val description: String? = null,
     val images: List<String> = emptyList(),
+    val imageUrl: String? = null,
+    val imageBgColor: String = "#fff2eb",
     val originalPrice: Double = 0.0,
     val discountedPrice: Double = 0.0,
+    val currentPrice: Double? = null,
+    val quantity: Int = 0,
     val availableItems: Int = 0,
-    val venueId: String,
-    val venueName: String,
-    val venueLogo: String? = null,
-    val venueAddress: String? = null,
+    val bagType: String? = null,
+    val category: String? = null,
+    val pickupTime: String? = null,
+    val venueName: String? = null,
+    val venueLogoUrl: String? = null,
     val venueLatitude: Double = 0.0,
     val venueLongitude: Double = 0.0,
-    val venueDistanceKm: Double? = null
+    val venueDistanceKm: Double? = null,
+    val venueRating: Double = 0.0
 )
 
-fun UnifiedSearchDto.toDomain() = UnifiedSearchData(
+fun FilterBox.toOfferItem() = OfferItem(
+    id = id,
+    title = title,
+    description = description,
+    imageUrl = imageUrl ?: images.firstOrNull(),
+    imageBgColor = imageBgColor,
+    quantity = if (availableItems > 0) availableItems else quantity,
+    originalPrice = originalPrice.toString(),
+    currentPrice = (currentPrice ?: discountedPrice).toString(),
+    bagType = bagType,
+    category = category ?: "",
+    pickupTime = pickupTime ?: "",
+    merchant = OfferMerchant(
+        id = "",
+        name = venueName ?: "",
+        logoUrl = venueLogoUrl,
+        latitude = venueLatitude,
+        longitude = venueLongitude,
+        rating = venueRating.toFloat()
+    )
+)
+
+fun SearchByFilterVenuesDto.toDomain() = SearchVenuesResult(
     venues = venues.map { it.toDomain() },
+    total = total,
+    page = pagination?.page ?: 1,
+    limit = pagination?.limit ?: 20
+)
+
+fun SearchByFilterBoxesDto.toDomain() = SearchBoxesResult(
     boxes = boxes.map { it.toDomain() },
-    total = total
+    total = total,
+    page = pagination?.page ?: 1,
+    limit = pagination?.limit ?: 20
+)
+
+fun FilterBoxDto.toDomain() = FilterBox(
+    id = id,
+    title = title,
+    description = description,
+    images = images,
+    imageUrl = imageUrl,
+    imageBgColor = imageBgColor ?: "#fff2eb",
+    originalPrice = originalPrice,
+    discountedPrice = discountedPrice,
+    currentPrice = currentPrice,
+    quantity = quantity,
+    availableItems = availableItems,
+    bagType = bagType,
+    category = category,
+    pickupTime = pickupTime,
+    venueName = venue?.name,
+    venueLogoUrl = venue?.logo,
+    venueLatitude = venue?.location?.coordinates?.getOrElse(1) { 0.0 } ?: 0.0,
+    venueLongitude = venue?.location?.coordinates?.getOrElse(0) { 0.0 } ?: 0.0,
+    venueDistanceKm = venue?.distanceKm,
+    venueRating = 0.0
 )
 
 fun SearchVenueDto.toDomain() = SearchVenue(
@@ -67,21 +137,4 @@ fun SearchVenueDto.toDomain() = SearchVenue(
     hasActiveOffers = hasActiveOffers,
     badgeText = badge?.text,
     ratingAndDistance = ratingAndDistance
-)
-
-fun SearchBoxDto.toDomain() = SearchBox(
-    id = id,
-    title = title,
-    description = description,
-    images = images,
-    originalPrice = originalPrice,
-    discountedPrice = discountedPrice,
-    availableItems = availableItems,
-    venueId = venue.id,
-    venueName = venue.name,
-    venueLogo = venue.logo,
-    venueAddress = venue.address,
-    venueLatitude = venue.location.coordinates.getOrElse(1) { 0.0 },
-    venueLongitude = venue.location.coordinates.getOrElse(0) { 0.0 },
-    venueDistanceKm = venue.distanceKm
 )

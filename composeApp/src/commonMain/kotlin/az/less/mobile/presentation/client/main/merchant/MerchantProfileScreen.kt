@@ -18,8 +18,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +36,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
+import az.less.mobile.presentation.client.main.merchant.components.MerchantOfferCard
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileContactSection
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileHeroSection
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileInfoSection
@@ -42,7 +49,10 @@ import az.less.mobile.presentation.maps.models.CameraPosition
 import az.less.mobile.presentation.maps.models.LatLong
 import az.less.mobile.presentation.maps.models.MapType
 import az.less.mobile.presentation.maps.models.Marker
+import az.less.mobile.navigation.ClientRoute
+import az.less.mobile.presentation.client.reserve.ReserveScreen
 import az.less.mobile.utils.shareContent
+import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
 import org.jetbrains.compose.resources.painterResource
@@ -50,6 +60,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MerchantProfileScreen(
     merchantId: String,
@@ -58,6 +69,13 @@ fun MerchantProfileScreen(
 ) {
     viewModel.initialize(merchantId)
     val state by viewModel.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    var isReserveBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var selectedOfferId by rememberSaveable { mutableStateOf("") }
+    val reserveSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -73,12 +91,49 @@ fun MerchantProfileScreen(
             is MerchantProfileSideEffect.CallPhone -> {
                 // Open phone dialer
             }
+            is MerchantProfileSideEffect.NavigateToReserve -> {
+                selectedOfferId = sideEffect.offerId
+                isReserveBottomSheetVisible = true
+                scope.launch {
+                    reserveSheetState.expand()
+                }
+            }
         }
     }
 
     MerchantProfileScreenContent(
         state = state,
         onIntent = viewModel::onIntent
+    )
+
+    ReserveScreen(
+        isVisible = isReserveBottomSheetVisible,
+        sheetState = reserveSheetState,
+        offerId = selectedOfferId,
+        onDismiss = {
+            scope.launch {
+                reserveSheetState.hide()
+            }.invokeOnCompletion {
+                isReserveBottomSheetVisible = false
+            }
+        },
+        onOrderPlaced = { orderInfo ->
+            navController.navigate(
+                ClientRoute.OrderAccepted(
+                    orderNumber = orderInfo.orderNumber,
+                    venueName = orderInfo.venueName,
+                    pickupTime = orderInfo.pickupTime
+                )
+            )
+        },
+        onNavigateToMerchant = { navMerchantId ->
+            navController.navigate(ClientRoute.Merchant(merchantId = navMerchantId))
+        },
+        onNavigateToAddCardWebView = { url ->
+            navController.navigate(
+                ClientRoute.AddCardWebView(url = url, title = "Add Card")
+            )
+        }
     )
 }
 
@@ -146,18 +201,36 @@ fun MerchantProfileScreenContent(
             // Tab Content
             when (state.selectedTab) {
                 MerchantProfileTab.OFFERS -> {
-                    // Offers tab - placeholder until boxes API is available
-                    item(key = "offers_placeholder") {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "No offers yet",
-                                style = LessTheme.typography.body16Regular,
-                                color = LessTheme.colors.textIconsGrey
+                    if (state.offers.isEmpty()) {
+                        item(key = "offers_empty") {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No offers yet",
+                                    style = LessTheme.typography.body16Regular,
+                                    color = LessTheme.colors.textIconsGrey
+                                )
+                            }
+                        }
+                    } else {
+                        items(
+                            items = state.offers,
+                            key = { it.id }
+                        ) { offer ->
+                            MerchantOfferCard(
+                                offer = offer,
+                                merchantLogoUrl = state.merchantLogoUrl,
+                                rating = state.rating,
+                                distance = state.distance,
+                                onClick = { onIntent(MerchantProfileIntent.OnOfferClicked(offer.id)) },
+                                modifier = Modifier.padding(
+                                    horizontal = LessTheme.spacing.medium,
+                                    vertical = LessTheme.spacing.xSmall
+                                )
                             )
                         }
                     }

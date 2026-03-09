@@ -130,6 +130,7 @@
     <string name="payment_delete_google_pay">Удалить Google Pay</string>
     <string name="payment_delete_card">Удалить карту</string>
     <string name="payment_delete_confirmation">Вы уверены, что хотите удалить эту карту из приложения? После удаления вам нужно будет выбрать другую карту для оплаты</string>
+    <string name="payment_continue">Продолжить</string>
 
     <!-- Add New Card Screen -->
     <string name="add_card_title">Добавить новую карту</string>
@@ -141,6 +142,10 @@
 
     <!-- Voucher Screen -->
     <string name="voucher_title">Ваучер</string>
+
+    <!-- Search Screen -->
+    <string name="search_items_on_sale">%1$d товаров со скидкой</string>
+    <string name="search_no_active_offer">Нет активных предложений</string>
 
     <!-- Category Offers Screen -->
     <string name="category_offers_empty">Нет доступных предложений</string>
@@ -229,6 +234,8 @@
     <!-- Merchant More Screen -->
     <string name="merch_more_places">Филиалы</string>
     <string name="merch_more_dark_mode">Тёмная тема</string>
+    <string name="more_switch_to_merchant">Перейти в режим продавца</string>
+    <string name="more_switch_to_client">Перейти в режим клиента</string>
 
     <!-- Merchant Orders Screen -->
     <string name="merch_orders_awaiting_pickup">Ожидают выдачи</string>

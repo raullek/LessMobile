@@ -2,6 +2,7 @@ package az.less.mobile.di
 
 import az.less.mobile.presentation.client.account.account.AccountViewModel
 import az.less.mobile.presentation.client.account.paymentmethods.PaymentMethodsViewModel
+import az.less.mobile.presentation.client.account.paymentmethods.addcard.AddCardWebViewViewModel
 import az.less.mobile.presentation.client.main.categoryoffers.CategoryOffersViewModel
 import az.less.mobile.presentation.client.main.explore.ExploreViewModel
 import az.less.mobile.presentation.client.main.merchant.MerchantProfileViewModel
@@ -42,6 +43,7 @@ val viewModelModule = module {
     viewModelOf(::InputAddressViewModel)
     viewModelOf(::AccountViewModel)
     viewModelOf(::PaymentMethodsViewModel)
+    viewModelOf(::AddCardWebViewViewModel)
     viewModelOf(::AddNewCardViewModel)
     viewModelOf(::OffersViewModel)
     viewModelOf(::ExploreViewModel)

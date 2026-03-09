@@ -1,19 +1,22 @@
 package az.less.mobile.presentation.client.main.categoryoffers
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -29,8 +32,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.ClientRoute
+import az.less.mobile.presentation.client.main.offers.components.OfferCard
+import az.less.mobile.presentation.client.main.offers.models.OfferItem
 import az.less.mobile.presentation.client.reserve.ReserveScreen
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
@@ -40,31 +47,25 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-/**
- * Stateful CategoryOffersScreen that connects to ViewModel
- * This is the entry point used by navigation
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryOffersScreen(
     navController: NavController,
-    categoryId: String,
-    categoryType: String,
     categoryTitle: String,
+    filtersJson: String,
     viewModel: CategoryOffersViewModel = koinViewModel()
 ) {
-    // Initialize ViewModel with navigation parameters
-    viewModel.initialize(categoryId, categoryType, categoryTitle)
+    viewModel.initialize(categoryTitle, filtersJson)
 
     val state by viewModel.collectAsState()
     val scope = rememberCoroutineScope()
-    
+    val pagingItems = viewModel.boxesPagingFlow.collectAsLazyPagingItems()
+
     // Reserve bottom sheet state
     var isReserveBottomSheetVisible by remember { mutableStateOf(false) }
-    var selectedOfferItem by remember { mutableStateOf<az.less.mobile.presentation.client.main.offers.models.OfferItem?>(null) }
+    var selectedOfferItem by remember { mutableStateOf<OfferItem?>(null) }
     val reserveSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    
-    // Collect side effects for navigation
+
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is CategoryOffersSideEffect.NavigateBack -> {
@@ -73,22 +74,96 @@ fun CategoryOffersScreen(
             is CategoryOffersSideEffect.NavigateToReserve -> {
                 selectedOfferItem = sideEffect.offerItem
                 isReserveBottomSheetVisible = true
-                scope.launch {
-                    reserveSheetState.expand()
+                scope.launch { reserveSheetState.expand() }
+            }
+            is CategoryOffersSideEffect.ShowError -> { }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LessTheme.colors.backgroundSecond)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .clip(RoundedCornerShape(36.dp))
+    ) {
+        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
+
+        _root_ide_package_.az.less.mobile.presentation.client.main.categoryoffers.components.CategoryOffersHeader(
+            title = state.categoryTitle,
+            onBackClick = { viewModel.onIntent(CategoryOffersIntent.OnBackClicked) },
+            modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
+        )
+
+        Spacer(modifier = Modifier.height(LessTheme.spacing.medium + LessTheme.spacing.xxSmall))
+
+        when {
+            pagingItems.loadState.refresh is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize().weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(40.dp),
+                        color = LessTheme.colors.textIconsBrand
+                    )
                 }
             }
-            is CategoryOffersSideEffect.ShowError -> {
-                // Show error snackbar
+            pagingItems.itemCount == 0 && pagingItems.loadState.refresh is LoadState.NotLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize().weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(Res.string.category_offers_empty),
+                        style = LessTheme.typography.body16Regular,
+                        color = LessTheme.colors.textIconsGrey,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().weight(1f),
+                    contentPadding = PaddingValues(horizontal = LessTheme.spacing.medium),
+                    verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
+                ) {
+                    items(
+                        count = pagingItems.itemCount,
+                        key = { index -> pagingItems[index]?.id ?: index }
+                    ) { index ->
+                        val offerItem = pagingItems[index]
+                        if (offerItem != null) {
+                            OfferCard(
+                                offerItem = offerItem,
+                                onClick = {
+                                    selectedOfferItem = offerItem
+                                    isReserveBottomSheetVisible = true
+                                    scope.launch { reserveSheetState.expand() }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+
+                    if (pagingItems.loadState.append is LoadState.Loading) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(LessTheme.spacing.medium),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = LessTheme.colors.textIconsBrand
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-    
-    // Render the stateless UI
-    CategoryOffersScreenContent(
-        state = state,
-        onIntent = viewModel::onIntent
-    )
-    
+
     // Reserve Bottom Sheet
     if (isReserveBottomSheetVisible && selectedOfferItem != null) {
         ReserveScreen(
@@ -103,7 +178,6 @@ fun CategoryOffersScreen(
                 }
             },
             onOrderPlaced = { orderInfo ->
-                // Navigate to Order Accepted screen
                 navController.navigate(
                     ClientRoute.OrderAccepted(
                         orderNumber = orderInfo.orderNumber,
@@ -113,87 +187,13 @@ fun CategoryOffersScreen(
                 )
             },
             onNavigateToMerchant = { merchantId ->
-                // Navigate to Merchant screen
                 navController.navigate(ClientRoute.Merchant(merchantId = merchantId))
+            },
+            onNavigateToAddCardWebView = { url ->
+                navController.navigate(
+                    ClientRoute.AddCardWebView(url = url, title = "Add Card")
+                )
             }
         )
     }
 }
-
-/**
- * Stateless CategoryOffersScreen UI implementation
- * Pure UI that receives state and emits intents
- */
-@Composable
-fun CategoryOffersScreenContent(
-    state: CategoryOffersState,
-    onIntent: (CategoryOffersIntent) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(LessTheme.colors.backgroundSecond)
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .clip(RoundedCornerShape(36.dp))
-    ) {
-        // Header Section - matching SearchScreen spacing
-        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-
-        _root_ide_package_.az.less.mobile.presentation.client.main.categoryoffers.components.CategoryOffersHeader(
-            title = state.categoryTitle,
-            onBackClick = { onIntent(CategoryOffersIntent.OnBackClicked) },
-            modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
-        )
-        
-        Spacer(modifier = Modifier.height(LessTheme.spacing.medium + LessTheme.spacing.xxSmall))
-        
-        if (state.isEmpty) {
-            // Empty State
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(Res.string.category_offers_empty),
-                    style = LessTheme.typography.body16Regular,
-                    color = LessTheme.colors.textIconsGrey,
-                    textAlign = TextAlign.Center
-                )
-            }
-        } else {
-            // List of Offers
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-                contentPadding = PaddingValues(
-                    horizontal = LessTheme.spacing.medium,
-                    vertical = LessTheme.spacing.medium
-                )
-            ) {
-                // Offers Vertical List
-                items(
-                    items = state.offers,
-                    key = { offer -> offer.id }
-                ) { offer ->
-                    _root_ide_package_.az.less.mobile.presentation.client.main.categoryoffers.components.VerticalOfferCard(
-                        item = offer,
-                        onClick = {
-                            onIntent(
-                                CategoryOffersIntent.OnOfferItemClicked(
-                                    offer.id
-                                )
-                            )
-                        }
-                    )
-                    
-                    Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
-                }
-            }
-        }
-    }
-}
-

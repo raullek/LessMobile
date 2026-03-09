@@ -9,10 +9,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class OffersScreenDto(
-    val categories: List<CategoryDto>,
-    val specialCategories: List<SpecialCategoryDto>,
-    val segmentedCategories: List<SegmentedCategoryDto>,
-    val offerSections: List<OfferSectionDto>
+    val categories: List<CategoryDto> = emptyList(),
+    val specialCategories: List<SpecialCategoryDto> = emptyList(),
+    val specialSegments: List<SpecialSegmentDto> = emptyList(),
+    val homepageButtons: List<HomepageButtonDto> = emptyList()
 )
 
 @Serializable
@@ -20,7 +20,16 @@ data class CategoryDto(
     val id: String,
     val type: String,
     val title: String,
-    val imageUrl: String? = null
+    val titles: String? = null,
+    val imageUrl: String? = null,
+    val filters: List<CategoryFilterDto> = emptyList(),
+    val searchUrl: String? = null
+)
+
+@Serializable
+data class CategoryFilterDto(
+    val searchFilterId: String,
+    val values: List<String> = emptyList()
 )
 
 @Serializable
@@ -28,23 +37,32 @@ data class SpecialCategoryDto(
     val id: String,
     val type: String,
     val title: String,
+    val titles: String? = null,
     val description: String,
-    val imageUrl: String? = null
+    val descriptions: String? = null,
+    val imageUrl: String? = null,
+    val filters: List<CategoryFilterDto> = emptyList(),
+    val searchUrl: String? = null
 )
 
 @Serializable
-data class SegmentedCategoryDto(
+data class SpecialSegmentDto(
     val id: String,
-    val type: String,
-    val title: String
+    val title: String,
+    val titles: String? = null,
+    val order: Int = 0,
+    val filters: List<CategoryFilterDto> = emptyList(),
+    val searchUrl: String? = null,
+    val boxes: List<OfferDto> = emptyList()
 )
 
 @Serializable
-data class OfferSectionDto(
+data class HomepageButtonDto(
     val id: String,
     val type: String,
     val title: String,
-    val offers: List<OfferDto>
+    val titles: String? = null,
+    val searchUrl: String? = null
 )
 
 @Serializable
@@ -70,7 +88,9 @@ data class VenueDto(
     val name: String,
     val logoUrl: String? = null,
     val location: LocationDto,
-    val rating: Double
+    val rating: Double,
+    val distanceText: String? = null,
+    val distanceKm: Double? = null
 )
 
 @Serializable

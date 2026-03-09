@@ -23,9 +23,12 @@ data class MerchantProfileDto(
     val longitude: Double? = null,
     val distanceKm: Double? = null,
     val rating: VenueRatingDto? = null,
-    val reviews: VenueReviewsDto? = null,
+    val reviews: List<VenueReviewItemDto> = emptyList(),
+    val offers: List<VenueOfferDto> = emptyList(),
     val businessHours: BusinessHoursDto? = null,
-    val status: String? = null
+    val status: String? = null,
+    val isFavorite: Boolean = false,
+    val favoriteId: String? = null
 )
 
 @Serializable
@@ -45,13 +48,6 @@ data class RatingDistributionDto(
 data class RatingPercentageDto(
     val count: Int = 0,
     val percentage: Double = 0.0
-)
-
-@Serializable
-data class VenueReviewsDto(
-    val data: List<VenueReviewItemDto> = emptyList(),
-    val total: Int = 0,
-    val hasMore: Boolean = false
 )
 
 @Serializable
@@ -93,4 +89,18 @@ data class BusinessHoursDto(
 data class DayHoursDto(
     val open: String,
     val close: String
+)
+
+@Serializable
+data class VenueOfferDto(
+    val id: String,
+    val title: String,
+    val description: String? = null,
+    val images: List<String> = emptyList(),
+    val originalPrice: Double = 0.0,
+    val discountedPrice: Double = 0.0,
+    val availableItems: Int = 0,
+    val pickupTimeStart: String? = null,
+    val pickupTimeEnd: String? = null,
+    val category: String? = null
 )

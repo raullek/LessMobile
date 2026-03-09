@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,11 +38,11 @@ import az.less.mobile.navigation.ClientRoute
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
-import lessmobile.composeapp.generated.resources.test_apple_logo
-import lessmobile.composeapp.generated.resources.test_google_logo
 import lessmobile.composeapp.generated.resources.test_master_card_logo
 import lessmobile.composeapp.generated.resources.test_visa_card_logo
+import lessmobile.composeapp.generated.resources.add_card_title
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -51,20 +53,30 @@ fun PaymentMethodsScreen(
     navController: NavController
 ) {
     val state by viewModel.collectAsState()
+    val addCardTitle = stringResource(Res.string.add_card_title)
+
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    LaunchedEffect(savedStateHandle) {
+        savedStateHandle?.getStateFlow("card_added", false)?.collect { cardAdded ->
+            if (cardAdded) {
+                savedStateHandle.remove<Boolean>("card_added")
+                viewModel.onIntent(PaymentMethodsIntent.LoadCards)
+            }
+        }
+    }
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is PaymentMethodsSideEffect.NavigateBack -> {
                 navController.popBackStack()
             }
-            is PaymentMethodsSideEffect.NavigateToAddCard -> {
-                navController.navigate(ClientRoute.AddNewCard)
-            }
-            is PaymentMethodsSideEffect.NavigateToApplePay -> {
-                // TODO: Navigate to Apple Pay setup
-            }
-            is PaymentMethodsSideEffect.NavigateToGooglePay -> {
-                // TODO: Navigate to Google Pay setup
+            is PaymentMethodsSideEffect.OpenAddCardWebView -> {
+                navController.navigate(
+                    ClientRoute.AddCardWebView(
+                        url = sideEffect.url,
+                        title = addCardTitle
+                    )
+                )
             }
             is PaymentMethodsSideEffect.ShowError -> {
                 // TODO: Show error message
@@ -82,16 +94,12 @@ fun PaymentMethodsScreen(
         val cardImage = when (cardToDelete.type) {
             PaymentMethodType.MASTERCARD -> painterResource(Res.drawable.test_master_card_logo)
             PaymentMethodType.VISA -> painterResource(Res.drawable.test_visa_card_logo)
-            PaymentMethodType.APPLE_PAY -> painterResource(Res.drawable.test_apple_logo)
-            PaymentMethodType.GOOGLE_PAY -> painterResource(Res.drawable.test_google_logo)
             PaymentMethodType.ADD_NEW_CARD -> painterResource(Res.drawable.ic_payment_card_24dp)
         }
-        
+
         val cardTitle = when (cardToDelete.type) {
             PaymentMethodType.MASTERCARD -> "Delete Mastercard${cardToDelete.lastFourDigits?.let { " •••• $it" } ?: ""}"
             PaymentMethodType.VISA -> "Delete Visa${cardToDelete.lastFourDigits?.let { " •••• $it" } ?: ""}"
-            PaymentMethodType.APPLE_PAY -> "Delete Apple Pay"
-            PaymentMethodType.GOOGLE_PAY -> "Delete Google Pay"
             PaymentMethodType.ADD_NEW_CARD -> "Delete Card"
         }
         
@@ -165,43 +173,12 @@ fun PaymentMethodsScreenContent(
                         type = PaymentMethodType.ADD_NEW_CARD
                     ),
                     onItemClick = {
-                        onIntent(PaymentMethodsIntent.OnAddNewCardClicked)
-                    },
-                    onDeleteClick = null,
-                    modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
-                )
-            }
-
-            // Other Methods Section
-            item {
-                Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-            }
-
-            item {
-                DsSectionHeader(
-                    title = "Other Methods",
-                    modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
-                )
-            }
-
-            items(
-                items = state.otherMethods,
-                key = { it.id }
-            ) { paymentMethod ->
-                PaymentMethodItem(
-                    paymentMethod = paymentMethod,
-                    onItemClick = {
-                        when (paymentMethod.type) {
-                            PaymentMethodType.APPLE_PAY -> {
-                                onIntent(PaymentMethodsIntent.OnApplePayClicked)
-                            }
-                            PaymentMethodType.GOOGLE_PAY -> {
-                                onIntent(PaymentMethodsIntent.OnGooglePayClicked)
-                            }
-                            else -> {}
+                        if (!state.isRegisterCardLoading) {
+                            onIntent(PaymentMethodsIntent.OnAddNewCardClicked)
                         }
                     },
                     onDeleteClick = null,
+                    isLoading = state.isRegisterCardLoading,
                     modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
                 )
             }
@@ -218,20 +195,17 @@ private fun PaymentMethodItem(
     paymentMethod: PaymentMethod,
     onItemClick: () -> Unit,
     onDeleteClick: (() -> Unit)?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ) {
     val displayName = when (paymentMethod.type) {
         PaymentMethodType.MASTERCARD -> "Mastercard${paymentMethod.lastFourDigits?.let { " .... $it" } ?: ""}"
         PaymentMethodType.VISA -> "Visa${paymentMethod.lastFourDigits?.let { " .... $it" } ?: ""}"
-        PaymentMethodType.APPLE_PAY -> "Apple Pay"
-        PaymentMethodType.GOOGLE_PAY -> "Google Pay"
         PaymentMethodType.ADD_NEW_CARD -> "Add new card"
     }
 
     val showDeleteIcon = onDeleteClick != null && paymentMethod.type != PaymentMethodType.ADD_NEW_CARD
-    val showChevron = paymentMethod.type == PaymentMethodType.ADD_NEW_CARD || 
-                      paymentMethod.type == PaymentMethodType.APPLE_PAY || 
-                      paymentMethod.type == PaymentMethodType.GOOGLE_PAY
+    val showChevron = paymentMethod.type == PaymentMethodType.ADD_NEW_CARD
     val showSelected = paymentMethod.isSelected && paymentMethod.type != PaymentMethodType.ADD_NEW_CARD
 
     Column(
@@ -269,22 +243,6 @@ private fun PaymentMethodItem(
                         Image(
                             painter = painterResource(Res.drawable.test_visa_card_logo),
                             contentDescription = "Visa",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    PaymentMethodType.APPLE_PAY -> {
-                        Image(
-                            painter = painterResource(Res.drawable.test_apple_logo),
-                            contentDescription = "Apple Pay",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    PaymentMethodType.GOOGLE_PAY -> {
-                        Image(
-                            painter = painterResource(Res.drawable.test_google_logo),
-                            contentDescription = "Google Pay",
                             contentScale = ContentScale.Fit,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -356,7 +314,13 @@ private fun PaymentMethodItem(
                     }
                 }
                 
-                if (showChevron) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(LessTheme.size.medium),
+                        strokeWidth = 2.dp,
+                        color = LessTheme.colors.elementsPrimaryBrand
+                    )
+                } else if (showChevron) {
                     Icon(
                         painter = painterResource(Res.drawable.ic_chevron_right_24dp),
                         contentDescription = null,

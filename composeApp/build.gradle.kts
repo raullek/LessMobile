@@ -103,6 +103,10 @@ kotlin {
             implementation(libs.paging.common)
             implementation(libs.paging.compose)
 
+            // WebView for Compose Mult
+            // iplatform
+            implementation(libs.compose.webview.multiplatform)
+
             // Compass - Geocoding, Location, Autocomplete
             implementation(libs.compass.autocomplete)
             implementation(libs.compass.autocomplete.mobile)

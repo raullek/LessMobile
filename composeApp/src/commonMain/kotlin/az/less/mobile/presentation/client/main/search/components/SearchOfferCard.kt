@@ -1,18 +1,21 @@
 package az.less.mobile.presentation.client.main.search.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,178 +28,210 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.presentation.client.main.search.models.SearchOffer
+import az.less.mobile.domain.model.SearchVenue
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.compose_multiplatform
-import lessmobile.composeapp.generated.resources.test_merchant_logo
-import lessmobile.composeapp.generated.resources.test_offer_item_image
+import lessmobile.composeapp.generated.resources.ic_star_24dp
+import lessmobile.composeapp.generated.resources.search_items_on_sale
+import lessmobile.composeapp.generated.resources.search_no_active_offer
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
-/**
- * Search offer card component for Search screen
- * Displays a merchant offer with image, price, pickup time, rating, and distance
- * Similar styling to FavoriteItemCard from Saved screen
- */
 @Composable
-fun SearchOfferCard(
-    offer: az.less.mobile.presentation.client.main.search.models.SearchOffer,
+fun SearchVenueCard(
+    venue: SearchVenue,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val hasActiveOffers = venue.hasActiveOffers
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = LessTheme.elevation.small,
-                shape = RoundedCornerShape(LessTheme.radius.medium),
-                ambientColor = Color.Black.copy(alpha = 0.05f),
-                spotColor = Color.Black.copy(alpha = 0.05f)
+                elevation = 16.dp,
+                spotColor = Color.Black.copy(alpha = 0.08f),
+                ambientColor = Color.Black.copy(alpha = 0.08f),
+                shape = RoundedCornerShape(LessTheme.radius.medium)
             )
             .clip(RoundedCornerShape(LessTheme.radius.medium))
             .background(LessTheme.colors.backgroundPrimary)
             .clickable { onClick() }
-            .padding(LessTheme.spacing.xxxSmall)
     ) {
-        // Image - 2dp from top and right, no bottom rounded corners
+        // Image section with badge and logo
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp) // Specific height from design
-                .clip(RoundedCornerShape(
-                    topStart = LessTheme.radius.small,
-                    topEnd = LessTheme.radius.small,
-                    bottomStart = 0.dp,
-                    bottomEnd = 0.dp
-                ))
+                .height(140.dp)
         ) {
-            Image(
-                painter = painterResource(Res.drawable.test_offer_item_image),
-                contentDescription = offer.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-        
-        // Content section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LessTheme.spacing.small)
-        ) {
-            Column(
+            // Main cover image
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = LessTheme.size.large + LessTheme.spacing.xxSmall) // Make room for merchant logo
+                    .fillMaxSize()
+                    .padding(2.dp)
+                    .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                    .background(Color(0xFFFFF2EB))
             ) {
-                // Price
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = offer.price,
-                        style = LessTheme.typography.body16Semibold,
-                        color = LessTheme.colors.textIconsBrand
+                AsyncImage(
+                    model = venue.logo,
+                    contentDescription = venue.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(Res.drawable.ill_box_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_box_placeholder)
+                )
+            }
+
+            // Badge - top left
+            Box(
+                modifier = Modifier
+                    .padding(start = 14.dp, top = 14.dp)
+                    .align(Alignment.TopStart)
+                    .background(
+                        color = if (hasActiveOffers) {
+                            LessTheme.colors.textIconsBrand
+                        } else {
+                            LessTheme.colors.textIconsGrey
+                        },
+                        shape = RoundedCornerShape(1000.dp)
                     )
-                    Text(
-                        text = " ₼",
-                        style = LessTheme.typography.body14Medium,
-                        color = LessTheme.colors.textIconsBrand
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
-                
-                // Title
+                    .padding(horizontal = LessTheme.spacing.xSmall, vertical = LessTheme.spacing.xxSmall)
+            ) {
                 Text(
-                    text = offer.title,
+                    text = if (venue.itemsOnSale > 0) {
+                        stringResource(Res.string.search_items_on_sale, venue.itemsOnSale)
+                    } else {
+                        stringResource(Res.string.search_no_active_offer)
+                    },
+                    style = LessTheme.typography.caption12Semibold,
+                    color = LessTheme.colors.textIconsNested
+                )
+            }
+
+            // Venue logo - bottom right overlapping
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-12).dp, y = 20.dp)
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.5.dp))
+                    .background(LessTheme.colors.backgroundPrimary)
+                    .border(
+                        width = 2.dp,
+                        color = LessTheme.colors.backgroundPrimary,
+                        shape = RoundedCornerShape(12.5.dp)
+                    )
+            ) {
+                AsyncImage(
+                    model = venue.logo,
+                    contentDescription = "${venue.name} logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(Res.drawable.ill_venue_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_venue_placeholder)
+                )
+            }
+        }
+
+        // Content section
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+                .padding(top = 12.dp, bottom = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            // Venue name + address
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Venue name
+                Text(
+                    text = venue.name,
                     style = LessTheme.typography.body16Semibold,
                     color = LessTheme.colors.textIconsBlack,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-            }
-            
-            // Merchant Logo - positioned at top right, aligned with price level
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(LessTheme.size.large)
-                    .clip(RoundedCornerShape(LessTheme.radius.small))
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.test_merchant_logo),
-                    contentDescription = "Merchant Logo",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(LessTheme.size.large)
-                )
-            }
-        }
-        
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LessTheme.spacing.small)
-        ) {
-            Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
-            
-            // Pickup time
-            Text(
-                text = offer.pickupTime,
-                style = LessTheme.typography.body14Medium,
-                color = LessTheme.colors.textIconsGrey,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            
-            Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
-            
-            // Rating and Distance
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
-            ) {
-                // Rating with star icon
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.compose_multiplatform),
-                        contentDescription = "Rating",
-                        tint = LessTheme.colors.textIconsWarning,
-                        modifier = Modifier.size(LessTheme.size.xSmall)
-                    )
-                    
+
+                // Address
+                if (venue.address != null) {
                     Text(
-                        text = "${offer.rating} (${offer.reviewCount})",
-                        style = LessTheme.typography.body14Semibold,
+                        text = venue.address,
+                        style = LessTheme.typography.body14Medium,
+                        color = LessTheme.colors.textIconsGrey,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            // Divider
+            HorizontalDivider(
+                color = LessTheme.colors.backgroundSecond,
+                thickness = 1.dp
+            )
+
+            // Rating and distance row
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Rating
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Star icon in rounded square
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(
+                                color = if (hasActiveOffers) {
+                                    LessTheme.colors.textIconsBrand
+                                } else {
+                                    LessTheme.colors.textIconsWarning
+                                },
+                                shape = RoundedCornerShape(LessTheme.spacing.xSmall)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_star_24dp),
+                            contentDescription = "Rating",
+                            modifier = Modifier.size(16.dp),
+                            tint = LessTheme.colors.backgroundPrimary
+                        )
+                    }
+
+                    Text(
+                        text = venue.rating.toString(),
+                        style = LessTheme.typography.body14Medium,
                         color = LessTheme.colors.textIconsBlack
                     )
                 }
-                
+
                 // Dot separator
-                Text(
-                    text = "•",
-                    style = LessTheme.typography.body14Semibold,
-                    color = LessTheme.colors.textIconsBlack
+                Box(
+                    modifier = Modifier
+                        .size(3.dp)
+                        .background(
+                            color = LessTheme.colors.textIconsBlack,
+                            shape = CircleShape
+                        )
                 )
-                
+
                 // Distance
-                Text(
-                    text = offer.distance,
-                    style = LessTheme.typography.body14Semibold,
-                    color = LessTheme.colors.textIconsBlack
-                )
+                if (venue.distanceKm != null) {
+                    Text(
+                        text = "${venue.distanceKm} km",
+                        style = LessTheme.typography.body14Medium,
+                        color = LessTheme.colors.textIconsBlack
+                    )
+                }
             }
-            
-            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
         }
     }
 }
-
-

@@ -1,6 +1,5 @@
-package az.less.mobile.presentation.client.main.offers.components
+package az.less.mobile.presentation.client.main.merchant.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -31,31 +29,30 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.presentation.client.main.offers.models.OfferItem
+import az.less.mobile.domain.model.MerchantOffer
+import az.less.mobile.utils.formatPickupTimePair
+import az.less.mobile.utils.formatPrice
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.ic_person_image_placeholder_48dp
 import lessmobile.composeapp.generated.resources.ic_star_24dp
 import lessmobile.composeapp.generated.resources.ill_box_placeholder
 import lessmobile.composeapp.generated.resources.ill_venue_placeholder
 import lessmobile.composeapp.generated.resources.orders_pickup_time
-import lessmobile.composeapp.generated.resources.test_merchant_logo
-import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-/**
- * Vertical offer card component for Top Rated and Top Picks sections
- * Based on Figma design with image, pricing, restaurant info, pickup time, rating, and distance
- */
 @Composable
-fun OfferCard(
-    offerItem: OfferItem,
+fun MerchantOfferCard(
+    offer: MerchantOffer,
+    merchantLogoUrl: String?,
+    rating: Float,
+    distance: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
+            .fillMaxWidth()
             .shadow(
                 elevation = 16.dp,
                 spotColor = Color.Black.copy(alpha = 0.08f),
@@ -80,18 +77,18 @@ fun OfferCard(
                     .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
                     .background(Color(0xFFFFF2EB))
             ) {
-                    AsyncImage(
-                        model = offerItem.imageUrl,
-                        contentDescription = offerItem.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                        error = painterResource(Res.drawable.ill_box_placeholder),
-                        placeholder = painterResource(Res.drawable.ill_box_placeholder)
-                    )
-                }
+                AsyncImage(
+                    model = offer.images.firstOrNull(),
+                    contentDescription = offer.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(Res.drawable.ill_box_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_box_placeholder)
+                )
+            }
 
             // "X left" badge - top left
-            if (offerItem.itemsLeft > 0) {
+            if (offer.availableItems > 0) {
                 Box(
                     modifier = Modifier
                         .padding(start = 14.dp, top = 14.dp)
@@ -103,7 +100,7 @@ fun OfferCard(
                         .padding(horizontal = LessTheme.spacing.xSmall, vertical = LessTheme.spacing.xxSmall)
                 ) {
                     Text(
-                        text = "${offerItem.itemsLeft} left",
+                        text = "${offer.availableItems} left",
                         style = LessTheme.typography.caption12Semibold,
                         color = LessTheme.colors.textIconsNested
                     )
@@ -124,16 +121,14 @@ fun OfferCard(
                         shape = RoundedCornerShape(12.5.dp)
                     )
             ) {
-
-                    AsyncImage(
-                        model = offerItem.restaurantLogoUrl,
-                        contentDescription = "${offerItem.restaurantName} logo",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                        error = painterResource(Res.drawable.ill_venue_placeholder),
-                        placeholder = painterResource(Res.drawable.ill_venue_placeholder)
-                    )
-
+                AsyncImage(
+                    model = merchantLogoUrl,
+                    contentDescription = "Merchant logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(Res.drawable.ill_venue_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_venue_placeholder)
+                )
             }
         }
 
@@ -151,24 +146,26 @@ fun OfferCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Original price (strikethrough)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = offerItem.originalPrice,
-                        style = LessTheme.typography.body14Semibold.copy(
-                            textDecoration = TextDecoration.LineThrough
-                        ),
-                        color = LessTheme.colors.textIconsGrey
-                    )
-                    Text(
-                        text = "₼",
-                        style = LessTheme.typography.caption12Semibold.copy(
-                            textDecoration = TextDecoration.LineThrough
-                        ),
-                        color = LessTheme.colors.textIconsGrey
-                    )
+                if (offer.originalPrice > offer.discountedPrice) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = offer.originalPrice.formatPrice(),
+                            style = LessTheme.typography.body14Semibold.copy(
+                                textDecoration = TextDecoration.LineThrough
+                            ),
+                            color = LessTheme.colors.textIconsGrey
+                        )
+                        Text(
+                            text = "₼",
+                            style = LessTheme.typography.caption12Semibold.copy(
+                                textDecoration = TextDecoration.LineThrough
+                            ),
+                            color = LessTheme.colors.textIconsGrey
+                        )
+                    }
                 }
 
                 // Discounted price
@@ -177,7 +174,7 @@ fun OfferCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = offerItem.currentPrice,
+                        text = offer.discountedPrice.formatPrice(),
                         style = LessTheme.typography.body16Semibold,
                         color = LessTheme.colors.textIconsBrand
                     )
@@ -191,7 +188,7 @@ fun OfferCard(
 
             // Title
             Text(
-                text = offerItem.title,
+                text = offer.title,
                 style = LessTheme.typography.body16Semibold,
                 color = LessTheme.colors.textIconsBlack,
                 maxLines = 1,
@@ -204,39 +201,34 @@ fun OfferCard(
                 thickness = 1.dp
             )
 
-            // Bag type, Category, and Pickup time
+            // Category and Pickup time
             Column(
                 verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
             ) {
-                // Bag type (green text)
-                if (offerItem.bagType != null) {
+                // Category (black text)
+                if (offer.category != null) {
                     Text(
-                        text = offerItem.bagType,
+                        text = offer.category.replaceFirstChar { it.uppercase() },
                         style = LessTheme.typography.body14Medium,
-                        color = LessTheme.colors.textIconsBrand
+                        color = LessTheme.colors.textIconsBlack
                     )
                 }
 
-                // Category (black text)
-                Text(
-                    text = offerItem.category,
-                    style = LessTheme.typography.body14Medium,
-                    color = LessTheme.colors.textIconsBlack
-                )
-
                 // Pickup time (grey text)
-                val pickupParts = offerItem.pickupTime.split(" - ")
-                Text(
-                    text = if (pickupParts.size == 2) {
-                        stringResource(Res.string.orders_pickup_time, pickupParts[0], pickupParts[1])
-                    } else {
-                        offerItem.pickupTime
-                    },
-                    style = LessTheme.typography.body14Medium,
-                    color = LessTheme.colors.textIconsGrey,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                val pickupTime = formatPickupTimePair(offer.pickupTimeStart, offer.pickupTimeEnd)
+                if (pickupTime != null) {
+                    Text(
+                        text = stringResource(
+                            Res.string.orders_pickup_time,
+                            pickupTime.first,
+                            pickupTime.second
+                        ),
+                        style = LessTheme.typography.body14Medium,
+                        color = LessTheme.colors.textIconsGrey,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             // Divider
@@ -274,7 +266,7 @@ fun OfferCard(
                     }
 
                     Text(
-                        text = offerItem.rating.toString(),
+                        text = rating.toString(),
                         style = LessTheme.typography.body14Medium,
                         color = LessTheme.colors.textIconsBlack
                     )
@@ -291,12 +283,15 @@ fun OfferCard(
                 )
 
                 // Distance
-                Text(
-                    text = offerItem.distance,
-                    style = LessTheme.typography.body14Medium,
-                    color = LessTheme.colors.textIconsBlack
-                )
+                if (distance.isNotBlank()) {
+                    Text(
+                        text = distance,
+                        style = LessTheme.typography.body14Medium,
+                        color = LessTheme.colors.textIconsBlack
+                    )
+                }
             }
         }
     }
 }
+

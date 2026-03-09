@@ -37,7 +37,14 @@ import az.less.mobile.presentation.client.reserve.models.CardType
 import az.less.mobile.presentation.client.reserve.models.PaymentCard
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
+import lessmobile.composeapp.generated.resources.payment_add_new_card
+import lessmobile.composeapp.generated.resources.payment_continue
+import lessmobile.composeapp.generated.resources.payment_credit_debit_cards
+import lessmobile.composeapp.generated.resources.payment_selected
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+
+private const val ADD_NEW_CARD_ID = "add_new_card"
 
 /**
  * Bottom sheet for selecting payment method
@@ -49,11 +56,16 @@ fun SelectPaymentMethodBottomSheet(
     isVisible: Boolean,
     sheetState: SheetState,
     paymentCards: List<PaymentCard>,
+    isRegisterCardLoading: Boolean = false,
     onCardSelected: (PaymentCard) -> Unit,
+    onAddNewCard: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedCardId by remember(paymentCards) {
-        mutableStateOf(paymentCards.firstOrNull { it.isSelected }?.id)
+    // Default to "add new card" when no cards exist, otherwise first selected card
+    var selectedId by remember(paymentCards) {
+        val defaultId = paymentCards.firstOrNull { it.isSelected }?.id
+            ?: if (paymentCards.isEmpty()) ADD_NEW_CARD_ID else null
+        mutableStateOf(defaultId)
     }
 
     if (isVisible) {
@@ -63,15 +75,15 @@ fun SelectPaymentMethodBottomSheet(
             containerColor = LessTheme.colors.backgroundSecond,
             contentColor = LessTheme.colors.textIconsBlack,
             shape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp),
-            dragHandle = null, // Remove default drag handle
+            dragHandle = null,
             contentWindowInsets = { WindowInsets(0, 0, 0, 0) }
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 34.dp) // Home indicator space
+                    .padding(bottom = 34.dp)
             ) {
-                // Custom drag handle inside shaped container
+                // Custom drag handle
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -86,7 +98,7 @@ fun SelectPaymentMethodBottomSheet(
                             .background(LessTheme.colors.borderPrimary)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Credit and debit cards section
@@ -97,7 +109,7 @@ fun SelectPaymentMethodBottomSheet(
                 ) {
                     // Section header
                     Text(
-                        text = "Credit and debit cards",
+                        text = stringResource(Res.string.payment_credit_debit_cards),
                         style = LessTheme.typography.body14Medium,
                         color = LessTheme.colors.textIconsGrey,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -109,22 +121,30 @@ fun SelectPaymentMethodBottomSheet(
                     paymentCards.forEach { card ->
                         PaymentCardItem(
                             card = card,
-                            isSelected = selectedCardId == card.id,
-                            onClick = {
-                                selectedCardId = card.id
-                            }
+                            isSelected = selectedId == card.id,
+                            onClick = { selectedId = card.id }
                         )
                     }
+
+                    // Add new card row
+                    AddNewCardItem(
+                        isSelected = selectedId == ADD_NEW_CARD_ID,
+                        onClick = { selectedId = ADD_NEW_CARD_ID }
+                    )
                 }
 
                 // Continue button
                 DsButton(
-                    text = "Continue",
+                    text = stringResource(Res.string.payment_continue),
                     onClick = {
-                        val selectedCard = paymentCards.firstOrNull { it.id == selectedCardId }
-                        if (selectedCard != null) {
-                            onCardSelected(selectedCard)
-                            onDismiss()
+                        if (selectedId == ADD_NEW_CARD_ID) {
+                            onAddNewCard()
+                        } else {
+                            val selectedCard = paymentCards.firstOrNull { it.id == selectedId }
+                            if (selectedCard != null) {
+                                onCardSelected(selectedCard)
+                                onDismiss()
+                            }
                         }
                     },
                     modifier = Modifier
@@ -132,7 +152,8 @@ fun SelectPaymentMethodBottomSheet(
                         .padding(horizontal = 16.dp),
                     variant = ButtonVariant.Primary,
                     size = ButtonSize.Large,
-                    enabled = selectedCardId != null
+                    enabled = selectedId != null,
+                    isLoading = isRegisterCardLoading
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -158,7 +179,7 @@ private fun PaymentCardItem(
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Card icon placeholder
+        // Card icon
         Box(
             modifier = Modifier
                 .size(40.dp)
@@ -183,30 +204,30 @@ private fun PaymentCardItem(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = when (card.type) {
-                    CardType.MASTERCARD -> "Mastercard •••• ${card.lastFourDigits}"
-                    CardType.VISA -> "Visa •••• ${card.lastFourDigits}"
-                    CardType.ADD_NEW -> "Add new card"
+                text = card.displayName.ifEmpty {
+                    when (card.type) {
+                        CardType.MASTERCARD -> "Mastercard •••• ${card.lastFourDigits}"
+                        CardType.VISA -> "Visa •••• ${card.lastFourDigits}"
+                        CardType.ADD_NEW -> stringResource(Res.string.payment_add_new_card)
+                    }
                 },
                 style = LessTheme.typography.body16Regular,
                 color = LessTheme.colors.textIconsBlack
             )
 
-            // Show "Selected" indicator for the selected card
-            if (isSelected && card.type != CardType.ADD_NEW) {
+            if (isSelected) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Green checkmark icon (using a simple text icon for now)
                     Text(
-                        text = "✓",
+                        text = "\u2713",
                         style = LessTheme.typography.body14Regular,
                         color = LessTheme.colors.textIconsBrand
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        text = "Selected",
+                        text = stringResource(Res.string.payment_selected),
                         style = LessTheme.typography.body14Regular,
                         color = LessTheme.colors.textIconsGrey
                     )
@@ -216,22 +237,67 @@ private fun PaymentCardItem(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        // Radio button
         DsRadioButton(
             selected = isSelected,
             onClick = onClick
         )
     }
 
-    // Bottom border for each item (except for "Add new card" which is the last item)
-    if (card.type != CardType.ADD_NEW) {
+    // Bottom border
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .padding(start = 68.dp)
+            .background(LessTheme.colors.borderPrimary)
+    )
+}
+
+/**
+ * Add new card item row with radio button
+ */
+@Composable
+private fun AddNewCardItem(
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(65.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Card add icon
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .padding(start = 68.dp) // Align with text
-                .background(LessTheme.colors.borderPrimary)
+                .size(40.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(LessTheme.colors.backgroundPrimary)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = vectorResource(Res.drawable.ic_payment_card_24dp),
+                contentDescription = null,
+                tint = LessTheme.colors.textIconsGrey,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = stringResource(Res.string.payment_add_new_card),
+            style = LessTheme.typography.body16Regular,
+            color = LessTheme.colors.textIconsBlack,
+            modifier = Modifier.weight(1f)
+        )
+
+        DsRadioButton(
+            selected = isSelected,
+            onClick = onClick
         )
     }
 }
-

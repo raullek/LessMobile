@@ -2,6 +2,7 @@ package az.less.mobile.presentation.client.main.merchant
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.domain.repository.FavoritesRepository
 import az.less.mobile.domain.repository.MerchantRepository
 import az.less.mobile.utils.formatOneDecimal
 import dev.jordond.compass.geolocation.Geolocator
@@ -11,8 +12,12 @@ import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
+private const val MAX_REVIEWS_LIMIT = 50
+private const val MAX_OFFERS_LIMIT = 50
+
 class MerchantProfileViewModel(
-    private val merchantRepository: MerchantRepository
+    private val merchantRepository: MerchantRepository,
+    private val favoritesRepository: FavoritesRepository
 ) : ViewModel(), ContainerHost<MerchantProfileState, MerchantProfileSideEffect> {
 
     override val container: Container<MerchantProfileState, MerchantProfileSideEffect> =
@@ -36,6 +41,7 @@ class MerchantProfileViewModel(
             is MerchantProfileIntent.OnPhoneClicked -> handlePhoneClicked()
             is MerchantProfileIntent.OnViewLocationClicked -> handleViewLocationClicked()
             is MerchantProfileIntent.OnMapBackClicked -> handleMapBackClicked()
+            is MerchantProfileIntent.OnOfferClicked -> handleOfferClicked(intent.offerId)
         }
     }
 
@@ -49,6 +55,9 @@ class MerchantProfileViewModel(
         merchantRepository.getMerchantProfile(
             merchantId = merchantId,
             includeReviews = true,
+            reviewsLimit = MAX_REVIEWS_LIMIT,
+            includeOffers = true,
+            offersLimit = MAX_OFFERS_LIMIT,
             latitude = userLat,
             longitude = userLng
         )
@@ -69,9 +78,12 @@ class MerchantProfileViewModel(
                         address = profile.businessAddress,
                         latitude = profile.latitude,
                         longitude = profile.longitude,
+                        offers = profile.offers,
                         reviews = profile.reviews,
                         reviewsTotal = profile.reviewsTotal,
-                        reviewsHasMore = profile.reviewsHasMore
+                        reviewsHasMore = profile.reviewsHasMore,
+                        isFavorite = profile.isFavorite,
+                        favoriteId = profile.favoriteId
                     )
                 }
             }
@@ -104,7 +116,36 @@ class MerchantProfileViewModel(
     }
 
     private fun handleFavoriteClicked() = intent {
-        reduce { state.copy(isFavorite = !state.isFavorite) }
+        val wasFavorite = state.isFavorite
+        val oldFavoriteId = state.favoriteId
+
+        // Optimistic UI toggle
+        reduce { state.copy(isFavorite = !wasFavorite) }
+
+        if (!wasFavorite) {
+            // Adding to favorites
+            favoritesRepository.addFavorite(state.merchantId)
+                .onSuccess { response ->
+                    reduce { state.copy(favoriteId = response.id) }
+                }
+                .onError { error ->
+                    reduce { state.copy(isFavorite = false, favoriteId = oldFavoriteId) }
+                    postSideEffect(MerchantProfileSideEffect.ShowError(error.message))
+                }
+        } else {
+            // Removing from favorites
+            val favoriteId = oldFavoriteId
+            if (favoriteId != null) {
+                favoritesRepository.removeFavorite(favoriteId)
+                    .onSuccess {
+                        reduce { state.copy(favoriteId = null) }
+                    }
+                    .onError { error ->
+                        reduce { state.copy(isFavorite = true, favoriteId = oldFavoriteId) }
+                        postSideEffect(MerchantProfileSideEffect.ShowError(error.message))
+                    }
+            }
+        }
     }
 
     private fun handleTabSelected(tab: MerchantProfileTab) = intent {
@@ -125,5 +166,9 @@ class MerchantProfileViewModel(
 
     private fun handleMapBackClicked() = intent {
         reduce { state.copy(isMapVisible = false) }
+    }
+
+    private fun handleOfferClicked(offerId: String) = intent {
+        postSideEffect(MerchantProfileSideEffect.NavigateToReserve(offerId))
     }
 }

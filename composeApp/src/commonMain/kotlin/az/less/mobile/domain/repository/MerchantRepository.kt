@@ -8,6 +8,8 @@ interface MerchantRepository {
         merchantId: String,
         includeReviews: Boolean = false,
         reviewsLimit: Int? = null,
+        includeOffers: Boolean = false,
+        offersLimit: Int? = null,
         latitude: Double? = null,
         longitude: Double? = null
     ): NetworkResult<MerchantProfile>

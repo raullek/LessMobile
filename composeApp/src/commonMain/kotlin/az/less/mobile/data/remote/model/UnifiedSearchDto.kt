@@ -3,13 +3,6 @@ package az.less.mobile.data.remote.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UnifiedSearchDto(
-    val venues: List<SearchVenueDto> = emptyList(),
-    val boxes: List<SearchBoxDto> = emptyList(),
-    val total: Int = 0
-)
-
-@Serializable
 data class SearchVenueDto(
     val id: String,
     val name: String,

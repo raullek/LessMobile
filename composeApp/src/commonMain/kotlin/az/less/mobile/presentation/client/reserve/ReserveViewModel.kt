@@ -2,6 +2,8 @@ package az.less.mobile.presentation.client.reserve
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.data.remote.model.DefaultPaymentDto
+import az.less.mobile.data.remote.model.PaymentCardDto
 import az.less.mobile.domain.repository.OffersRepository
 import az.less.mobile.presentation.client.reserve.models.CardType
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
@@ -43,6 +45,8 @@ class ReserveViewModel(
             is ReserveIntent.OnSelectVoucherClicked -> handleSelectVoucherClicked()
             is ReserveIntent.OnVoucherSelected -> handleVoucherSelected(intent.voucher)
             is ReserveIntent.OnVoucherBottomSheetDismissed -> handleVoucherBottomSheetDismissed()
+            is ReserveIntent.OnAddNewCardClicked -> handleAddNewCardClicked()
+            is ReserveIntent.OnPaymentSheetDismissed -> handlePaymentSheetDismissed()
         }
     }
 
@@ -59,30 +63,6 @@ class ReserveViewModel(
             .onSuccess { detail ->
                 val quantity = 1
                 val subtotal = calculateSubtotal(quantity, detail.discountedPrice)
-
-                // Mock payment cards (separate endpoint in future)
-                val mockPaymentCards = listOf(
-                    PaymentCard(
-                        id = "card_1",
-                        type = CardType.MASTERCARD,
-                        lastFourDigits = "2412",
-                        isSelected = true
-                    ),
-                    PaymentCard(
-                        id = "card_2",
-                        type = CardType.VISA,
-                        lastFourDigits = "3440",
-                        isSelected = false
-                    ),
-                    PaymentCard(
-                        id = "add_new",
-                        type = CardType.ADD_NEW,
-                        lastFourDigits = "",
-                        isSelected = false
-                    )
-                )
-
-                val selectedCard = mockPaymentCards.firstOrNull { it.isSelected }
 
                 // Mock lot size info
                 val mockLotSizeInfo = listOf(
@@ -123,19 +103,13 @@ class ReserveViewModel(
                         venueName = detail.venue.businessName,
                         venueId = detail.venue.id,
                         venueLogoUrl = detail.venue.businessLogo,
-                        availablePaymentCards = mockPaymentCards,
-                        selectedPaymentCard = selectedCard,
-                        paymentMethodDisplay = selectedCard?.let {
-                            when (it.type) {
-                                CardType.MASTERCARD -> "Mastercard •••• ${it.lastFourDigits}"
-                                CardType.VISA -> "Visa •••• ${it.lastFourDigits}"
-                                CardType.ADD_NEW -> ""
-                            }
-                        } ?: "",
                         lotSizeInfoList = mockLotSizeInfo,
                         availableVouchers = mockVouchers
                     )
                 }
+
+                // Load default payment method
+                loadDefaultPayment()
             }
             .onError { error ->
                 reduce {
@@ -146,6 +120,41 @@ class ReserveViewModel(
                 }
                 postSideEffect(ReserveSideEffect.ShowError(error.message))
             }
+    }
+
+    private fun loadDefaultPayment() = intent {
+        reduce { state.copy(isPaymentLoading = true) }
+
+        offersRepository.getDefaultPayment()
+            .onSuccess { payment ->
+                val card = payment.toPaymentCard()
+                reduce {
+                    state.copy(
+                        isPaymentLoading = false,
+                        selectedPaymentCard = card,
+                        paymentMethodDisplay = payment.displayName ?: ""
+                    )
+                }
+            }
+            .onError {
+                reduce { state.copy(isPaymentLoading = false) }
+            }
+    }
+
+    private fun DefaultPaymentDto.toPaymentCard(): PaymentCard {
+        val cardType = when (brand?.lowercase()) {
+            "visa" -> CardType.VISA
+            "mastercard" -> CardType.MASTERCARD
+            else -> CardType.VISA
+        }
+        return PaymentCard(
+            id = id,
+            type = cardType,
+            lastFourDigits = last4 ?: cardMask ?: "",
+            brand = brand ?: "",
+            displayName = displayName ?: "",
+            isSelected = true
+        )
     }
 
     private fun calculateSubtotal(quantity: Int, pricePerPiece: Double): Double {
@@ -177,7 +186,44 @@ class ReserveViewModel(
     }
 
     private fun handlePaymentMethodClicked() = intent {
-        postSideEffect(ReserveSideEffect.NavigateToPaymentMethods)
+        reduce { state.copy(isPaymentSheetVisible = true, isPaymentCardsLoading = true) }
+        loadAllPaymentCards()
+    }
+
+    private fun loadAllPaymentCards() = intent {
+        offersRepository.getPaymentMethods()
+            .onSuccess { methods ->
+                val cards = methods.cards.map { it.toPaymentCard() }
+                reduce {
+                    state.copy(
+                        isPaymentCardsLoading = false,
+                        availablePaymentCards = cards
+                    )
+                }
+            }
+            .onError {
+                reduce { state.copy(isPaymentCardsLoading = false) }
+            }
+    }
+
+    private fun PaymentCardDto.toPaymentCard(): PaymentCard {
+        val cardType = when (brand?.lowercase()) {
+            "visa" -> CardType.VISA
+            "mastercard" -> CardType.MASTERCARD
+            else -> CardType.VISA
+        }
+        return PaymentCard(
+            id = id,
+            type = cardType,
+            lastFourDigits = last4 ?: cardMask ?: "",
+            brand = brand ?: "",
+            displayName = displayName ?: "",
+            isSelected = isDefault
+        )
+    }
+
+    private fun handlePaymentSheetDismissed() = intent {
+        reduce { state.copy(isPaymentSheetVisible = false) }
     }
 
     private fun handlePaymentCardSelected(card: PaymentCard) = intent {
@@ -189,17 +235,20 @@ class ReserveViewModel(
             it.copy(isSelected = it.id == card.id)
         }
 
-        val displayText = when (card.type) {
-            CardType.MASTERCARD -> "Mastercard •••• ${card.lastFourDigits}"
-            CardType.VISA -> "Visa •••• ${card.lastFourDigits}"
-            CardType.ADD_NEW -> ""
+        val displayText = card.displayName.ifEmpty {
+            when (card.type) {
+                CardType.MASTERCARD -> "Mastercard •••• ${card.lastFourDigits}"
+                CardType.VISA -> "Visa •••• ${card.lastFourDigits}"
+                CardType.ADD_NEW -> ""
+            }
         }
 
         reduce {
             state.copy(
                 selectedPaymentCard = card,
                 availablePaymentCards = updatedCards,
-                paymentMethodDisplay = displayText
+                paymentMethodDisplay = displayText,
+                isPaymentSheetVisible = false
             )
         }
     }
@@ -259,5 +308,24 @@ class ReserveViewModel(
 
     private fun handleVoucherBottomSheetDismissed() = intent {
         reduce { state.copy(isVoucherBottomSheetVisible = false) }
+    }
+
+    private fun handleAddNewCardClicked() = intent {
+        reduce { state.copy(isRegisterCardLoading = true) }
+
+        offersRepository.registerCard()
+            .onSuccess { response ->
+                reduce { state.copy(isRegisterCardLoading = false) }
+                val url = response.redirectUrl ?: response.url
+                if (url != null) {
+                    postSideEffect(ReserveSideEffect.OpenRedirectUrl(url))
+                }
+                println("RegisterCard response: redirectUrl=${response.redirectUrl}, url=${response.url}, extra=${response.extra}")
+            }
+            .onError { error ->
+                reduce { state.copy(isRegisterCardLoading = false) }
+                postSideEffect(ReserveSideEffect.ShowError(error.message))
+                println("RegisterCard error: ${error.message}")
+            }
     }
 }

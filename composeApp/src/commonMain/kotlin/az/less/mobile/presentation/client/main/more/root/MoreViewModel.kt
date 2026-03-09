@@ -19,6 +19,7 @@ import lessmobile.composeapp.generated.resources.ic_account_24dp
 import lessmobile.composeapp.generated.resources.ic_bubble_question_24dp
 import lessmobile.composeapp.generated.resources.ic_clock_24dp
 import lessmobile.composeapp.generated.resources.ic_customer_support_24dp
+import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.ic_notification_24dp
 import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
 import lessmobile.composeapp.generated.resources.ic_terms_file_24dp
@@ -35,6 +36,7 @@ import lessmobile.composeapp.generated.resources.more_payment_methods
 import lessmobile.composeapp.generated.resources.more_section_application
 import lessmobile.composeapp.generated.resources.more_section_support
 import lessmobile.composeapp.generated.resources.more_terms_of_service
+import lessmobile.composeapp.generated.resources.more_switch_to_merchant
 import lessmobile.composeapp.generated.resources.more_vouchers
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -67,7 +69,7 @@ class MoreViewModel(
                     state.copy(
                         locationPermissionGranted = hasPermission,
                         sections = if (state.isLoggedIn) {
-                            buildAuthSections(state.notificationEnabled, hasPermission)
+                            buildAuthSections(state.notificationEnabled, hasPermission, state.hasMerchantRole)
                         } else {
                             buildNonAuthSections(state.notificationEnabled, hasPermission)
                         }
@@ -82,13 +84,15 @@ class MoreViewModel(
             userLocalRepository.currentUser.collectLatest { user ->
                 intent {
                     if (user != null) {
+                        val isMerchant = user.roles.contains("merchant")
                         reduce {
                             state.copy(
                                 isLoggedIn = true,
+                                hasMerchantRole = isMerchant,
                                 userName = user.name,
                                 userEmail = user.email,
                                 userAvatarUrl = user.avatarUrl,
-                                sections = buildAuthSections(state.notificationEnabled, state.locationPermissionGranted)
+                                sections = buildAuthSections(state.notificationEnabled, state.locationPermissionGranted, isMerchant)
                             )
                         }
                     } else {
@@ -156,6 +160,7 @@ class MoreViewModel(
             CellId.Notification -> {
                 // Notification is handled separately via toggle
             }
+            CellId.SwitchToMerchant -> postSideEffect(MoreSideEffect.NavigateToMerchantFlow)
         }
     }
 
@@ -203,7 +208,7 @@ class MoreViewModel(
             state.copy(
                 notificationEnabled = newEnabled,
                 sections = if (state.isLoggedIn) {
-                    buildAuthSections(newEnabled, state.locationPermissionGranted)
+                    buildAuthSections(newEnabled, state.locationPermissionGranted, state.hasMerchantRole)
                 } else {
                     buildNonAuthSections(newEnabled, state.locationPermissionGranted)
                 }
@@ -214,50 +219,64 @@ class MoreViewModel(
     /**
      * Build sections for authenticated users
      */
-    private fun buildAuthSections(notificationEnabled: Boolean, locationGranted: Boolean): List<MoreSection> {
+    private fun buildAuthSections(notificationEnabled: Boolean, locationGranted: Boolean, hasMerchantRole: Boolean): List<MoreSection> {
+        val appCells = mutableListOf(
+            MoreCellModel(
+                id = CellId.Account,
+                titleRes = Res.string.more_account,
+                icon = Res.drawable.ic_account_24dp,
+                type = MoreCellType.Navigation
+            ),
+            MoreCellModel(
+                id = CellId.PaymentMethods,
+                titleRes = Res.string.more_payment_methods,
+                icon = Res.drawable.ic_payment_card_24dp,
+                type = MoreCellType.Navigation
+            ),
+            MoreCellModel(
+                id = CellId.Voucher,
+                titleRes = Res.string.more_vouchers,
+                icon = Res.drawable.ic_voucher_24dp,
+                type = MoreCellType.Navigation
+            ),
+            MoreCellModel(
+                id = CellId.History,
+                titleRes = Res.string.more_history,
+                icon = Res.drawable.ic_clock_24dp,
+                type = MoreCellType.Navigation,
+            ),
+            MoreCellModel(
+                id = CellId.Location,
+                titleRes = Res.string.more_location,
+                subtitleRes = if (locationGranted) Res.string.more_location_granted else Res.string.more_location_not_granted,
+                icon = Res.drawable.ic_map_24dp,
+                type = MoreCellType.Navigation
+            ),
+            MoreCellModel(
+                id = CellId.Notification,
+                titleRes = Res.string.more_notification,
+                icon = Res.drawable.ic_notification_24dp,
+                type = MoreCellType.Toggle(notificationEnabled),
+                showDivider = !hasMerchantRole
+            )
+        )
+
+        if (hasMerchantRole) {
+            appCells.add(
+                MoreCellModel(
+                    id = CellId.SwitchToMerchant,
+                    titleRes = Res.string.more_switch_to_merchant,
+                    icon = Res.drawable.ic_explore_24dp,
+                    type = MoreCellType.Navigation,
+                    showDivider = false
+                )
+            )
+        }
+
         return listOf(
             MoreSection(
                 titleRes = Res.string.more_section_application,
-                cells = listOf(
-                    MoreCellModel(
-                        id = CellId.Account,
-                        titleRes = Res.string.more_account,
-                        icon = Res.drawable.ic_account_24dp,
-                        type = MoreCellType.Navigation
-                    ),
-                    MoreCellModel(
-                        id = CellId.PaymentMethods,
-                        titleRes = Res.string.more_payment_methods,
-                        icon = Res.drawable.ic_payment_card_24dp,
-                        type = MoreCellType.Navigation
-                    ),
-                    MoreCellModel(
-                        id = CellId.Voucher,
-                        titleRes = Res.string.more_vouchers,
-                        icon = Res.drawable.ic_voucher_24dp,
-                        type = MoreCellType.Navigation
-                    ),
-                    MoreCellModel(
-                        id = CellId.History,
-                        titleRes = Res.string.more_history,
-                        icon = Res.drawable.ic_clock_24dp,
-                        type = MoreCellType.Navigation,
-                    ),
-                    MoreCellModel(
-                        id = CellId.Location,
-                        titleRes = Res.string.more_location,
-                        subtitleRes = if (locationGranted) Res.string.more_location_granted else Res.string.more_location_not_granted,
-                        icon = Res.drawable.ic_map_24dp,
-                        type = MoreCellType.Navigation
-                    ),
-                    MoreCellModel(
-                        id = CellId.Notification,
-                        titleRes = Res.string.more_notification,
-                        icon = Res.drawable.ic_notification_24dp,
-                        type = MoreCellType.Toggle(notificationEnabled),
-                        showDivider = false
-                    )
-                )
+                cells = appCells
             ),
             MoreSection(
                 titleRes = Res.string.more_section_support,

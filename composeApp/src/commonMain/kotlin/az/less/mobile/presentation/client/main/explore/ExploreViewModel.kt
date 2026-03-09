@@ -2,9 +2,8 @@ package az.less.mobile.presentation.client.main.explore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.domain.model.SearchBox
-import az.less.mobile.domain.model.SearchVenue
 import az.less.mobile.data.remote.model.SearchFilterDto
+import az.less.mobile.data.remote.model.SearchFilterParam
 import az.less.mobile.domain.repository.ExploreRepository
 import az.less.mobile.presentation.client.main.explore.models.FilterCategory
 import az.less.mobile.presentation.client.main.explore.models.FilterData
@@ -18,6 +17,8 @@ import az.less.mobile.utils.formatPrice
 import dev.jordond.compass.geolocation.Geolocator
 import dev.jordond.compass.geolocation.mobile
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -51,11 +52,29 @@ class ExploreViewModel(
             is ExploreIntent.OnFilterOptionClicked -> handleFilterOptionClicked(intent.categoryId, intent.optionId)
             is ExploreIntent.OnApplyFilters -> handleApplyFilters()
             is ExploreIntent.OnDidCenterCameraOnMarker -> handleDidCenterCameraOnMarker()
+            is ExploreIntent.OnDismissMerchantSlots -> handleDismissMerchantSlots()
+            is ExploreIntent.OnSlotClicked -> handleSlotClicked(intent.slotId)
         }
     }
 
     private suspend fun getLocation() = withTimeoutOrNull(3000L) {
         if (geolocator.isAvailable()) geolocator.current().getOrNull() else null
+    }
+
+    private fun buildFiltersJson(): String {
+        val filterParams = container.stateFlow.value.filterData.categories
+            .mapNotNull { category ->
+                val selectedValues = category.options
+                    .filter { it.isSelected }
+                    .map { it.id }
+                if (selectedValues.isNotEmpty()) {
+                    SearchFilterParam(
+                        searchFilterId = category.id,
+                        values = selectedValues
+                    )
+                } else null
+            }
+        return Json.encodeToString(filterParams)
     }
 
     private fun performSearch() = intent {
@@ -65,27 +84,22 @@ class ExploreViewModel(
         val latitude = location?.coordinates?.latitude
         val longitude = location?.coordinates?.longitude
 
-        val tags = state.activeFilters["tags"]
-            ?.takeIf { it.isNotEmpty() }?.joinToString(",")
-        val category = state.activeFilters["category"]
-            ?.takeIf { it.isNotEmpty() }?.joinToString(",")
-
         val quickFilters = state.activeQuickFilters
+        val isFavorite = if (QuickFilter.FAVORITE in quickFilters) true else null
         val openNow = if (QuickFilter.OPEN_NOW in quickFilters) true else null
-        val sortBy = when {
-            QuickFilter.NEAREST in quickFilters -> "nearest"
-            QuickFilter.HOT_DEALS in quickFilters -> "hot_deals"
-            else -> null
-        }
+        val nearest = if (QuickFilter.NEAREST in quickFilters) true else null
+        val hotDeals = if (QuickFilter.HOT_DEALS in quickFilters) true else null
 
-        exploreRepository.unifiedSearch(
-            query = state.searchQuery.takeIf { it.isNotBlank() },
-            tags = tags,
-            category = category,
-            openNow = openNow,
-            sortBy = sortBy,
+        val filtersJson = buildFiltersJson()
+
+        exploreRepository.searchVenuesByFilters(
+            filters = filtersJson,
+            latitude = latitude,
             longitude = longitude,
-            latitude = latitude
+            isFavorite = isFavorite,
+            nearest = nearest,
+            hotDeals = hotDeals,
+            openNow = openNow
         )
             .onSuccess { data ->
                 val markers = data.venues.map { venue ->
@@ -104,7 +118,6 @@ class ExploreViewModel(
                     state.copy(
                         isLoading = false,
                         venues = data.venues,
-                        boxes = data.boxes,
                         totalResults = data.total,
                         markers = markers,
                         error = null
@@ -172,20 +185,8 @@ class ExploreViewModel(
     }
 
     private fun handleMapMarkerClicked(venueId: String) = intent {
-        // Find boxes belonging to this venue from API data
-        val venueBoxes = state.boxes.filter { it.venueId == venueId }
         val venue = state.venues.find { it.id == venueId }
         val merchantName = venue?.name ?: ""
-
-        val slots = venueBoxes.map { box ->
-            OfferSlot(
-                id = box.id,
-                title = box.title,
-                price = box.discountedPrice.formatPrice(),
-                pickupTime = "",
-                imageUrl = box.images.firstOrNull()
-            )
-        }
 
         val clickedMarker = state.markers.find { marker ->
             val markerVenueId = marker.tag as? String ?: marker.id
@@ -208,11 +209,28 @@ class ExploreViewModel(
                 markers = updatedMarkers,
                 selectedVenueId = venueId,
                 selectedMerchantName = merchantName,
-                selectedMerchantSlots = slots,
+                selectedMerchantSlots = emptyList(),
                 selectedMarkerPosition = adjustedPosition
             )
         }
-        postSideEffect(ExploreSideEffect.NavigateToVenueDetail(venueId))
+
+        // Fetch boxes for this venue
+        exploreRepository.getBoxesForVenue(venueId)
+            .onSuccess { data ->
+                val slots = data.boxes.map { box ->
+                    OfferSlot(
+                        id = box.id,
+                        title = box.title,
+                        price = box.discountedPrice.formatPrice(),
+                        pickupTime = "",
+                        imageUrl = box.images.firstOrNull()
+                    )
+                }
+                reduce { state.copy(selectedMerchantSlots = slots) }
+            }
+            .onError { error ->
+                postSideEffect(ExploreSideEffect.ShowError(error.message))
+            }
     }
 
     private fun handleLocationPermissionChanged(granted: Boolean) = intent {
@@ -255,17 +273,10 @@ class ExploreViewModel(
     }
 
     private fun handleApplyFilters() = intent {
-        val activeFilters = mutableMapOf<String, List<String>>()
-        state.filterData.categories.forEach { category ->
-            val selectedValues = category.options
-                .filter { it.isSelected }
-                .map { it.id }
-            if (selectedValues.isNotEmpty()) {
-                activeFilters[category.fieldName] = selectedValues
-            }
+        val hasActiveFilters = state.filterData.categories.any { category ->
+            category.options.any { it.isSelected }
         }
 
-        val hasActiveFilters = activeFilters.isNotEmpty()
         val updatedFilterItems = state.filterItems.map { item ->
             if (item.quickFilter == QuickFilter.FILTER_BUTTON) item.copy(isSelected = hasActiveFilters)
             else item
@@ -274,7 +285,6 @@ class ExploreViewModel(
         reduce {
             state.copy(
                 isFilterSheetVisible = false,
-                activeFilters = activeFilters,
                 filterItems = updatedFilterItems
             )
         }
@@ -284,6 +294,22 @@ class ExploreViewModel(
 
     private fun handleDidCenterCameraOnMarker() = intent {
         reduce { state.copy(selectedMarkerPosition = null) }
+    }
+
+    private fun handleDismissMerchantSlots() = intent {
+        val updatedMarkers = state.markers.map { it.copy(isSelected = false) }
+        reduce {
+            state.copy(
+                selectedVenueId = null,
+                selectedMerchantName = "",
+                selectedMerchantSlots = emptyList(),
+                markers = updatedMarkers
+            )
+        }
+    }
+
+    private fun handleSlotClicked(slotId: String) = intent {
+        postSideEffect(ExploreSideEffect.NavigateToReserve(slotId))
     }
 
     private fun loadFilterData() = intent {

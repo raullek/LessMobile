@@ -6,21 +6,21 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import az.less.mobile.presentation.client.account.account.AccountScreen
 import az.less.mobile.presentation.client.account.paymentmethods.PaymentMethodsScreen
+import az.less.mobile.presentation.client.account.paymentmethods.addcard.AddCardWebViewScreen
 import az.less.mobile.presentation.client.main.categoryoffers.CategoryOffersScreen
 import az.less.mobile.presentation.client.main.explore.ExploreScreen
+import az.less.mobile.presentation.client.main.favorites.FavoritesScreen
 import az.less.mobile.presentation.client.main.merchant.MerchantProfileScreen
 import az.less.mobile.presentation.client.main.more.root.MoreScreen
 import az.less.mobile.presentation.client.main.offers.OffersScreen
 import az.less.mobile.presentation.client.main.orders.OrdersScreen
-import az.less.mobile.presentation.client.main.favorites.FavoritesScreen
 import az.less.mobile.presentation.client.main.search.SearchScreen
+import az.less.mobile.presentation.client.main.voucher.VoucherScreen
 import az.less.mobile.presentation.client.onboarding.loginemail.LoginEmailScreen
 import az.less.mobile.presentation.client.onboarding.otp.LoginCodeScreen
 import az.less.mobile.presentation.client.onboarding.welcome.WelcomeScreen
 import az.less.mobile.presentation.client.reserve.OrderAcceptedScreen
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
-import az.less.mobile.presentation.client.main.voucher.VoucherScreen
-import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardScreen
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
@@ -51,8 +51,9 @@ sealed interface ClientRoute {
     @Serializable
     data class CategoryOffers(
         val categoryId: String,
-        val categoryType: String,  // Type from backend (e.g., "FOOD_CATEGORY", "DISCOUNT", "NEAREST")
-        val categoryTitle: String
+        val categoryType: String,
+        val categoryTitle: String,
+        val filtersJson: String = "[]"
     ) : ClientRoute
 
     @Serializable
@@ -79,7 +80,10 @@ sealed interface ClientRoute {
     data object PaymentMethods : ClientRoute
 
     @Serializable
-    data object AddNewCard : ClientRoute
+    data class WebView(val url: String, val title: String) : ClientRoute
+
+    @Serializable
+    data class AddCardWebView(val url: String, val title: String) : ClientRoute
 
     @Serializable
     data object Voucher : ClientRoute
@@ -107,7 +111,7 @@ fun NavGraphBuilder.mainGraph(
     }
 
     composable<ClientRoute.Explore> {
-        ExploreScreen()
+        ExploreScreen(navController = navController)
     }
 
     composable<ClientRoute.Orders> {
@@ -133,9 +137,8 @@ fun NavGraphBuilder.mainGraph(
         val args = backStackEntry.toRoute<ClientRoute.CategoryOffers>()
         CategoryOffersScreen(
             navController = navController,
-            categoryId = args.categoryId,
-            categoryType = args.categoryType,
-            categoryTitle = args.categoryTitle
+            categoryTitle = args.categoryTitle,
+            filtersJson = args.filtersJson
         )
     }
 
@@ -176,8 +179,14 @@ fun NavGraphBuilder.moreGraph(
         AccountScreen(navController = navController)
     }
 
-    composable<ClientRoute.AddNewCard> {
-        AddNewCardScreen(navController = navController)
+
+    composable<ClientRoute.AddCardWebView> { backStackEntry ->
+        val args = backStackEntry.toRoute<ClientRoute.AddCardWebView>()
+        AddCardWebViewScreen(
+            navController = navController,
+            url = args.url,
+            title = args.title
+        )
     }
 
     composable<ClientRoute.Voucher> {

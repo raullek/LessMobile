@@ -27,10 +27,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.navigation.NavController
+import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.explore.components.FilterBottomSheet
 import az.less.mobile.presentation.client.main.explore.components.FilterChip
 import az.less.mobile.presentation.client.main.explore.components.MerchantSlotsRow
 import az.less.mobile.presentation.client.main.explore.models.QuickFilter
+import az.less.mobile.presentation.client.reserve.ReserveScreen
 import kotlinx.coroutines.launch
 import az.less.mobile.presentation.maps.GoogleMaps
 import az.less.mobile.presentation.maps.LocationPermissionHandler
@@ -45,37 +49,80 @@ import org.orbitmvi.orbit.compose.collectSideEffect
  * Stateful ExploreScreen that connects to ViewModel
  * This is the entry point used by navigation
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreScreen(
+    navController: NavController,
     viewModel: ExploreViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    var isReserveBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var selectedOfferId by rememberSaveable { mutableStateOf("") }
+    val reserveSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     // Collect side effects for navigation
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is ExploreSideEffect.NavigateToVenueDetail -> {
                 // Handle navigation to venue detail
-                // navController.navigate("venue_detail/${sideEffect.venueId}")
             }
             is ExploreSideEffect.NavigateToSearch -> {
                 // Handle navigation to search screen
-                // navController.navigate("search")
             }
             is ExploreSideEffect.NavigateToFilter -> {
                 // Handle navigation to filter screen
-                // navController.navigate("filter")
             }
             is ExploreSideEffect.ShowError -> {
                 // Show error snackbar
             }
+            is ExploreSideEffect.NavigateToReserve -> {
+                selectedOfferId = sideEffect.offerId
+                isReserveBottomSheetVisible = true
+                scope.launch {
+                    reserveSheetState.expand()
+                }
+            }
         }
     }
-    
+
     // Render the stateless UI
     ExploreScreenContent(
         state = state,
         onIntent = viewModel::onIntent
+    )
+
+    ReserveScreen(
+        isVisible = isReserveBottomSheetVisible,
+        sheetState = reserveSheetState,
+        offerId = selectedOfferId,
+        onDismiss = {
+            scope.launch {
+                reserveSheetState.hide()
+            }.invokeOnCompletion {
+                isReserveBottomSheetVisible = false
+            }
+        },
+        onOrderPlaced = { orderInfo ->
+            navController.navigate(
+                ClientRoute.OrderAccepted(
+                    orderNumber = orderInfo.orderNumber,
+                    venueName = orderInfo.venueName,
+                    pickupTime = orderInfo.pickupTime
+                )
+            )
+        },
+        onNavigateToMerchant = { merchantId ->
+            navController.navigate(ClientRoute.Merchant(merchantId = merchantId))
+        },
+        onNavigateToAddCardWebView = { url ->
+            navController.navigate(
+                ClientRoute.AddCardWebView(url = url, title = "Add Card")
+            )
+        }
     )
 }
 
@@ -144,6 +191,11 @@ fun ExploreScreenContent(
     ) {
         // Map is full screen
         Box(modifier = modifier.fillMaxSize()) {
+            // TODO: Add BackHandler to dismiss merchant slots on back press
+            // BackHandler(enabled = state.selectedMerchantSlots.isNotEmpty()) {
+            //     onIntent(ExploreIntent.OnDismissMerchantSlots)
+            // }
+
             // Google Maps - render after delay to avoid blocking tab switch
             if (shouldRenderMap) {
                 GoogleMaps(
@@ -233,8 +285,7 @@ fun ExploreScreenContent(
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth(),
                     onSlotClick = { slotId ->
-                        // Handle slot click - navigate to offer detail
-                        // onIntent(ExploreIntent.OnSlotClicked(slotId))
+                        onIntent(ExploreIntent.OnSlotClicked(slotId))
                     }
                 )
             }

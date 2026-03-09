@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.client.main.merchant.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,8 +23,8 @@ import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
 import lessmobile.composeapp.generated.resources.ic_saved_24dp
-import lessmobile.composeapp.generated.resources.test_merchant_logo
-import lessmobile.composeapp.generated.resources.test_offer_item_image
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -46,25 +45,16 @@ fun MerchantProfileHeroSection(
             .height(240.dp)
     ) {
         // Hero Image
-        if (heroImageUrl != null) {
-            AsyncImage(
-                model = heroImageUrl,
-                contentDescription = "Merchant hero image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-        } else {
-            Image(
-                painter = painterResource(Res.drawable.test_offer_item_image),
-                contentDescription = "Merchant hero image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-        }
+        AsyncImage(
+            model = heroImageUrl,
+            contentDescription = "Merchant hero image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            error = painterResource(Res.drawable.ill_box_placeholder),
+            placeholder = painterResource(Res.drawable.ill_box_placeholder)
+        )
 
         // Back Button
         Box(
@@ -116,25 +106,16 @@ fun MerchantProfileHeroSection(
                 .background(LessTheme.colors.backgroundPrimary),
             contentAlignment = Alignment.Center
         ) {
-            if (merchantLogoUrl != null) {
-                AsyncImage(
-                    model = merchantLogoUrl,
-                    contentDescription = "Merchant logo",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(76.dp)
-                        .clip(RoundedCornerShape(LessTheme.radius.medium))
-                )
-            } else {
-                Image(
-                    painter = painterResource(Res.drawable.test_merchant_logo),
-                    contentDescription = "Merchant logo",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(76.dp)
-                        .clip(RoundedCornerShape(LessTheme.radius.medium))
-                )
-            }
+            AsyncImage(
+                model = merchantLogoUrl,
+                contentDescription = "Merchant logo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(76.dp)
+                    .clip(RoundedCornerShape(LessTheme.radius.medium)),
+                error = painterResource(Res.drawable.ill_venue_placeholder),
+                placeholder = painterResource(Res.drawable.ill_venue_placeholder)
+            )
         }
     }
 }

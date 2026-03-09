@@ -17,7 +17,8 @@ enum class CellId {
     TermsOfService,
     HowToUse,
     Notification,
-    Location
+    Location,
+    SwitchToMerchant
 }
 
 /**

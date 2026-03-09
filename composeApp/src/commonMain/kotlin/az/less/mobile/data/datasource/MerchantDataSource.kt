@@ -14,6 +14,8 @@ class MerchantDataSource(
         merchantId: String,
         includeReviews: Boolean = false,
         reviewsLimit: Int? = null,
+        includeOffers: Boolean = false,
+        offersLimit: Int? = null,
         latitude: Double? = null,
         longitude: Double? = null
     ): NetworkResult<MerchantProfileDto> {
@@ -21,6 +23,8 @@ class MerchantDataSource(
             httpClient.get("v1/venues/$merchantId") {
                 if (includeReviews) parameter("includeReviews", true)
                 reviewsLimit?.let { parameter("reviewsLimit", it) }
+                if (includeOffers) parameter("includeOffers", true)
+                offersLimit?.let { parameter("offersLimit", it) }
                 latitude?.let { parameter("latitude", it) }
                 longitude?.let { parameter("longitude", it) }
             }

@@ -1,8 +1,6 @@
 package az.less.mobile.presentation.client.main.explore
 
-import az.less.mobile.domain.model.SearchBox
 import az.less.mobile.domain.model.SearchVenue
-import az.less.mobile.presentation.client.main.explore.models.ExploreVenueItem
 import az.less.mobile.presentation.client.main.explore.models.FilterData
 import az.less.mobile.presentation.client.main.explore.models.FilterItem
 import az.less.mobile.presentation.client.main.explore.models.FilterType
@@ -30,12 +28,10 @@ data class ExploreState(
     val selectedMarkerPosition: LatLong? = null,
     // API data
     val venues: List<SearchVenue> = emptyList(),
-    val boxes: List<SearchBox> = emptyList(),
     val totalResults: Int = 0,
     val error: String? = null,
     // Active filter tracking
-    val activeQuickFilters: Set<QuickFilter> = emptySet(),
-    val activeFilters: Map<String, List<String>> = emptyMap()
+    val activeQuickFilters: Set<QuickFilter> = emptySet()
 )
 
 /**
@@ -47,6 +43,8 @@ sealed interface ExploreSideEffect {
     data object NavigateToSearch : ExploreSideEffect
     data object NavigateToFilter : ExploreSideEffect
     data class ShowError(val message: String) :
+        ExploreSideEffect
+    data class NavigateToReserve(val offerId: String) :
         ExploreSideEffect
 }
 
@@ -74,5 +72,7 @@ sealed interface ExploreIntent {
         ExploreIntent
     data object OnApplyFilters : ExploreIntent
     data object OnDidCenterCameraOnMarker : ExploreIntent
+    data object OnDismissMerchantSlots : ExploreIntent
+    data class OnSlotClicked(val slotId: String) : ExploreIntent
 }
 
