@@ -1,5 +1,6 @@
 package az.less.mobile.data.datasource
 
+import az.less.mobile.data.remote.model.MerchantOrdersData
 import az.less.mobile.data.remote.model.OrdersDataDto
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.network.safeApiCall
@@ -20,6 +21,14 @@ class OrdersDataSource(
                 parameter("type", type)
                 parameter("page", page)
                 parameter("limit", limit)
+            }
+        }
+    }
+
+    suspend fun getMerchantOrders(venueId: String): NetworkResult<MerchantOrdersData> {
+        return safeApiCall {
+            httpClient.get("v1/orders/merchant-orders") {
+                parameter("venueId", venueId)
             }
         }
     }

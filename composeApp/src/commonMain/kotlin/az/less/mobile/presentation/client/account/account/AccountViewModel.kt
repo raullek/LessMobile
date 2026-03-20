@@ -3,10 +3,10 @@ package az.less.mobile.presentation.client.account.account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.designsystem.components.ToastType
-import az.less.mobile.data.remote.model.account.UpdateUserRequest
 import az.less.mobile.domain.model.auth.User
 import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -236,15 +236,16 @@ class AccountViewModel(
 
         reduce { state.copy(isLoading = true) }
 
-        val request = UpdateUserRequest(
+        accountRepository.updateUser(
+            userId = userId,
             name = state.fullName.takeIf { it.isNotEmpty() },
             phone = phoneForValidation.takeIf { it.isNotEmpty() },
             gender = state.gender?.apiValue,
-            birthDay = state.birthDate.displayDateToIso()
+            birthDay = state.birthDate.displayDateToIso(),
+            avatar = state.profilePhotoBytes
         )
-
-        accountRepository.updateUser(userId, request)
             .onSuccess { data ->
+                val currentUser = sessionLocalRepository.currentUser.first()
                 val updatedUser = User(
                     id = data.id,
                     name = data.name,
@@ -254,7 +255,12 @@ class AccountViewModel(
                     avatarUrl = data.avatar,
                     phone = data.phone,
                     gender = data.gender,
-                    birthDay = data.birthDay
+                    birthDay = data.birthDay,
+                    emailVerified = currentUser?.emailVerified ?: false,
+                    currentLocation = currentUser?.currentLocation,
+                    venue = currentUser?.venue,
+                    stats = currentUser?.stats,
+                    ecoHeroBadge = currentUser?.ecoHeroBadge
                 )
                 sessionLocalRepository.updateUser(updatedUser)
                 reduce {

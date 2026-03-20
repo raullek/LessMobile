@@ -28,6 +28,14 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.edit_profile_description_input_placeholder
+import lessmobile.composeapp.generated.resources.edit_profile_description_label
+import lessmobile.composeapp.generated.resources.edit_profile_edit_merch_details
+import lessmobile.composeapp.generated.resources.edit_profile_save
+import lessmobile.composeapp.generated.resources.edit_profile_title_label
+import lessmobile.composeapp.generated.resources.edit_profile_title_placeholder
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Bottom sheet for editing merchant details (title and description)
@@ -109,7 +117,7 @@ private fun EditMerchDetailsBottomSheetContent(
     ) {
         // Title
         Text(
-            text = "Edit merch details",
+            text = stringResource(Res.string.edit_profile_edit_merch_details),
             style = LessTheme.typography.title24Bold,
             color = LessTheme.colors.textIconsBlack
         )
@@ -120,8 +128,8 @@ private fun EditMerchDetailsBottomSheetContent(
         DsTextField(
             value = title,
             onValueChange = onTitleChange,
-            label = "Title",
-            placeholder = "Enter venue name",
+            label = stringResource(Res.string.edit_profile_title_label),
+            placeholder = stringResource(Res.string.edit_profile_title_placeholder),
             modifier = Modifier.fillMaxWidth(),
             onEndIconClick = { onTitleChange("") }
         )
@@ -132,8 +140,8 @@ private fun EditMerchDetailsBottomSheetContent(
         DsTextField(
             value = description,
             onValueChange = onDescriptionChange,
-            label = "Description",
-            placeholder = "Enter description",
+            label = stringResource(Res.string.edit_profile_description_label),
+            placeholder = stringResource(Res.string.edit_profile_description_input_placeholder),
             modifier = Modifier.fillMaxWidth(),
             singleLine = false,
             maxLines = 3,
@@ -144,7 +152,7 @@ private fun EditMerchDetailsBottomSheetContent(
 
         // Save button
         DsButton(
-            text = "Save",
+            text = stringResource(Res.string.edit_profile_save),
             onClick = onSaveClick,
             modifier = Modifier.fillMaxWidth(),
             variant = ButtonVariant.Primary,

@@ -27,7 +27,6 @@ import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
 import lessmobile.composeapp.generated.resources.ic_edit_24dp
 import lessmobile.composeapp.generated.resources.image_placeholder
-import lessmobile.composeapp.generated.resources.test_merchant_logo
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -167,8 +166,8 @@ fun EditMerchantProfileHeroSection(
                         modifier = Modifier
                             .size(76.dp)
                             .clip(RoundedCornerShape(LessTheme.radius.medium)),
-                        placeholder = painterResource(Res.drawable.test_merchant_logo),
-                        error = painterResource(Res.drawable.test_merchant_logo)
+                        placeholder = painterResource(Res.drawable.image_placeholder),
+                        error = painterResource(Res.drawable.image_placeholder)
                     )
                 }
                 else -> {

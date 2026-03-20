@@ -30,6 +30,11 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.edit_profile_edit_phone_number
+import lessmobile.composeapp.generated.resources.edit_profile_phone_number
+import lessmobile.composeapp.generated.resources.edit_profile_save
+import org.jetbrains.compose.resources.stringResource
 import io.github.skeptick.inputmask.compose.phone.rememberPhoneInputMaskVisualTransformation
 import io.github.skeptick.inputmask.core.InputMasks
 import io.github.skeptick.inputmask.core.format
@@ -148,7 +153,7 @@ private fun EditPhoneNumberBottomSheetContent(
     ) {
         // Title
         Text(
-            text = "Edit phone number",
+            text = stringResource(Res.string.edit_profile_edit_phone_number),
             style = LessTheme.typography.title24Bold,
             color = LessTheme.colors.textIconsBlack
         )
@@ -163,7 +168,7 @@ private fun EditPhoneNumberBottomSheetContent(
                 val sanitized = phoneVisualTransformation.sanitize(newValue)
                 onPhoneNumberChange(sanitized)
             },
-            label = "Phone number",
+            label = stringResource(Res.string.edit_profile_phone_number),
             placeholder = "+994 XX XXX XX XX",
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -175,7 +180,7 @@ private fun EditPhoneNumberBottomSheetContent(
 
         // Save button - disabled when phone number is not valid
         DsButton(
-            text = "Save",
+            text = stringResource(Res.string.edit_profile_save),
             onClick = onSaveClick,
             modifier = Modifier.fillMaxWidth(),
             variant = ButtonVariant.Primary,

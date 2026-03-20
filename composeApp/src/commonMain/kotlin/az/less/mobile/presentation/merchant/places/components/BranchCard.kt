@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.merchant.places.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -29,10 +27,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.merchant.places.model.BranchItem
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_star_16dp
-import lessmobile.composeapp.generated.resources.image_placeholder
-import lessmobile.composeapp.generated.resources.test_merchant_logo
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -62,9 +61,9 @@ fun BranchCard(
                     .fillMaxWidth()
                     .height(160.dp) // Image height from design
             ) {
-                // Branch Image
-                Image(
-                    painter = painterResource(Res.drawable.image_placeholder),
+                // Branch Cover Image
+                AsyncImage(
+                    model = branch.imageUrl,
                     contentDescription = branch.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -74,7 +73,9 @@ fun BranchCard(
                                 topStart = LessTheme.radius.medium,
                                 topEnd = LessTheme.radius.medium
                             )
-                        )
+                        ),
+                    placeholder = painterResource(Res.drawable.ill_box_placeholder),
+                    error = painterResource(Res.drawable.ill_box_placeholder)
                 )
 
                 // Top-left Badge: Items on sale or No active offer
@@ -208,13 +209,15 @@ fun BranchCard(
                 .background(LessTheme.colors.backgroundPrimary),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(Res.drawable.test_merchant_logo),
+            AsyncImage(
+                model = branch.logoUrl,
                 contentDescription = "Branch merchant logo",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(36.dp)
-                    .clip(RoundedCornerShape(LessTheme.radius.small))
+                    .clip(RoundedCornerShape(LessTheme.radius.small)),
+                placeholder = painterResource(Res.drawable.ill_venue_placeholder),
+                error = painterResource(Res.drawable.ill_venue_placeholder)
             )
         }
     }

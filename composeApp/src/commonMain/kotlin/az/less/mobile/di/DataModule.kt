@@ -8,6 +8,7 @@ import az.less.mobile.data.datasource.FavoritesDataSource
 import az.less.mobile.data.datasource.MerchantDataSource
 import az.less.mobile.data.datasource.OffersDataSource
 import az.less.mobile.data.datasource.OrdersDataSource
+import az.less.mobile.data.datasource.VenuesDataSource
 import az.less.mobile.data.repository.AccountRepositoryImpl
 import az.less.mobile.data.repository.AuthorizationRepositoryImpl
 import az.less.mobile.data.repository.ContentRepositoryImpl
@@ -16,6 +17,7 @@ import az.less.mobile.data.repository.FavoritesRepositoryImpl
 import az.less.mobile.data.repository.MerchantRepositoryImpl
 import az.less.mobile.data.repository.OffersRepositoryImpl
 import az.less.mobile.data.repository.OrdersRepositoryImpl
+import az.less.mobile.data.repository.VenuesRepositoryImpl
 import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.ContentRepository
@@ -24,6 +26,7 @@ import az.less.mobile.domain.repository.FavoritesRepository
 import az.less.mobile.domain.repository.MerchantRepository
 import az.less.mobile.domain.repository.OffersRepository
 import az.less.mobile.domain.repository.OrdersRepository
+import az.less.mobile.domain.repository.VenuesRepository
 import org.koin.dsl.module
 
 val dataModule = module {
@@ -36,9 +39,10 @@ val dataModule = module {
     single { ExploreDataSource(get()) }
     single { MerchantDataSource(get()) }
     single { ContentDataSource(get()) }
+    single { VenuesDataSource(get()) }
 
     // Repositories
-    single<AuthorizationRepository> { AuthorizationRepositoryImpl(get()) }
+    single<AuthorizationRepository> { AuthorizationRepositoryImpl(get(), get(), get()) }
     single<AccountRepository> { AccountRepositoryImpl(get()) }
     single<OffersRepository> { OffersRepositoryImpl(get()) }
     single<FavoritesRepository> { FavoritesRepositoryImpl(get()) }
@@ -46,4 +50,5 @@ val dataModule = module {
     single<ExploreRepository> { ExploreRepositoryImpl(get()) }
     single<MerchantRepository> { MerchantRepositoryImpl(get()) }
     single<ContentRepository> { ContentRepositoryImpl(get()) }
+    single<VenuesRepository> { VenuesRepositoryImpl(get()) }
 }

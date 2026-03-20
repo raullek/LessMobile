@@ -219,6 +219,8 @@
     <string name="error_invalid_expiry_date">Invalid expiration date</string>
     <string name="error_invalid_cvv">Invalid CVV</string>
     <string name="error_generic">Something went wrong</string>
+    <string name="error_generic_subtitle">Please try again later</string>
+    <string name="error_try_again">Try again</string>
 
     <!-- Currency -->
     <string name="currency_azn">%1$s &#8380;</string>
@@ -226,7 +228,7 @@
     <!-- ==================== MERCHANT FLOW ==================== -->
 
     <!-- Merchant Bottom Navigation -->
-    <string name="merch_nav_orders">Orders</string>
+    <string name="merch_nav_orders">Boxes</string>
     <string name="merch_nav_add">Add</string>
     <string name="merch_nav_history">History</string>
     <string name="merch_nav_more">More</string>
@@ -247,6 +249,8 @@
     <string name="merch_orders_handed_over">Handed Over</string>
     <string name="merch_orders_cancel_lot">Cancel Lot</string>
     <string name="merch_orders_cancellation_ended">Cancellation Time Ended</string>
+    <string name="merch_boxes_empty_title">No boxes yet</string>
+    <string name="merch_boxes_empty_description">Your boxes will appear here</string>
 
     <!-- Add Lot Screen -->
     <string name="add_lot_title">Add Lot</string>
@@ -266,11 +270,36 @@
     <string name="places_empty_title">No branches yet</string>
     <string name="places_empty_description">Add your first branch to start managing your locations. Customers will be able to find and visit your places.</string>
     <string name="places_cd_no_places">No places</string>
+    <string name="places_edit_merch_details">Edit merch details</string>
+    <string name="places_edit_venue">Edit venue</string>
+    <string name="places_edit_users">Edit users</string>
 
     <!-- Edit Merchant Profile Screen -->
-    <string name="edit_profile_manage_email">Manage this location from this email</string>
+    <string name="edit_profile_make_me_merchant">Make me a merchant of this venue</string>
     <string name="edit_profile_create_branch">Create branch</string>
     <string name="edit_profile_update_branch">Update branch</string>
+    <string name="edit_profile_error_name_required">Venue name is required</string>
+    <string name="edit_profile_error_phone_required">Phone number is required</string>
+    <string name="edit_profile_error_location_required">Location is required</string>
+    <string name="edit_profile_venue_created">Venue created successfully</string>
+    <string name="edit_profile_venue_updated">Venue updated successfully</string>
+    <string name="edit_profile_name_placeholder">Name of venue</string>
+    <string name="edit_profile_description_placeholder">Description or some notes about your perfect place to show for customers</string>
+    <string name="edit_profile_phone_number">Phone number</string>
+    <string name="edit_profile_phone_optional">Optional</string>
+    <string name="edit_profile_edit">Edit</string>
+    <string name="edit_profile_view_location">View location</string>
+    <string name="edit_profile_location_placeholder">Location of your perfect place</string>
+    <string name="edit_profile_default_box_description">Default box description</string>
+    <string name="edit_profile_box_description_placeholder">Some tips for user to understand what can be inside</string>
+    <string name="edit_profile_add_for_lots">Add for lots</string>
+    <string name="edit_profile_edit_phone_number">Edit phone number</string>
+    <string name="edit_profile_edit_merch_details">Edit merch details</string>
+    <string name="edit_profile_title_label">Title</string>
+    <string name="edit_profile_title_placeholder">Enter venue name</string>
+    <string name="edit_profile_description_label">Description</string>
+    <string name="edit_profile_description_input_placeholder">Enter description</string>
+    <string name="edit_profile_save">Save</string>
 
     <!-- Branch Verification Screen -->
     <string name="branch_verification_title">Venue was added</string>

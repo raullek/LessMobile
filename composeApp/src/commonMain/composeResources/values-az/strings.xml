@@ -226,7 +226,7 @@
     <!-- ==================== MERCHANT FLOW ==================== -->
 
     <!-- Merchant Bottom Navigation -->
-    <string name="merch_nav_orders">Sifarişlər</string>
+    <string name="merch_nav_orders">Bokslar</string>
     <string name="merch_nav_add">Əlavə et</string>
     <string name="merch_nav_history">Tarixçə</string>
     <string name="merch_nav_more">Daha çox</string>
@@ -247,6 +247,8 @@
     <string name="merch_orders_handed_over">Təhvil verildi</string>
     <string name="merch_orders_cancel_lot">Lotu ləğv et</string>
     <string name="merch_orders_cancellation_ended">Ləğv vaxtı bitdi</string>
+    <string name="merch_boxes_empty_title">Hələ boks yoxdur</string>
+    <string name="merch_boxes_empty_description">Bokslarınız burada görünəcək</string>
 
     <!-- Add Lot Screen -->
     <string name="add_lot_title">Lot əlavə et</string>
@@ -266,11 +268,36 @@
     <string name="places_empty_title">Hələ filial yoxdur</string>
     <string name="places_empty_description">Məkanlarınızı idarə etməyə başlamaq üçün ilk filialınızı əlavə edin. Müştərilər məkanlarınızı tapa və ziyarət edə biləcəklər.</string>
     <string name="places_cd_no_places">Məkan yoxdur</string>
+    <string name="places_edit_merch_details">Mağaza detallarını redaktə et</string>
+    <string name="places_edit_venue">Məkanı redaktə et</string>
+    <string name="places_edit_users">İstifadəçiləri redaktə et</string>
 
     <!-- Edit Merchant Profile Screen -->
-    <string name="edit_profile_manage_email">Bu e-poçtdan bu məkanı idarə et</string>
+    <string name="edit_profile_make_me_merchant">Məni bu məkanın merchantı et</string>
     <string name="edit_profile_create_branch">Filial yarat</string>
     <string name="edit_profile_update_branch">Filialı yenilə</string>
+    <string name="edit_profile_error_name_required">Məkan adı tələb olunur</string>
+    <string name="edit_profile_error_phone_required">Telefon nömrəsi tələb olunur</string>
+    <string name="edit_profile_error_location_required">Məkan tələb olunur</string>
+    <string name="edit_profile_venue_created">Məkan uğurla yaradıldı</string>
+    <string name="edit_profile_venue_updated">Məkan uğurla yeniləndi</string>
+    <string name="edit_profile_name_placeholder">Məkanın adı</string>
+    <string name="edit_profile_description_placeholder">Müştərilərə göstərmək üçün məkanınız haqqında təsvir və ya qeydlər</string>
+    <string name="edit_profile_phone_number">Telefon nömrəsi</string>
+    <string name="edit_profile_phone_optional">İstəyə bağlı</string>
+    <string name="edit_profile_edit">Redaktə et</string>
+    <string name="edit_profile_view_location">Məkanı göstər</string>
+    <string name="edit_profile_location_placeholder">Məkanınızın ünvanı</string>
+    <string name="edit_profile_default_box_description">Standart qutu təsviri</string>
+    <string name="edit_profile_box_description_placeholder">İstifadəçi üçün qutunun içində nə ola biləcəyi haqqında məsləhətlər</string>
+    <string name="edit_profile_add_for_lots">Lotlar üçün əlavə et</string>
+    <string name="edit_profile_edit_phone_number">Telefon nömrəsini redaktə et</string>
+    <string name="edit_profile_edit_merch_details">Məkan məlumatlarını redaktə et</string>
+    <string name="edit_profile_title_label">Başlıq</string>
+    <string name="edit_profile_title_placeholder">Məkan adını daxil edin</string>
+    <string name="edit_profile_description_label">Təsvir</string>
+    <string name="edit_profile_description_input_placeholder">Təsvir daxil edin</string>
+    <string name="edit_profile_save">Saxla</string>
 
     <!-- Branch Verification Screen -->
     <string name="branch_verification_title">Məkan əlavə edildi</string>

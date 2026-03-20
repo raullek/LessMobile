@@ -24,8 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import az.less.designsystem.base.LessTheme
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.edit_profile_description_placeholder
+import lessmobile.composeapp.generated.resources.edit_profile_name_placeholder
 import lessmobile.composeapp.generated.resources.ic_edit_24dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Merchant profile info section with name, description, and edit icon
@@ -49,7 +52,7 @@ fun EditMerchantProfileInfoSection(
 
         // Venue Name with Edit Icon
         Text(
-            text = venueName.ifEmpty { "Name of venue" },
+            text = venueName.ifEmpty { stringResource(Res.string.edit_profile_name_placeholder) },
             style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsBlack,
             textAlign = TextAlign.Center
@@ -58,7 +61,7 @@ fun EditMerchantProfileInfoSection(
         Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
 
         // Description Text with Edit Icon inline at the end
-        val text = description.ifEmpty { "Description or some notes about your perfect place to show fo customers" }
+        val text = description.ifEmpty { stringResource(Res.string.edit_profile_description_placeholder) }
         val textColor = if (description.isEmpty()) LessTheme.colors.textIconsGrey else LessTheme.colors.textIconsBlack
         
         val annotatedText = remember(text) {
@@ -102,6 +105,7 @@ fun EditMerchantProfileInfoSection(
             text = annotatedText,
             style = LessTheme.typography.body14Regular,
             inlineContent = inlineContent,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onDescriptionChanged(description) },

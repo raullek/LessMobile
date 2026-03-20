@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.merchant.more.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,24 +20,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.compose_multiplatform
 import lessmobile.composeapp.generated.resources.ic_star_16dp
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 /**
  * Header component for MerchMore screen
- * Shows merchant image, name, email, and rating
+ * Shows venue logo, name, and rating
  */
 @Composable
 fun MerchMoreHeader(
-    merchantName: String,
-    merchantEmail: String,
+    venueName: String,
     rating: String,
     reviewCount: String,
     modifier: Modifier = Modifier,
-    merchantImageRes: DrawableResource? = null
+    venueLogoUrl: String? = null
 ) {
     Column(
         modifier = modifier
@@ -47,7 +44,7 @@ fun MerchMoreHeader(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
     ) {
-        // Merchant image
+        // Venue logo
         Box(
             modifier = Modifier
                 .size(96.dp)
@@ -55,9 +52,9 @@ fun MerchMoreHeader(
                 .background(LessTheme.colors.elementsSecondaryElement),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(merchantImageRes ?: Res.drawable.compose_multiplatform),
-                contentDescription = "Merchant Image",
+            AsyncImage(
+                model = venueLogoUrl,
+                contentDescription = "$venueName logo",
                 modifier = Modifier
                     .size(96.dp)
                     .clip(RoundedCornerShape(20.dp)),
@@ -65,23 +62,12 @@ fun MerchMoreHeader(
             )
         }
 
-        // Merchant name and email
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxxSmall)
-        ) {
-            Text(
-                text = merchantName,
-                style = LessTheme.typography.title28Bold,
-                color = LessTheme.colors.textIconsBlack
-            )
-
-            Text(
-                text = merchantEmail,
-                style = LessTheme.typography.body16Regular,
-                color = LessTheme.colors.textIconsGrey
-            )
-        }
+        // Venue name
+        Text(
+            text = venueName,
+            style = LessTheme.typography.title28Bold,
+            color = LessTheme.colors.textIconsBlack
+        )
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
 

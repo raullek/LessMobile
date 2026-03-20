@@ -1,9 +1,14 @@
 package az.less.mobile.navigation
 
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import az.less.mobile.domain.model.auth.AppMode
+import az.less.mobile.domain.repository.SessionLocalRepository
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import az.less.mobile.presentation.merchant.add.addlot.AddLotScreen
 import az.less.mobile.presentation.merchant.history.IncomeHistoryScreen
 import az.less.mobile.presentation.merchant.more.MerchMoreScreen
@@ -41,16 +46,21 @@ sealed interface MerchantRoute {
     data object Places : MerchantRoute
 
     @Serializable
-    data class EditProfile(val branchId: String? = null) : MerchantRoute
+    data class EditProfile(val venueData: String? = null) : MerchantRoute
 
     @Serializable
     data object BranchVerification : MerchantRoute
 
     @Serializable
-    data object BranchUsers : MerchantRoute
+    data class BranchUsers(
+        val venueId: String = "",
+        val venueName: String = ""
+    ) : MerchantRoute
 
     @Serializable
     data class AddBranchUser(
+        val venueId: String,
+        val venueName: String,
         val userNumber: Int,
         val user: String? = null
     ) : MerchantRoute
@@ -77,9 +87,14 @@ fun NavGraphBuilder.merchantGraph(
 ) {
     // Bottom navigation screens
     composable<MerchantRoute.More> {
+        val sessionLocalRepository: SessionLocalRepository = koinInject()
+        val coroutineScope = rememberCoroutineScope()
         MerchMoreScreen(
             navController = navController,
             navigateToClientFlow = {
+                coroutineScope.launch {
+                    sessionLocalRepository.saveLastUsedMode(AppMode.CLIENT)
+                }
                 rootNavController.navigate(ROOT_CLIENT)
             }
         )
@@ -105,7 +120,7 @@ fun NavGraphBuilder.merchantGraph(
     composable<MerchantRoute.EditProfile> { backStackEntry ->
         val args = backStackEntry.toRoute<MerchantRoute.EditProfile>()
         EditMerchantProfileScreen(
-            branchId = args.branchId,
+            venueData = args.venueData,
             navController = navController
         )
     }
@@ -122,8 +137,13 @@ fun NavGraphBuilder.merchantGraph(
         )
     }
 
-    composable<MerchantRoute.BranchUsers> {
-        BranchUsersScreen(navController = navController)
+    composable<MerchantRoute.BranchUsers> { backStackEntry ->
+        val args = backStackEntry.toRoute<MerchantRoute.BranchUsers>()
+        BranchUsersScreen(
+            venueId = args.venueId,
+            venueName = args.venueName,
+            navController = navController
+        )
     }
 
     composable<MerchantRoute.AddBranchUser> {

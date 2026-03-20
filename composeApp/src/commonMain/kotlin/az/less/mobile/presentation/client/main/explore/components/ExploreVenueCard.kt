@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.client.main.explore.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,10 +25,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.explore.models.ExploreVenueItem
+import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.compose_multiplatform
-import lessmobile.composeapp.generated.resources.test_merchant_logo
-import lessmobile.composeapp.generated.resources.test_offer_item_image
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -68,11 +68,13 @@ fun ExploreVenueCard(
                     bottomEnd = 0.dp
                 ))
         ) {
-            Image(
-                painter = painterResource(Res.drawable.test_offer_item_image),
+            AsyncImage(
+                model = item.imageUrl,
                 contentDescription = item.title,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                error = painterResource(Res.drawable.ill_box_placeholder),
+                placeholder = painterResource(Res.drawable.ill_box_placeholder)
             )
         }
         
@@ -126,11 +128,13 @@ fun ExploreVenueCard(
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(Res.drawable.test_merchant_logo),
+                AsyncImage(
+                    model = item.merchantIconUrl,
                     contentDescription = "Restaurant Logo",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(LessTheme.size.large)
+                    modifier = Modifier.size(LessTheme.size.large),
+                    error = painterResource(Res.drawable.ill_venue_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_venue_placeholder)
                 )
             }
         }

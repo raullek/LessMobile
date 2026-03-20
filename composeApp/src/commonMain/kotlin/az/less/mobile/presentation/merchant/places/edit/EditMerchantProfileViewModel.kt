@@ -2,6 +2,9 @@ package az.less.mobile.presentation.merchant.places.edit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.designsystem.components.ToastType
+import az.less.mobile.domain.repository.VenuesRepository
+import az.less.mobile.presentation.merchant.places.model.BranchItem
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -9,33 +12,32 @@ import org.orbitmvi.orbit.container
 /**
  * ViewModel for Edit Merchant Profile Screen using Orbit MVI
  */
-class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProfileState, EditMerchantProfileSideEffect> {
+class EditMerchantProfileViewModel(
+    private val venuesRepository: VenuesRepository
+) : ViewModel(), ContainerHost<EditMerchantProfileState, EditMerchantProfileSideEffect> {
 
     override val container: Container<EditMerchantProfileState, EditMerchantProfileSideEffect> =
         viewModelScope.container(EditMerchantProfileState())
 
-    fun initialize(branchId: String?) = intent {
-        if (branchId != null) {
-            reduce { state.copy(branchId = branchId) }
-            loadBranch(branchId)
-        }
-    }
-
-    private fun loadBranch(branchId: String) = intent {
-        reduce { state.copy(isLoading = true) }
-
-        // TODO: Load branch from repository
-        // For now, using mock data
-        reduce {
-            state.copy(
-                venueName = "Belgian Chocolate & Coffee",
-                description = "Description or some notes about your perfect place to show fo customers",
-                phoneNumber = "+994 12 123 45 67",
-                location = "Location of your perfect place",
-                defaultBoxDescription = "Some tips for user to understant what can be inside",
-                manageFromEmail = false,
-                isLoading = false
-            )
+    fun initialize(venueData: String?) = intent {
+        if (venueData != null) {
+            val branch = BranchItem.decode(venueData) ?: return@intent
+            reduce {
+                state.copy(
+                    branchId = branch.id,
+                    venueImageUrl = branch.imageUrl,
+                    logoUrl = branch.logoUrl,
+                    venueName = branch.name,
+                    description = branch.businessDescription ?: "",
+                    phoneNumber = branch.phone,
+                    location = branch.address,
+                    locationLatitude = branch.latitude,
+                    locationLongitude = branch.longitude,
+                    defaultBoxDescription = branch.defaultBoxDescription ?: "",
+                    lotsImageUrl = branch.lotImageUrl,
+                    email = branch.email
+                )
+            }
         }
     }
 
@@ -57,7 +59,7 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
             is EditMerchantProfileIntent.OnLocationChanged -> handleLocationChanged(intent.location)
             is EditMerchantProfileIntent.OnLocationSelected -> handleLocationSelected(intent.latitude, intent.longitude, intent.address)
             is EditMerchantProfileIntent.OnDefaultBoxDescriptionChanged -> handleDefaultBoxDescriptionChanged(intent.description)
-            is EditMerchantProfileIntent.OnManageFromEmailToggled -> handleManageFromEmailToggled(intent.enabled)
+            is EditMerchantProfileIntent.OnMakeMeMerchantToggled -> handleMakeMeMerchantToggled(intent.enabled)
             is EditMerchantProfileIntent.OnCreateBranchClick -> handleCreateBranchClick()
             is EditMerchantProfileIntent.OnEditMerchDetailsClick -> handleEditMerchDetailsClick()
             is EditMerchantProfileIntent.OnEditMerchDetailsBottomSheetDismiss -> handleEditMerchDetailsBottomSheetDismiss()
@@ -103,7 +105,7 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
     }
 
     private fun handleNameEditClick() = intent {
-        // TODO: Open name edit dialog or navigate to edit screen
+        // Open name edit via bottom sheet
     }
 
     private fun handlePhoneEditClick() = intent {
@@ -162,22 +164,89 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
         reduce { state.copy(defaultBoxDescription = description) }
     }
 
-    private fun handleManageFromEmailToggled(enabled: Boolean) = intent {
-        reduce { state.copy(manageFromEmail = enabled) }
+    private fun handleMakeMeMerchantToggled(enabled: Boolean) = intent {
+        reduce { state.copy(makeMeMerchant = enabled) }
     }
 
     private fun handleCreateBranchClick() = intent {
+        // Validation
+        if (state.venueName.isBlank()) {
+            postSideEffect(EditMerchantProfileSideEffect.ShowToast(VALIDATION_NAME_REQUIRED, ToastType.Error))
+            return@intent
+        }
+        if (state.phoneNumber.isBlank()) {
+            postSideEffect(EditMerchantProfileSideEffect.ShowToast(VALIDATION_PHONE_REQUIRED, ToastType.Error))
+            return@intent
+        }
+        if (state.location.isBlank()) {
+            postSideEffect(EditMerchantProfileSideEffect.ShowToast(VALIDATION_LOCATION_REQUIRED, ToastType.Error))
+            return@intent
+        }
+
         reduce { state.copy(isLoading = true) }
 
-        // TODO: Save branch to repository
-        // For now, simulate success
-        reduce { state.copy(isLoading = false) }
-
         if (state.branchId == null) {
-            postSideEffect(EditMerchantProfileSideEffect.BranchCreated)
+            // Create new venue
+            venuesRepository.createVenue(
+                name = state.venueName,
+                businessName = state.venueName,
+                businessAddress = state.location.ifEmpty { null },
+                latitude = state.locationLatitude,
+                longitude = state.locationLongitude,
+                businessDescription = state.description.ifEmpty { null },
+                defaultBoxDescription = state.defaultBoxDescription.ifEmpty { null },
+                phone = state.phoneNumber.ifEmpty { null },
+                email = state.email,
+                makeMeMerchant = state.makeMeMerchant,
+                coverImage = state.venueImageBytes,
+                businessLogo = state.logoImageBytes,
+                lotImage = state.lotsImageBytes
+            )
+                .onSuccess {
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(EditMerchantProfileSideEffect.ShowToast(SUCCESS_VENUE_CREATED, ToastType.Success))
+                    postSideEffect(EditMerchantProfileSideEffect.BranchCreated)
+                }
+                .onError { error ->
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(EditMerchantProfileSideEffect.ShowToast(error.message, ToastType.Error))
+                }
         } else {
-            postSideEffect(EditMerchantProfileSideEffect.BranchUpdated)
+            // Update existing venue — only send image bytes if user selected new ones
+            venuesRepository.updateVenue(
+                id = state.branchId!!,
+                name = state.venueName,
+                businessName = state.venueName,
+                businessAddress = state.location.ifEmpty { null },
+                latitude = state.locationLatitude,
+                longitude = state.locationLongitude,
+                businessDescription = state.description.ifEmpty { null },
+                defaultBoxDescription = state.defaultBoxDescription.ifEmpty { null },
+                phone = state.phoneNumber.ifEmpty { null },
+                email = state.email,
+                status = null,
+                coverImage = state.venueImageBytes,
+                businessLogo = state.logoImageBytes,
+                lotImage = state.lotsImageBytes
+            )
+                .onSuccess {
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(EditMerchantProfileSideEffect.ShowToast(SUCCESS_VENUE_UPDATED, ToastType.Success))
+                    postSideEffect(EditMerchantProfileSideEffect.BranchUpdated)
+                }
+                .onError { error ->
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(EditMerchantProfileSideEffect.ShowToast(error.message, ToastType.Error))
+                }
         }
+    }
+
+    companion object {
+        const val VALIDATION_NAME_REQUIRED = "validation_name_required"
+        const val VALIDATION_PHONE_REQUIRED = "validation_phone_required"
+        const val VALIDATION_LOCATION_REQUIRED = "validation_location_required"
+        const val SUCCESS_VENUE_CREATED = "success_venue_created"
+        const val SUCCESS_VENUE_UPDATED = "success_venue_updated"
     }
 
     private fun handleEditMerchDetailsClick() = intent {
@@ -215,4 +284,3 @@ class EditMerchantProfileViewModel : ViewModel(), ContainerHost<EditMerchantProf
         }
     }
 }
-

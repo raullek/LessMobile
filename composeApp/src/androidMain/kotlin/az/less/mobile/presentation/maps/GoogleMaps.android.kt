@@ -39,7 +39,6 @@ import coil3.request.allowHardware
 import coil3.request.SuccessResult
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
-import lessmobile.composeapp.generated.resources.test_merchant_logo
 import org.jetbrains.compose.resources.painterResource
 import az.less.mobile.presentation.maps.models.CameraLocationBounds
 import az.less.mobile.presentation.maps.models.CameraPosition

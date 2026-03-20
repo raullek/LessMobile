@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,19 +15,26 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
+import az.less.mobile.navigation.MerchantRoute
+import az.less.designsystem.components.AnimatedToast
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.DsToolBar
+import az.less.designsystem.components.ToastType
 import io.github.skeptick.inputmask.compose.phone.rememberPhoneInputMaskVisualTransformation
+import kotlinx.coroutines.delay
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.add_user_delete
 import lessmobile.composeapp.generated.resources.add_user_name_placeholder
@@ -54,6 +62,16 @@ fun AddBranchUserScreen(
     navController: NavController
 ) {
     val state by viewModel.collectAsState()
+    var toastMessage by remember { mutableStateOf<String?>(null) }
+    var toastType by remember { mutableStateOf(ToastType.Success) }
+
+    // Auto-hide toast after delay
+    LaunchedEffect(toastMessage) {
+        if (toastMessage != null) {
+            delay(2000)
+            toastMessage = null
+        }
+    }
 
     // Collect side effects for navigation
     viewModel.collectSideEffect { sideEffect ->
@@ -62,22 +80,53 @@ fun AddBranchUserScreen(
                 navController.popBackStack()
             }
             is AddBranchUserSideEffect.UserSaved -> {
-                navController.popBackStack()
+                toastType = ToastType.Success
+                toastMessage = sideEffect.message
+                delay(1500)
+                navController.navigate(
+                    MerchantRoute.BranchUsers(
+                        venueId = state.venueId,
+                        venueName = state.venueName
+                    )
+                ) {
+                    popUpTo<MerchantRoute.BranchUsers> { inclusive = true }
+                    launchSingleTop = true
+                }
             }
             is AddBranchUserSideEffect.UserDeleted -> {
-                navController.popBackStack()
+                navController.navigate(
+                    MerchantRoute.BranchUsers(
+                        venueId = state.venueId,
+                        venueName = state.venueName
+                    )
+                ) {
+                    popUpTo<MerchantRoute.BranchUsers> { inclusive = true }
+                    launchSingleTop = true
+                }
             }
             is AddBranchUserSideEffect.ShowError -> {
-                // Show error snackbar or dialog
+                toastType = ToastType.Error
+                toastMessage = sideEffect.message
             }
         }
     }
 
     // Render the stateless UI
-    AddBranchUserScreenContent(
-        state = state,
-        onIntent = viewModel::onIntent
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        AddBranchUserScreenContent(
+            state = state,
+            onIntent = viewModel::onIntent
+        )
+
+        // Toast
+        AnimatedToast(
+            visible = toastMessage != null,
+            title = toastMessage ?: "",
+            type = toastType,
+            modifier = Modifier.align(Alignment.TopCenter),
+            showGradientScrim = false
+        )
+    }
 }
 
 /**
@@ -181,12 +230,10 @@ fun AddBranchUserScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Primary,
                 size = ButtonSize.Large,
-                enabled = !state.isLoading
+                enabled = !state.isLoading,
+                isLoading = state.isLoading
             )
-            
-            // Delete button - only shown in edit mode
 
         }
     }
 }
-

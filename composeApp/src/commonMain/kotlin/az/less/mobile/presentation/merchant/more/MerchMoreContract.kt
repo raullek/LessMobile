@@ -8,11 +8,13 @@ import az.less.mobile.presentation.merchant.more.model.MerchMoreSection
  * State of the MerchMore Screen
  */
 data class MerchMoreState(
-    // Merchant info
-    val merchantName: String = "",
-    val merchantEmail: String = "",
+    // Venue info
+    val venueName: String = "",
+    val venueLogoUrl: String? = null,
     val rating: String = "0.0",
     val reviewCount: String = "0",
+    val isPartner: Boolean = false,
+    val canSwitchMode: Boolean = false,
     // Settings
     val notificationEnabled: Boolean = true,
     val darkModeEnabled: Boolean = false,

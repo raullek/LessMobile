@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.client.main.offers.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,13 +33,10 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.ic_person_image_placeholder_48dp
 import lessmobile.composeapp.generated.resources.ic_star_24dp
 import lessmobile.composeapp.generated.resources.ill_box_placeholder
 import lessmobile.composeapp.generated.resources.ill_venue_placeholder
 import lessmobile.composeapp.generated.resources.orders_pickup_time
-import lessmobile.composeapp.generated.resources.test_merchant_logo
-import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

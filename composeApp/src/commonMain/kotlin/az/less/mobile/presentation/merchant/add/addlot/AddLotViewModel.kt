@@ -2,12 +2,14 @@ package az.less.mobile.presentation.merchant.add.addlot
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.data.remote.model.FilterOptionsDto
+import az.less.mobile.domain.repository.ContentRepository
 import az.less.mobile.presentation.merchant.add.addlot.model.AddLotResponseModel
 import az.less.mobile.presentation.merchant.add.addlot.model.ChipOption
 import az.less.mobile.presentation.merchant.add.addlot.model.ChipsSection
 import az.less.mobile.presentation.merchant.add.addlot.model.CounterSection
-import az.less.mobile.presentation.merchant.add.addlot.model.IconGridOption
 import az.less.mobile.presentation.merchant.add.addlot.model.IconGridSection
+import az.less.mobile.presentation.merchant.add.addlot.model.IconGridOption
 import az.less.mobile.presentation.merchant.add.addlot.model.InputField
 import az.less.mobile.presentation.merchant.add.addlot.model.InputType
 import az.less.mobile.presentation.merchant.add.addlot.model.InputValidation
@@ -15,23 +17,13 @@ import az.less.mobile.presentation.merchant.add.addlot.model.TextareaSection
 import az.less.mobile.presentation.merchant.add.addlot.model.TimeRange
 import az.less.mobile.presentation.merchant.add.addlot.model.TimeRangeSelectorSection
 import az.less.mobile.presentation.merchant.add.addlot.model.TwoInputsSection
-import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.ic_gluten24dp
-import lessmobile.composeapp.generated.resources.ic_gmo24dp
-import lessmobile.composeapp.generated.resources.ic_milk24dp
-import lessmobile.composeapp.generated.resources.ic_sugar24dp
-import lessmobile.composeapp.generated.resources.test_offer_category_burger
-import lessmobile.composeapp.generated.resources.test_offer_category_pasta
-import lessmobile.composeapp.generated.resources.test_offer_category_pizza
-import lessmobile.composeapp.generated.resources.test_offer_category_sushi
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
-/**
- * ViewModel for Add Lot Screen using Orbit MVI
- */
-class AddLotViewModel : ViewModel(), ContainerHost<AddLotState, AddLotSideEffect> {
+class AddLotViewModel(
+    private val contentRepository: ContentRepository
+) : ViewModel(), ContainerHost<AddLotState, AddLotSideEffect> {
 
     override val container: Container<AddLotState, AddLotSideEffect> =
         viewModelScope.container(AddLotState())
@@ -41,66 +33,116 @@ class AddLotViewModel : ViewModel(), ContainerHost<AddLotState, AddLotSideEffect
     }
 
     private fun loadData() = intent {
-        reduce { state.copy(isLoading = true) }
+        reduce { state.copy(isLoading = true, error = null) }
 
-        // Mock data matching the JSON structure
-        val mockResponseModel = AddLotResponseModel(
-            sections = listOf(
-                // Box type section
-                ChipsSection(
-                    id = "box_type",
-                    title = "Box type",
-                    required = true,
-                    multiSelect = false,
-                    options = listOf(
-                        ChipOption(id = "small", label = "Small bag"),
-                        ChipOption(id = "medium", label = "Medium bag"),
-                        ChipOption(id = "family", label = "Family bag")
+        contentRepository.getFilterOptions()
+            .onSuccess { data ->
+                val responseModel = mapFilterOptionsToFormSections(data)
+                reduce {
+                    state.copy(
+                        responseModel = responseModel,
+                        isLoading = false,
+                        boxCount = 1
                     )
-                ),
-                // Categories section
-                IconGridSection(
-                    id = "categories",
-                    title = "Choose category",
-                    required = true,
-                    multiSelect = true,
-                    options = listOf(
-                        IconGridOption(id = "meals", label = "Meals", icon = Res.drawable.test_offer_category_burger),
-                        IconGridOption(id = "lunch", label = "Lunch", icon = Res.drawable.test_offer_category_pasta),
-                        IconGridOption(id = "dinner", label = "Dinner", icon = Res.drawable.test_offer_category_pizza),
-                        IconGridOption(id = "bakery", label = "Bakery", icon = Res.drawable.test_offer_category_sushi),
-                        IconGridOption(id = "dessert", label = "Dessert", icon = Res.drawable.test_offer_category_burger),
-                        IconGridOption(id = "grocery", label = "Grocery", icon = Res.drawable.test_offer_category_pasta),
-                        IconGridOption(id = "healthy", label = "Healthy", icon = Res.drawable.test_offer_category_pizza)
+                }
+            }
+            .onError { error ->
+                reduce {
+                    state.copy(
+                        isLoading = false,
+                        error = error.message
                     )
-                ),
-                // Diet tags section
-                ChipsSection(
-                    id = "diet_tags",
-                    title = "Some specific tags (optional)",
-                    required = false,
-                    multiSelect = true,
-                    options = listOf(
-                        ChipOption(id = "lactose_free", label = "Lactose free", icon = Res.drawable.ic_milk24dp),
-                        ChipOption(id = "sugar_free", label = "Sugar free", icon = Res.drawable.ic_sugar24dp),
-                        ChipOption(id = "gluten_free", label = "Gluten free", icon = Res.drawable.ic_gluten24dp),
-                        ChipOption(id = "gmo_free", label = "GMO free", icon = Res.drawable.ic_gmo24dp)
+                }
+            }
+    }
+
+    private fun mapFilterOptionsToFormSections(dto: FilterOptionsDto): AddLotResponseModel {
+        val sections = buildList {
+            // Bag types → ChipsSection (single select)
+            if (dto.bagTypes.isNotEmpty()) {
+                add(
+                    ChipsSection(
+                        id = "bag_type",
+                        title = "Box type",
+                        required = true,
+                        multiSelect = false,
+                        options = dto.bagTypes.map { bagType ->
+                            ChipOption(
+                                id = bagType.value,
+                                label = bagType.key
+                            )
+                        }
                     )
-                ),
-                // Time slots section
-                TimeRangeSelectorSection(
-                    id = "time_slots",
-                    title = "Choose time range",
-                    required = true,
-                    multiSelect = true,
-                    predefinedRanges = listOf(
-                        TimeRange(id = "morning", from = "09:00", to = "12:00"),
-                        TimeRange(id = "midday", from = "12:00", to = "15:00"),
-                        TimeRange(id = "evening", from = "15:00", to = "18:00")
-                    ),
-                    allowCustom = true
-                ),
-                // Price section
+                )
+            }
+
+            // Categories → IconGridSection (multi select)
+            if (dto.categories.isNotEmpty()) {
+                add(
+                    IconGridSection(
+                        id = "categories",
+                        title = "Choose category",
+                        required = true,
+                        multiSelect = true,
+                        options = dto.categories
+                            .sortedBy { it.sortOrder }
+                            .map { category ->
+                                IconGridOption(
+                                    id = category.id,
+                                    label = category.title,
+                                    imageUrl = category.imageUrl
+                                )
+                            }
+                    )
+                )
+            }
+
+            // Tags → ChipsSection (multi select, optional)
+            if (dto.tags.isNotEmpty()) {
+                add(
+                    ChipsSection(
+                        id = "tags",
+                        title = "Some specific tags (optional)",
+                        required = false,
+                        multiSelect = true,
+                        options = dto.tags
+                            .sortedBy { it.sortOrder }
+                            .map { tag ->
+                                ChipOption(
+                                    id = tag.id,
+                                    label = tag.title,
+                                    value = tag.value,
+                                    imageUrl = tag.imageUrl
+                                )
+                            }
+                    )
+                )
+            }
+
+            // Pickup ranges → TimeRangeSelectorSection
+            if (dto.pickupRanges.isNotEmpty()) {
+                add(
+                    TimeRangeSelectorSection(
+                        id = "pickup_time",
+                        title = "Choose time range",
+                        required = true,
+                        multiSelect = true,
+                        predefinedRanges = dto.pickupRanges.mapIndexed { index, range ->
+                            val parts = range.value.split("-")
+                            TimeRange(
+                                id = "range_$index",
+                                from = parts.getOrElse(0) { range.value },
+                                to = parts.getOrElse(1) { "" }
+                            )
+                        },
+                        allowCustom = true
+                    )
+                )
+            }
+
+            // Static sections (not from API)
+            // Box price
+            add(
                 TwoInputsSection(
                     id = "price",
                     title = "Box price",
@@ -121,8 +163,11 @@ class AddLotViewModel : ViewModel(), ContainerHost<AddLotState, AddLotSideEffect
                             validation = InputValidation(min = 0.0)
                         )
                     )
-                ),
-                // Description section
+                )
+            )
+
+            // Description
+            add(
                 TextareaSection(
                     id = "description",
                     title = "Some info for customer (optional)",
@@ -130,27 +175,21 @@ class AddLotViewModel : ViewModel(), ContainerHost<AddLotState, AddLotSideEffect
                     maxLength = 300,
                     placeholder = "Input lot information",
                     defaultValue = null
-                ),
-                // Box count section
+                )
+            )
+
+            // Box count
+            add(
                 CounterSection(
                     id = "box_count",
                     title = "Box Count"
                 )
             )
-        )
-
-        reduce {
-            state.copy(
-                responseModel = mockResponseModel,
-                isLoading = false,
-                boxCount = 1
-            )
         }
+
+        return AddLotResponseModel(sections = sections)
     }
 
-    /**
-     * Handle user intents
-     */
     fun onIntent(intent: AddLotIntent) {
         when (intent) {
             is AddLotIntent.OnBackClick -> handleBackClick()
@@ -241,7 +280,6 @@ class AddLotViewModel : ViewModel(), ContainerHost<AddLotState, AddLotSideEffect
     }
 
     private fun handleAddLotClick() = intent {
-        // Validate required sections
         val sections = state.responseModel?.sections ?: return@intent
 
         for (section in sections) {
@@ -290,7 +328,7 @@ class AddLotViewModel : ViewModel(), ContainerHost<AddLotState, AddLotSideEffect
                     }
                 }
                 is CounterSection -> {
-                    // Counter always has a value (boxCount in state)
+                    // Counter always has a value
                 }
             }
         }

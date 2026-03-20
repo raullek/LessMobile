@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.merchant.add.addlot.model.IconGridOption
+import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -59,15 +60,27 @@ fun CategoryGridItem(
                 .padding(LessTheme.spacing.xxSmall),
             contentAlignment = Alignment.Center
         ) {
-            option.icon?.let { icon ->
-                Image(
-                    painter = painterResource(icon),
-                    contentDescription = option.label,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(RoundedCornerShape(LessTheme.radius.xSmall)),
-                    contentScale = ContentScale.Crop
-                )
+            when {
+                option.imageUrl != null -> {
+                    AsyncImage(
+                        model = option.imageUrl,
+                        contentDescription = option.label,
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(LessTheme.radius.xSmall)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                option.icon != null -> {
+                    Image(
+                        painter = painterResource(option.icon),
+                        contentDescription = option.label,
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(LessTheme.radius.xSmall)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
         Text(

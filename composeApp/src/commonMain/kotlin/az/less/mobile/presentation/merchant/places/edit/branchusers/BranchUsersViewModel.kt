@@ -1,7 +1,10 @@
 package az.less.mobile.presentation.merchant.places.edit.branchusers
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.data.remote.model.VenueMerchantDto
+import az.less.mobile.domain.repository.VenuesRepository
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -9,35 +12,45 @@ import org.orbitmvi.orbit.container
 /**
  * ViewModel for Branch Users Screen using Orbit MVI
  */
-class BranchUsersViewModel : ViewModel(), ContainerHost<BranchUsersState, BranchUsersSideEffect> {
+class BranchUsersViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val venuesRepository: VenuesRepository
+) : ViewModel(), ContainerHost<BranchUsersState, BranchUsersSideEffect> {
+
+    private val venueId: String = savedStateHandle["venueId"] ?: ""
+    private val venueName: String = savedStateHandle["venueName"] ?: ""
 
     override val container: Container<BranchUsersState, BranchUsersSideEffect> =
-        viewModelScope.container(BranchUsersState())
+        viewModelScope.container(
+            BranchUsersState(
+                venueId = venueId,
+                branchName = venueName
+            )
+        )
 
     init {
         loadUsers()
     }
 
     private fun loadUsers() = intent {
+        if (state.venueId.isEmpty()) return@intent
+
         reduce { state.copy(isLoading = true) }
 
-        // TODO: Load users from repository
-        // For now, using mock data matching Figma design
-        val mockUsers = listOf(
-            BranchUser(
-                id = "1",
-                name = "Mahammadali",
-                phoneNumber = "501234567",
-                email = "mahammadali@example.com"
-            )
-        )
-
-        reduce {
-            state.copy(
-                users = mockUsers,
-                isLoading = false
-            )
-        }
+        venuesRepository.getVenueMerchants(state.venueId)
+            .onSuccess { merchants ->
+                val users = merchants.map { it.toBranchUser() }
+                reduce {
+                    state.copy(
+                        users = users,
+                        isLoading = false
+                    )
+                }
+            }
+            .onError { error ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(BranchUsersSideEffect.ShowError(error.message))
+            }
     }
 
     /**
@@ -61,22 +74,32 @@ class BranchUsersViewModel : ViewModel(), ContainerHost<BranchUsersState, Branch
     }
 
     private fun handleUserClick(userId: String) = intent {
-        // Find user in list
         val userIndex = state.users.indexOfFirst { it.id == userId }
         val user = state.users.getOrNull(userIndex)
         if (user != null) {
-            postSideEffect(BranchUsersSideEffect.NavigateToEditUser(
-                userNumber = userIndex + 1,
-                user = user
-            ))
+            postSideEffect(
+                BranchUsersSideEffect.NavigateToEditUser(
+                    userNumber = userIndex + 1,
+                    user = user
+                )
+            )
         }
     }
 
     private fun handleDeleteUserClick(userId: String) = intent {
-        // TODO: Delete user from list
         reduce {
             state.copy(users = state.users.filter { it.id != userId })
         }
     }
 }
 
+private fun VenueMerchantDto.toBranchUser(): BranchUser {
+    return BranchUser(
+        id = id,
+        name = userId.name ?: "",
+        phoneNumber = userId.phone ?: "",
+        email = userId.email ?: "",
+        avatar = userId.avatar,
+        isActive = isActive
+    )
+}

@@ -3,6 +3,7 @@ package az.less.mobile.presentation.merchant.places.edit.branchusers.addbranchus
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.domain.repository.VenuesRepository
 import az.less.mobile.presentation.merchant.places.edit.branchusers.BranchUser
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -14,17 +15,22 @@ import org.orbitmvi.orbit.container
  * User data is passed via navigation as serialized JSON from BranchUsersScreen
  */
 class AddBranchUserViewModel(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val venuesRepository: VenuesRepository
 ) : ViewModel(), ContainerHost<AddBranchUserState, AddBranchUserSideEffect> {
 
+    private val venueId: String = savedStateHandle.get<String>("venueId") ?: ""
+    private val venueName: String = savedStateHandle.get<String>("venueName") ?: ""
     private val userNumber: Int = savedStateHandle.get<Int>("userNumber") ?: 1
-    private val user: BranchUser? = savedStateHandle.get<String>("user")?.let { 
+    private val user: BranchUser? = savedStateHandle.get<String>("user")?.let {
         BranchUser.decode(it)
     }
 
     override val container: Container<AddBranchUserState, AddBranchUserSideEffect> =
         viewModelScope.container(
             AddBranchUserState(
+                venueId = venueId,
+                venueName = venueName,
                 userId = user?.id,
                 userNumber = userNumber,
                 name = user?.name ?: "",
@@ -100,21 +106,40 @@ class AddBranchUserViewModel(
 
         reduce { state.copy(isLoading = true) }
 
-        // TODO: Save user via repository (create or update based on userId)
-        // For now, simulate success
-        reduce { state.copy(isLoading = false) }
-        postSideEffect(AddBranchUserSideEffect.UserSaved)
+        val phone = if (state.phoneNumber.startsWith("+")) {
+            state.phoneNumber
+        } else {
+            "+994${state.phoneNumber}"
+        }
+
+        venuesRepository.addVenueMerchant(
+            venueId = state.venueId,
+            userIdentifier = state.email,
+            name = state.name,
+            email = state.email,
+            phone = phone
+        )
+            .onSuccess { response ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(
+                    AddBranchUserSideEffect.UserSaved(
+                        message = response.message ?: "User added successfully"
+                    )
+                )
+            }
+            .onError { error ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(AddBranchUserSideEffect.ShowError(error.message))
+            }
     }
 
     private fun onDeleteClick() = intent {
         if (state.userId == null) return@intent
-        
+
         reduce { state.copy(isLoading = true) }
-        
+
         // TODO: Delete user via repository
-        // For now, simulate success
         reduce { state.copy(isLoading = false) }
         postSideEffect(AddBranchUserSideEffect.UserDeleted)
     }
 }
-

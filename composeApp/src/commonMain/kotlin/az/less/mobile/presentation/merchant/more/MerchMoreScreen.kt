@@ -168,10 +168,10 @@ fun MerchMoreScreenContent(
         // Header with merchant info
         item {
             MerchMoreHeader(
-                merchantName = state.merchantName,
-                merchantEmail = state.merchantEmail,
+                venueName = state.venueName,
                 rating = state.rating,
-                reviewCount = state.reviewCount
+                reviewCount = state.reviewCount,
+                venueLogoUrl = state.venueLogoUrl
             )
         }
 
