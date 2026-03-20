@@ -15,12 +15,17 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
+import az.less.designsystem.components.AnimatedToast
+import az.less.designsystem.components.ToastType
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.CellType
@@ -35,11 +40,17 @@ import az.less.mobile.presentation.merchant.places.edit.components.EditMerchantP
 import az.less.mobile.presentation.merchant.places.edit.components.EditPhoneNumberBottomSheet
 import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.edit_profile_create_branch
-import lessmobile.composeapp.generated.resources.edit_profile_manage_email
+import lessmobile.composeapp.generated.resources.edit_profile_error_location_required
+import lessmobile.composeapp.generated.resources.edit_profile_error_name_required
+import lessmobile.composeapp.generated.resources.edit_profile_error_phone_required
+import lessmobile.composeapp.generated.resources.edit_profile_make_me_merchant
 import lessmobile.composeapp.generated.resources.edit_profile_update_branch
+import lessmobile.composeapp.generated.resources.edit_profile_venue_created
+import lessmobile.composeapp.generated.resources.edit_profile_venue_updated
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -51,15 +62,28 @@ import org.orbitmvi.orbit.compose.collectSideEffect
  */
 @Composable
 fun EditMerchantProfileScreen(
-    branchId: String? = null,
+    venueData: String? = null,
     viewModel: EditMerchantProfileViewModel = koinViewModel(),
     navController: NavController
 ) {
     val state by viewModel.collectAsState()
 
-    // Initialize ViewModel with branchId
-    LaunchedEffect(branchId) {
-        viewModel.initialize(branchId)
+    // Toast local state
+    var toastVisible by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
+    var toastType by remember { mutableStateOf(ToastType.Success) }
+    val coroutineToastScope = rememberCoroutineScope()
+
+    // Resolve localized validation/success messages
+    val validationNameRequired = stringResource(Res.string.edit_profile_error_name_required)
+    val validationPhoneRequired = stringResource(Res.string.edit_profile_error_phone_required)
+    val validationLocationRequired = stringResource(Res.string.edit_profile_error_location_required)
+    val successVenueCreated = stringResource(Res.string.edit_profile_venue_created)
+    val successVenueUpdated = stringResource(Res.string.edit_profile_venue_updated)
+
+    // Initialize ViewModel with venue data
+    LaunchedEffect(venueData) {
+        viewModel.initialize(venueData)
     }
 
     // Listen for location selection result from SelectBranchLocationOnMapScreen
@@ -104,23 +128,47 @@ fun EditMerchantProfileScreen(
                     )
                 )
             }
-            is EditMerchantProfileSideEffect.ShowError -> {
-                // Show error snackbar
-            }
             is EditMerchantProfileSideEffect.BranchCreated -> {
                 navController.navigate(MerchantRoute.BranchVerification)
             }
             is EditMerchantProfileSideEffect.BranchUpdated -> {
                 navController.popBackStack()
             }
+            is EditMerchantProfileSideEffect.ShowToast -> {
+                val resolvedMessage = when (sideEffect.message) {
+                    EditMerchantProfileViewModel.VALIDATION_NAME_REQUIRED -> validationNameRequired
+                    EditMerchantProfileViewModel.VALIDATION_PHONE_REQUIRED -> validationPhoneRequired
+                    EditMerchantProfileViewModel.VALIDATION_LOCATION_REQUIRED -> validationLocationRequired
+                    EditMerchantProfileViewModel.SUCCESS_VENUE_CREATED -> successVenueCreated
+                    EditMerchantProfileViewModel.SUCCESS_VENUE_UPDATED -> successVenueUpdated
+                    else -> sideEffect.message // API error messages as-is
+                }
+                toastMessage = resolvedMessage
+                toastType = sideEffect.type
+                toastVisible = true
+                coroutineToastScope.launch {
+                    delay(3000)
+                    toastVisible = false
+                }
+            }
         }
     }
 
     // Render the stateless UI
-    EditMerchantProfileScreenContent(
-        state = state,
-        onIntent = viewModel::onIntent
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        EditMerchantProfileScreenContent(
+            state = state,
+            onIntent = viewModel::onIntent
+        )
+
+        // Toast
+        AnimatedToast(
+            visible = toastVisible,
+            title = toastMessage,
+            type = toastType,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+    }
 }
 
 /**
@@ -208,90 +256,86 @@ fun EditMerchantProfileScreenContent(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(LessTheme.colors.backgroundSecond),
-            contentPadding = PaddingValues(
-                bottom = LessTheme.spacing.xLarge + 80.dp // Space for bottom button
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(LessTheme.colors.backgroundSecond)
+            .windowInsetsPadding(WindowInsets.navigationBars),
+        contentPadding = PaddingValues(
+            bottom = LessTheme.spacing.medium
+        )
+    ) {
+        // Hero Section with overlapping logo and edit icons
+        item(key = "hero_section") {
+            EditMerchantProfileHeroSection(
+                venueImageUrl = state.venueImageUrl,
+                logoUrl = state.logoUrl,
+                venueImageBytes = state.venueImageBytes,
+                logoImageBytes = state.logoImageBytes,
+                onBackClick = { onIntent(EditMerchantProfileIntent.OnBackClick) },
+                onVenueImageEditClick = { onIntent(EditMerchantProfileIntent.OnVenueImageEditClick) },
+                onLogoEditClick = { onIntent(EditMerchantProfileIntent.OnLogoEditClick) }
             )
-        ) {
-            // Hero Section with overlapping logo and edit icons
-            item(key = "hero_section") {
-                EditMerchantProfileHeroSection(
-                    venueImageUrl = state.venueImageUrl,
-                    logoUrl = state.logoUrl,
-                    venueImageBytes = state.venueImageBytes,
-                    logoImageBytes = state.logoImageBytes,
-                    onBackClick = { onIntent(EditMerchantProfileIntent.OnBackClick) },
-                    onVenueImageEditClick = { onIntent(EditMerchantProfileIntent.OnVenueImageEditClick) },
-                    onLogoEditClick = { onIntent(EditMerchantProfileIntent.OnLogoEditClick) }
-                )
-            }
-
-            // Merchant Profile Info Section
-            item(key = "profile_info") {
-                EditMerchantProfileInfoSection(
-                    venueName = state.venueName,
-                    description = state.description,
-                    onNameEditClick = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsClick) },
-                    onDescriptionChanged = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsClick) }
-                )
-            }
-
-            // Contact Section
-            item(key = "contact_section") {
-                EditMerchantProfileContactSection(
-                    phoneNumber = state.phoneNumber,
-                    location = state.location,
-                    onPhoneEditClick = { onIntent(EditMerchantProfileIntent.OnPhoneEditClick) },
-                    onLocationEditClick = { onIntent(EditMerchantProfileIntent.OnLocationEditClick) }
-                )
-            }
-
-            // Default Box Description and Add for Lots Sections
-            item(key = "additional_sections") {
-                EditBranchAdditionalSections(
-                    defaultBoxDescription = state.defaultBoxDescription,
-                    lotsImageUrl = state.lotsImageUrl,
-                    lotsImageBytes = state.lotsImageBytes,
-                    onDefaultBoxDescriptionChanged = { onIntent(EditMerchantProfileIntent.OnDefaultBoxDescriptionChanged(it)) },
-                    onLotsEditClick = { onIntent(EditMerchantProfileIntent.OnLotsEditClick) }
-                )
-            }
-
-            // Toggle Section (using DsCell like in More screen)
-            item(key = "toggle_section") {
-                DsCell(
-                    title = stringResource(Res.string.edit_profile_manage_email),
-                    type = CellType.Toggle(
-                        checked = state.manageFromEmail,
-                        onCheckedChange = { onIntent(EditMerchantProfileIntent.OnManageFromEmailToggled(it)) }
-                    ),
-                    showDivider = false,
-                    modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
-                )
-            }
         }
 
-        // Bottom Create Branch Button
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(
-                    horizontal = LessTheme.spacing.medium,
-                    vertical = LessTheme.spacing.medium
-                )
-                .windowInsetsPadding(WindowInsets.navigationBars)
-        ) {
+        // Merchant Profile Info Section
+        item(key = "profile_info") {
+            EditMerchantProfileInfoSection(
+                venueName = state.venueName,
+                description = state.description,
+                onNameEditClick = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsClick) },
+                onDescriptionChanged = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsClick) }
+            )
+        }
+
+        // Contact Section
+        item(key = "contact_section") {
+            EditMerchantProfileContactSection(
+                phoneNumber = state.phoneNumber,
+                location = state.location,
+                onPhoneEditClick = { onIntent(EditMerchantProfileIntent.OnPhoneEditClick) },
+                onLocationEditClick = { onIntent(EditMerchantProfileIntent.OnLocationEditClick) }
+            )
+        }
+
+        // Default Box Description and Add for Lots Sections
+        item(key = "additional_sections") {
+            EditBranchAdditionalSections(
+                defaultBoxDescription = state.defaultBoxDescription,
+                lotsImageUrl = state.lotsImageUrl,
+                lotsImageBytes = state.lotsImageBytes,
+                onDefaultBoxDescriptionChanged = { onIntent(EditMerchantProfileIntent.OnDefaultBoxDescriptionChanged(it)) },
+                onLotsEditClick = { onIntent(EditMerchantProfileIntent.OnLotsEditClick) }
+            )
+        }
+
+        // Toggle Section (using DsCell like in More screen)
+        item(key = "toggle_section") {
+            DsCell(
+                title = stringResource(Res.string.edit_profile_make_me_merchant),
+                type = CellType.Toggle(
+                    checked = state.makeMeMerchant,
+                    onCheckedChange = { onIntent(EditMerchantProfileIntent.OnMakeMeMerchantToggled(it)) }
+                ),
+                showDivider = false,
+                modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
+            )
+        }
+
+        // Create/Update Branch Button
+        item(key = "submit_button") {
             DsButton(
                 text = if (state.branchId == null) stringResource(Res.string.edit_profile_create_branch) else stringResource(Res.string.edit_profile_update_branch),
                 onClick = { onIntent(EditMerchantProfileIntent.OnCreateBranchClick) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = LessTheme.spacing.medium,
+                        vertical = LessTheme.spacing.medium
+                    ),
                 variant = ButtonVariant.Primary,
-                size = ButtonSize.Large
+                size = ButtonSize.Large,
+                isLoading = state.isLoading
             )
         }
     }
@@ -318,5 +362,6 @@ fun EditMerchantProfileScreenContent(
         },
         onDismiss = { onIntent(EditMerchantProfileIntent.OnEditPhoneNumberBottomSheetDismiss) }
     )
+
 }
 

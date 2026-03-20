@@ -5,7 +5,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import az.less.mobile.data.datasource.OrdersDataSource
 import az.less.mobile.data.paging.OrdersPagingSource
+import az.less.mobile.data.remote.model.MerchantOrdersData
 import az.less.mobile.domain.repository.OrdersRepository
+import az.less.mobile.network.NetworkResult
 import az.less.mobile.presentation.client.main.orders.models.Order
 import kotlinx.coroutines.flow.Flow
 
@@ -25,4 +27,8 @@ class OrdersRepositoryImpl(
             )
         }
     ).flow
+
+    override suspend fun getMerchantOrders(venueId: String): NetworkResult<MerchantOrdersData> {
+        return ordersDataSource.getMerchantOrders(venueId)
+    }
 }

@@ -2,6 +2,11 @@ package az.less.mobile.presentation.merchant.more
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.domain.model.auth.User
+import az.less.mobile.domain.model.auth.UserEcoHeroBadge
+import az.less.mobile.domain.model.auth.UserStats
+import az.less.mobile.domain.model.auth.UserVenue
+import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.ContentRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
@@ -32,7 +37,8 @@ import org.orbitmvi.orbit.container
 class MerchMoreViewModel(
     private val sessionLocalRepository: SessionLocalRepository,
     private val authorizationRepository: AuthorizationRepository,
-    private val contentRepository: ContentRepository
+    private val contentRepository: ContentRepository,
+    private val accountRepository: AccountRepository
 ) : ViewModel(), ContainerHost<MerchMoreState, MerchMoreSideEffect> {
 
     override val container: Container<MerchMoreState, MerchMoreSideEffect> =
@@ -40,6 +46,60 @@ class MerchMoreViewModel(
 
     init {
         observeUserState()
+        refreshUserInBackground()
+    }
+
+    private fun refreshUserInBackground() {
+        viewModelScope.launch {
+            accountRepository.getProfile()
+                .onSuccess { profileData ->
+                    val userData = profileData.user
+                    val updatedUser = User(
+                        id = userData.id,
+                        name = userData.name,
+                        email = userData.email,
+                        roles = userData.roles,
+                        status = userData.status,
+                        avatarUrl = userData.avatar,
+                        phone = userData.phone,
+                        gender = userData.gender,
+                        birthDay = userData.birthDay,
+                        emailVerified = userData.emailVerified,
+                        currentLocation = userData.currentLocation,
+                        venue = userData.venue?.let {
+                            UserVenue(
+                                id = it.id,
+                                name = it.name,
+                                businessName = it.businessName,
+                                businessAddress = it.businessAddress,
+                                businessDescription = it.businessDescription,
+                                businessLogo = it.businessLogo,
+                                coverImage = it.coverImage,
+                                rating = it.rating,
+                                totalReviews = it.totalReviews,
+                                status = it.status
+                            )
+                        },
+                        stats = profileData.stats?.let {
+                            UserStats(
+                                mealsSaved = it.mealsSaved,
+                                co2Saved = it.co2Saved,
+                                moneySaved = it.moneySaved
+                            )
+                        },
+                        ecoHeroBadge = profileData.ecoHeroBadge?.let {
+                            UserEcoHeroBadge(
+                                level = it.level,
+                                message = it.message,
+                                mealsSaved = it.mealsSaved,
+                                icon = it.icon,
+                                color = it.color
+                            )
+                        }
+                    )
+                    sessionLocalRepository.updateUser(updatedUser)
+                }
+        }
     }
 
     private fun observeUserState() {
@@ -49,9 +109,18 @@ class MerchMoreViewModel(
                     if (user != null) {
                         reduce {
                             state.copy(
-                                merchantName = user.name,
-                                merchantEmail = user.email,
-                                sections = buildSections(state.notificationEnabled, state.darkModeEnabled)
+                                venueName = user.venue?.name ?: user.name,
+                                venueLogoUrl = user.venue?.businessLogo,
+                                rating = user.venue?.rating?.toString() ?: "0.0",
+                                reviewCount = user.venue?.totalReviews?.toString() ?: "0",
+                                isPartner = user.isPartner,
+                                canSwitchMode = user.canSwitchMode(),
+                                sections = buildSections(
+                                    notificationEnabled = state.notificationEnabled,
+                                    darkModeEnabled = state.darkModeEnabled,
+                                    isPartner = user.isPartner,
+                                    canSwitchMode = user.canSwitchMode()
+                                )
                             )
                         }
                     }
@@ -122,7 +191,7 @@ class MerchMoreViewModel(
         reduce {
             state.copy(
                 notificationEnabled = newEnabled,
-                sections = buildSections(newEnabled, state.darkModeEnabled)
+                sections = buildSections(newEnabled, state.darkModeEnabled, isPartner = state.isPartner, canSwitchMode = state.canSwitchMode)
             )
         }
     }
@@ -132,7 +201,7 @@ class MerchMoreViewModel(
         reduce {
             state.copy(
                 darkModeEnabled = newEnabled,
-                sections = buildSections(state.notificationEnabled, newEnabled)
+                sections = buildSections(state.notificationEnabled, newEnabled, isPartner = state.isPartner, canSwitchMode = state.canSwitchMode)
             )
         }
     }
@@ -149,37 +218,60 @@ class MerchMoreViewModel(
         postSideEffect(MerchMoreSideEffect.Logout)
     }
 
-    private fun buildSections(notificationEnabled: Boolean, darkModeEnabled: Boolean): List<MerchMoreSection> {
+    private fun buildSections(
+        notificationEnabled: Boolean,
+        darkModeEnabled: Boolean,
+        isPartner: Boolean,
+        canSwitchMode: Boolean
+    ): List<MerchMoreSection> {
+        val appCells = mutableListOf<MerchMoreCellModel>()
+
+        if (isPartner) {
+            appCells.add(
+                MerchMoreCellModel(
+                    id = MerchCellId.Places,
+                    titleRes = Res.string.merch_more_places,
+                    icon = Res.drawable.ic_explore_24dp,
+                    type = MerchMoreCellType.Navigation
+                )
+            )
+        }
+
+        appCells.add(
+            MerchMoreCellModel(
+                id = MerchCellId.Notification,
+                titleRes = Res.string.more_notification,
+                icon = Res.drawable.ic_notification_24dp,
+                type = MerchMoreCellType.Toggle(notificationEnabled)
+            )
+        )
+
+        appCells.add(
+            MerchMoreCellModel(
+                id = MerchCellId.DarkMode,
+                titleRes = Res.string.merch_more_dark_mode,
+                icon = Res.drawable.ic_more_24dp,
+                type = MerchMoreCellType.Toggle(darkModeEnabled),
+                showDivider = canSwitchMode
+            )
+        )
+
+        if (canSwitchMode) {
+            appCells.add(
+                MerchMoreCellModel(
+                    id = MerchCellId.SwitchToClient,
+                    titleRes = Res.string.more_switch_to_client,
+                    icon = Res.drawable.ic_explore_24dp,
+                    type = MerchMoreCellType.Navigation,
+                    showDivider = false
+                )
+            )
+        }
+
         return listOf(
             MerchMoreSection(
                 titleRes = Res.string.more_section_application,
-                cells = listOf(
-                    MerchMoreCellModel(
-                        id = MerchCellId.Places,
-                        titleRes = Res.string.merch_more_places,
-                        icon = Res.drawable.ic_explore_24dp,
-                        type = MerchMoreCellType.Navigation
-                    ),
-                    MerchMoreCellModel(
-                        id = MerchCellId.Notification,
-                        titleRes = Res.string.more_notification,
-                        icon = Res.drawable.ic_notification_24dp,
-                        type = MerchMoreCellType.Toggle(notificationEnabled)
-                    ),
-                    MerchMoreCellModel(
-                        id = MerchCellId.DarkMode,
-                        titleRes = Res.string.merch_more_dark_mode,
-                        icon = Res.drawable.ic_more_24dp,
-                        type = MerchMoreCellType.Toggle(darkModeEnabled)
-                    ),
-                    MerchMoreCellModel(
-                        id = MerchCellId.SwitchToClient,
-                        titleRes = Res.string.more_switch_to_client,
-                        icon = Res.drawable.ic_explore_24dp,
-                        type = MerchMoreCellType.Navigation,
-                        showDivider = false
-                    )
-                )
+                cells = appCells
             ),
             MerchMoreSection(
                 titleRes = Res.string.more_section_support,

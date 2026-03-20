@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Related Documentation
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed architecture documentation
+- [ROLES_SPEC.md](ROLES_SPEC.md) - User roles and specifications
+
 ## Build Commands
 
 ```bash

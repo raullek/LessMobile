@@ -44,6 +44,8 @@ import org.orbitmvi.orbit.compose.collectSideEffect
  */
 @Composable
 fun BranchUsersScreen(
+    venueId: String,
+    venueName: String,
     viewModel: BranchUsersViewModel = koinViewModel(),
     navController: NavController
 ) {
@@ -57,11 +59,19 @@ fun BranchUsersScreen(
             }
             is BranchUsersSideEffect.NavigateToAddUser -> {
                 val userNumber = state.users.size + 1
-                navController.navigate(MerchantRoute.AddBranchUser(userNumber = userNumber))
+                navController.navigate(
+                    MerchantRoute.AddBranchUser(
+                        venueId = state.venueId,
+                        venueName = state.branchName,
+                        userNumber = userNumber
+                    )
+                )
             }
             is BranchUsersSideEffect.NavigateToEditUser -> {
                 navController.navigate(
                     MerchantRoute.AddBranchUser(
+                        venueId = state.venueId,
+                        venueName = state.branchName,
                         userNumber = sideEffect.userNumber,
                         user = sideEffect.user.encode()
                     )

@@ -28,9 +28,13 @@ import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.TextFieldColors
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.edit_profile_add_for_lots
+import lessmobile.composeapp.generated.resources.edit_profile_box_description_placeholder
+import lessmobile.composeapp.generated.resources.edit_profile_default_box_description
 import lessmobile.composeapp.generated.resources.ic_edit_24dp
 import lessmobile.composeapp.generated.resources.image_placeholder
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Default box description section
@@ -47,7 +51,7 @@ fun DefaultBoxDescriptionSection(
             .padding(horizontal = LessTheme.spacing.medium)
     ) {
         Text(
-            text = "Default box description",
+            text = stringResource(Res.string.edit_profile_default_box_description),
             style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsSecondary
         )
@@ -57,7 +61,7 @@ fun DefaultBoxDescriptionSection(
         DsTextField(
             value = defaultBoxDescription,
             onValueChange = onDefaultBoxDescriptionChanged,
-            placeholder = "Some tips for user to understant what can be inside",
+            placeholder = stringResource(Res.string.edit_profile_box_description_placeholder),
             singleLine = false,
             maxLines = 3,
             modifier = Modifier.fillMaxWidth(),
@@ -117,7 +121,7 @@ fun AddForLotsSection(
                 )
                 // Show placeholder text when no image
                 Text(
-                    text = "Add for lots",
+                    text = stringResource(Res.string.edit_profile_add_for_lots),
                     style = LessTheme.typography.title28Semibold,
                     color = LessTheme.colors.textIconsBlack
                 )

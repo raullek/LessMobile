@@ -1,9 +1,14 @@
 package az.less.mobile.navigation
 
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import az.less.mobile.domain.model.auth.AppMode
+import az.less.mobile.domain.repository.SessionLocalRepository
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import az.less.mobile.presentation.client.account.account.AccountScreen
 import az.less.mobile.presentation.client.account.paymentmethods.PaymentMethodsScreen
 import az.less.mobile.presentation.client.account.paymentmethods.addcard.AddCardWebViewScreen
@@ -123,9 +128,16 @@ fun NavGraphBuilder.mainGraph(
     }
 
     composable<ClientRoute.More> {
+        val sessionLocalRepository: SessionLocalRepository = koinInject()
+        val coroutineScope = rememberCoroutineScope()
         MoreScreen(
             navController = navController,
-            navigateToMerchant = { rootNavController.navigate(ROOT_MERCHANT) }
+            navigateToMerchant = {
+                coroutineScope.launch {
+                    sessionLocalRepository.saveLastUsedMode(AppMode.MERCHANT)
+                }
+                rootNavController.navigate(ROOT_MERCHANT)
+            }
         )
     }
 
@@ -206,7 +218,9 @@ fun NavGraphBuilder.moreGraph(
         LoginCodeScreen(
             navController = navController,
             email = args.email,
-            navigateToMerchant = { rootNavController.navigate(ROOT_MERCHANT) }
+            navigateToMerchant = {
+                rootNavController.navigate(ROOT_MERCHANT)
+            }
         )
     }
 }

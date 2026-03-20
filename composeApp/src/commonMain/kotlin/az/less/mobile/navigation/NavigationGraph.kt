@@ -17,10 +17,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import az.less.designsystem.base.LessTheme
+import az.less.mobile.domain.model.auth.AppMode
 import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.AppClientBottomNavigation
 import az.less.mobile.presentation.merchant.AppMerchantBottomNavigation
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 private fun logNavigation(tag: String, route: String) {
@@ -40,7 +42,8 @@ fun AppRootNavigation() {
 
     LaunchedEffect(Unit) {
         val user = sessionLocalRepository.currentUser.first()
-        if (user?.roles?.contains("merchant") == true) {
+        val lastMode = sessionLocalRepository.lastUsedMode.first()
+        if (user != null && lastMode == AppMode.MERCHANT && AppMode.MERCHANT in user.availableModes()) {
             navController.navigate(ROOT_MERCHANT) {
                 popUpTo(ROOT_CLIENT) { inclusive = true }
             }

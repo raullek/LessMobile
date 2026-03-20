@@ -18,15 +18,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
-import az.less.mobile.presentation.merchant.add.addlot.model.ChipOption
+import coil3.compose.AsyncImage
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun TagChip(
-    option: ChipOption,
+    label: String,
     isSelected: Boolean,
     onToggle: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    icon: DrawableResource? = null,
+    imageUrl: String? = null
 ) {
     val backgroundColor = if (isSelected) {
         LessTheme.colors.elementsSecondaryBrand
@@ -61,16 +64,25 @@ fun TagChip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
     ) {
-        option.icon?.let { icon ->
-            Icon(
-                painter = painterResource(icon),
-                contentDescription = option.label,
-                tint = Color.Unspecified,
-                modifier = Modifier.size(LessTheme.size.medium)
-            )
+        when {
+            imageUrl != null -> {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = label,
+                    modifier = Modifier.size(LessTheme.size.medium)
+                )
+            }
+            icon != null -> {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = label,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(LessTheme.size.medium)
+                )
+            }
         }
         Text(
-            text = option.label,
+            text = label,
             style = LessTheme.typography.body14Semibold,
             color = textColor
         )

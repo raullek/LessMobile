@@ -1,5 +1,10 @@
 package az.less.mobile.presentation.merchant.add.addlot.model
 
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ic_gluten24dp
+import lessmobile.composeapp.generated.resources.ic_gmo24dp
+import lessmobile.composeapp.generated.resources.ic_milk24dp
+import lessmobile.composeapp.generated.resources.ic_sugar24dp
 import org.jetbrains.compose.resources.DrawableResource
 
 /**
@@ -33,7 +38,8 @@ data class ChipsSection(
 data class ChipOption(
     val id: String,
     val label: String,
-    val icon: DrawableResource? = null
+    val value: String? = null,
+    val imageUrl: String? = null
 )
 
 /**
@@ -50,7 +56,8 @@ data class IconGridSection(
 data class IconGridOption(
     val id: String,
     val label: String,
-    val icon: DrawableResource? = null
+    val icon: DrawableResource? = null,
+    val imageUrl: String? = null
 )
 
 /**
@@ -122,4 +129,12 @@ data class CounterSection(
     override val required: Boolean = true
 ) : FormSection() {
     val minValue: Int = 0
+}
+
+fun tagValueToIcon(value: String): DrawableResource? = when (value) {
+    "sugar_free" -> Res.drawable.ic_sugar24dp
+    "gluten_free" -> Res.drawable.ic_gluten24dp
+    "gmo_free" -> Res.drawable.ic_gmo24dp
+    "lactose_free" -> Res.drawable.ic_milk24dp
+    else -> null
 }

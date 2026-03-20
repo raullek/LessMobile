@@ -2,6 +2,11 @@ package az.less.mobile.presentation.client.main.more.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.domain.model.auth.User
+import az.less.mobile.domain.model.auth.UserEcoHeroBadge
+import az.less.mobile.domain.model.auth.UserStats
+import az.less.mobile.domain.model.auth.UserVenue
+import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.ContentRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
@@ -12,6 +17,7 @@ import az.less.mobile.presentation.client.main.more.root.models.MoreCellModel
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellType
 import az.less.mobile.presentation.client.main.more.root.models.MoreSection
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_map_24dp
@@ -48,7 +54,8 @@ import org.orbitmvi.orbit.container
 class MoreViewModel(
     private val userLocalRepository: SessionLocalRepository,
     private val authorizationRepository: AuthorizationRepository,
-    private val contentRepository: ContentRepository
+    private val contentRepository: ContentRepository,
+    private val accountRepository: AccountRepository
 ) : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
 
     override val container: Container<MoreState, MoreSideEffect> =
@@ -57,8 +64,89 @@ class MoreViewModel(
     private val permissionController: LocationPermissionController = LocationPermissionController.mobile()
 
     init {
+        logUserInfo()
         checkLocationPermission()
         observeUserState()
+        refreshUserInBackground()
+    }
+
+    private fun logUserInfo() {
+        viewModelScope.launch {
+            val user = userLocalRepository.currentUser.first()
+            println("[MoreViewModel] === User Info from DataStore ===")
+            println("[MoreViewModel] user: $user")
+            println("[MoreViewModel] accessToken: ${userLocalRepository.getAccessToken()}")
+            println("[MoreViewModel] refreshToken: ${userLocalRepository.getRefreshToken()}")
+            println("[MoreViewModel] ================================")
+        }
+    }
+
+    private fun refreshUserInBackground() {
+        viewModelScope.launch {
+            // Only refresh if user is logged in
+            val token = userLocalRepository.getAccessToken() ?: return@launch
+
+            accountRepository.getProfile()
+                .onSuccess { profileData ->
+                    val userData = profileData.user
+                    val updatedUser = User(
+                        id = userData.id,
+                        name = userData.name,
+                        email = userData.email,
+                        roles = userData.roles,
+                        status = userData.status,
+                        avatarUrl = userData.avatar,
+                        phone = userData.phone,
+                        gender = userData.gender,
+                        birthDay = userData.birthDay,
+                        emailVerified = userData.emailVerified,
+                        currentLocation = userData.currentLocation,
+                        venue = userData.venue?.let {
+                            UserVenue(
+                                id = it.id,
+                                name = it.name,
+                                businessName = it.businessName,
+                                businessAddress = it.businessAddress,
+                                businessDescription = it.businessDescription,
+                                businessLogo = it.businessLogo,
+                                coverImage = it.coverImage,
+                                rating = it.rating,
+                                totalReviews = it.totalReviews,
+                                status = it.status
+                            )
+                        },
+                        stats = profileData.stats?.let {
+                            UserStats(
+                                mealsSaved = it.mealsSaved,
+                                co2Saved = it.co2Saved,
+                                moneySaved = it.moneySaved
+                            )
+                        },
+                        ecoHeroBadge = profileData.ecoHeroBadge?.let {
+                            UserEcoHeroBadge(
+                                level = it.level,
+                                message = it.message,
+                                mealsSaved = it.mealsSaved,
+                                icon = it.icon,
+                                color = it.color
+                            )
+                        }
+                    )
+                    userLocalRepository.updateUser(updatedUser)
+
+                    // Update eco stats in UI state
+                    intent {
+                        reduce {
+                            state.copy(
+                                co2Saved = updatedUser.stats?.co2Saved?.toString(),
+                                moneySaved = updatedUser.stats?.moneySaved?.toString(),
+                                ecoHeroTitle = updatedUser.ecoHeroBadge?.level,
+                                ecoHeroDescription = updatedUser.ecoHeroBadge?.message
+                            )
+                        }
+                    }
+                }
+        }
     }
 
     private fun checkLocationPermission() {
@@ -69,7 +157,7 @@ class MoreViewModel(
                     state.copy(
                         locationPermissionGranted = hasPermission,
                         sections = if (state.isLoggedIn) {
-                            buildAuthSections(state.notificationEnabled, hasPermission, state.hasMerchantRole)
+                            buildAuthSections(state.notificationEnabled, hasPermission, state.canSwitchMode)
                         } else {
                             buildNonAuthSections(state.notificationEnabled, hasPermission)
                         }
@@ -84,15 +172,15 @@ class MoreViewModel(
             userLocalRepository.currentUser.collectLatest { user ->
                 intent {
                     if (user != null) {
-                        val isMerchant = user.roles.contains("merchant")
+                        val canSwitch = user.canSwitchMode()
                         reduce {
                             state.copy(
                                 isLoggedIn = true,
-                                hasMerchantRole = isMerchant,
+                                canSwitchMode = canSwitch,
                                 userName = user.name,
                                 userEmail = user.email,
                                 userAvatarUrl = user.avatarUrl,
-                                sections = buildAuthSections(state.notificationEnabled, state.locationPermissionGranted, isMerchant)
+                                sections = buildAuthSections(state.notificationEnabled, state.locationPermissionGranted, canSwitch)
                             )
                         }
                     } else {
@@ -208,7 +296,7 @@ class MoreViewModel(
             state.copy(
                 notificationEnabled = newEnabled,
                 sections = if (state.isLoggedIn) {
-                    buildAuthSections(newEnabled, state.locationPermissionGranted, state.hasMerchantRole)
+                    buildAuthSections(newEnabled, state.locationPermissionGranted, state.canSwitchMode)
                 } else {
                     buildNonAuthSections(newEnabled, state.locationPermissionGranted)
                 }
@@ -219,7 +307,7 @@ class MoreViewModel(
     /**
      * Build sections for authenticated users
      */
-    private fun buildAuthSections(notificationEnabled: Boolean, locationGranted: Boolean, hasMerchantRole: Boolean): List<MoreSection> {
+    private fun buildAuthSections(notificationEnabled: Boolean, locationGranted: Boolean, canSwitchMode: Boolean): List<MoreSection> {
         val appCells = mutableListOf(
             MoreCellModel(
                 id = CellId.Account,
@@ -257,11 +345,11 @@ class MoreViewModel(
                 titleRes = Res.string.more_notification,
                 icon = Res.drawable.ic_notification_24dp,
                 type = MoreCellType.Toggle(notificationEnabled),
-                showDivider = !hasMerchantRole
+                showDivider = !canSwitchMode
             )
         )
 
-        if (hasMerchantRole) {
+        if (canSwitchMode) {
             appCells.add(
                 MoreCellModel(
                     id = CellId.SwitchToMerchant,

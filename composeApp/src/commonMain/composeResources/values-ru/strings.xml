@@ -226,7 +226,7 @@
     <!-- ==================== MERCHANT FLOW ==================== -->
 
     <!-- Merchant Bottom Navigation -->
-    <string name="merch_nav_orders">Заказы</string>
+    <string name="merch_nav_orders">Боксы</string>
     <string name="merch_nav_add">Добавить</string>
     <string name="merch_nav_history">История</string>
     <string name="merch_nav_more">Ещё</string>
@@ -247,6 +247,8 @@
     <string name="merch_orders_handed_over">Выдан</string>
     <string name="merch_orders_cancel_lot">Отменить лот</string>
     <string name="merch_orders_cancellation_ended">Время отмены истекло</string>
+    <string name="merch_boxes_empty_title">Боксов пока нет</string>
+    <string name="merch_boxes_empty_description">Ваши боксы появятся здесь</string>
 
     <!-- Add Lot Screen -->
     <string name="add_lot_title">Добавить лот</string>
@@ -266,11 +268,36 @@
     <string name="places_empty_title">Пока нет филиалов</string>
     <string name="places_empty_description">Добавьте свой первый филиал, чтобы начать управлять локациями. Клиенты смогут находить и посещать ваши заведения.</string>
     <string name="places_cd_no_places">Нет филиалов</string>
+    <string name="places_edit_merch_details">Редактировать данные</string>
+    <string name="places_edit_venue">Редактировать заведение</string>
+    <string name="places_edit_users">Редактировать пользователей</string>
 
     <!-- Edit Merchant Profile Screen -->
-    <string name="edit_profile_manage_email">Управлять этой локацией с этого email</string>
+    <string name="edit_profile_make_me_merchant">Сделать меня мерчантом этого заведения</string>
     <string name="edit_profile_create_branch">Создать филиал</string>
     <string name="edit_profile_update_branch">Обновить филиал</string>
+    <string name="edit_profile_error_name_required">Название заведения обязательно</string>
+    <string name="edit_profile_error_phone_required">Номер телефона обязателен</string>
+    <string name="edit_profile_error_location_required">Местоположение обязательно</string>
+    <string name="edit_profile_venue_created">Заведение успешно создано</string>
+    <string name="edit_profile_venue_updated">Заведение успешно обновлено</string>
+    <string name="edit_profile_name_placeholder">Название заведения</string>
+    <string name="edit_profile_description_placeholder">Описание или заметки о вашем заведении для клиентов</string>
+    <string name="edit_profile_phone_number">Номер телефона</string>
+    <string name="edit_profile_phone_optional">Необязательно</string>
+    <string name="edit_profile_edit">Изменить</string>
+    <string name="edit_profile_view_location">Просмотр местоположения</string>
+    <string name="edit_profile_location_placeholder">Местоположение вашего заведения</string>
+    <string name="edit_profile_default_box_description">Описание коробки по умолчанию</string>
+    <string name="edit_profile_box_description_placeholder">Советы для пользователя о содержимом коробки</string>
+    <string name="edit_profile_add_for_lots">Добавить для лотов</string>
+    <string name="edit_profile_edit_phone_number">Изменить номер телефона</string>
+    <string name="edit_profile_edit_merch_details">Изменить данные заведения</string>
+    <string name="edit_profile_title_label">Название</string>
+    <string name="edit_profile_title_placeholder">Введите название заведения</string>
+    <string name="edit_profile_description_label">Описание</string>
+    <string name="edit_profile_description_input_placeholder">Введите описание</string>
+    <string name="edit_profile_save">Сохранить</string>
 
     <!-- Branch Verification Screen -->
     <string name="branch_verification_title">Заведение добавлено</string>

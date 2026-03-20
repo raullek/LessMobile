@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.client.main.orders.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,10 +31,10 @@ import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.cd_completed
 import lessmobile.composeapp.generated.resources.ic_check_rounded_36dp
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
 import lessmobile.composeapp.generated.resources.orders_picked_up_on
 import lessmobile.composeapp.generated.resources.orders_pickup_time
 import lessmobile.composeapp.generated.resources.orders_reserve_number
-import lessmobile.composeapp.generated.resources.test_offer_item_image
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -67,21 +66,14 @@ fun OrderItem(
                 .clip(RoundedCornerShape(LessTheme.radius.small))
                 .background(LessTheme.colors.elementsThirdElement)
         ) {
-            if (item.imageUrl != null) {
-                AsyncImage(
-                    model = item.imageUrl,
-                    contentDescription = item.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Image(
-                    painter = painterResource(Res.drawable.test_offer_item_image),
-                    contentDescription = item.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            AsyncImage(
+                model = item.imageUrl,
+                contentDescription = item.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+                error = painterResource(Res.drawable.ill_box_placeholder),
+                placeholder = painterResource(Res.drawable.ill_box_placeholder)
+            )
 
             // Dark overlay and checkmark for completed orders
             if (item.isCompleted) {

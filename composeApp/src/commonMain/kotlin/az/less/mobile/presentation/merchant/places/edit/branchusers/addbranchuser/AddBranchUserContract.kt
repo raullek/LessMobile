@@ -5,6 +5,8 @@ package az.less.mobile.presentation.merchant.places.edit.branchusers.addbranchus
  * @param userId null for create mode, non-null for edit mode
  */
 data class AddBranchUserState(
+    val venueId: String = "",
+    val venueName: String = "",
     val userId: String? = null,
     val userNumber: Int = 1,
     val name: String = "",
@@ -40,7 +42,7 @@ private fun String.isValidEmail(): Boolean {
  */
 sealed interface AddBranchUserSideEffect {
     data object NavigateBack : AddBranchUserSideEffect
-    data object UserSaved : AddBranchUserSideEffect
+    data class UserSaved(val message: String) : AddBranchUserSideEffect
     data object UserDeleted : AddBranchUserSideEffect
     data class ShowError(val message: String) : AddBranchUserSideEffect
 }

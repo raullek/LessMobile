@@ -8,6 +8,7 @@ import az.less.mobile.presentation.merchant.add.addlot.model.AddLotResponseModel
  */
 data class AddLotState(
     val isLoading: Boolean = false,
+    val error: String? = null,
     val responseModel: AddLotResponseModel? = null,
 
     // Dynamic selections by section ID
@@ -28,7 +29,8 @@ data class AddLotState(
     val timePickerType: TimePickerType? = null,
     val activeTimeSection: String? = null
 ) {
-    val isEmpty: Boolean get() = responseModel == null && !isLoading
+    val isEmpty: Boolean get() = responseModel == null && !isLoading && error == null
+    val hasError: Boolean get() = error != null
 
     // Helper functions to get values
     fun getSingleSelection(sectionId: String): String? = singleSelections[sectionId]

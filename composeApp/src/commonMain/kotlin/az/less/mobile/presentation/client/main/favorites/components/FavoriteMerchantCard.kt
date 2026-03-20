@@ -1,6 +1,5 @@
 package az.less.mobile.presentation.client.main.favorites.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,8 +32,8 @@ import az.less.mobile.presentation.client.main.favorites.models.FavoriteMerchant
 import coil3.compose.AsyncImage
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_star_24dp
-import lessmobile.composeapp.generated.resources.test_merchant_logo
-import lessmobile.composeapp.generated.resources.test_offer_item_image
+import lessmobile.composeapp.generated.resources.ill_box_placeholder
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -70,21 +69,14 @@ fun FavoriteMerchantCard(
                     .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
                     .background(Color(0xFFFFF2EB))
             ) {
-                if (merchant.imageUrl != null) {
-                    AsyncImage(
-                        model = merchant.imageUrl,
-                        contentDescription = merchant.merchantName,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(Res.drawable.test_offer_item_image),
-                        contentDescription = merchant.merchantName,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                AsyncImage(
+                    model = merchant.imageUrl,
+                    contentDescription = merchant.merchantName,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(Res.drawable.ill_box_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_box_placeholder)
+                )
             }
 
             // Badge - top left
@@ -129,21 +121,14 @@ fun FavoriteMerchantCard(
                         shape = RoundedCornerShape(LessTheme.radius.small)
                     )
             ) {
-                if (merchant.merchantLogoUrl != null) {
-                    AsyncImage(
-                        model = merchant.merchantLogoUrl,
-                        contentDescription = "${merchant.merchantName} logo",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(Res.drawable.test_merchant_logo),
-                        contentDescription = "${merchant.merchantName} logo",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                AsyncImage(
+                    model = merchant.merchantLogoUrl,
+                    contentDescription = "${merchant.merchantName} logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(Res.drawable.ill_venue_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_venue_placeholder)
+                )
             }
         }
 

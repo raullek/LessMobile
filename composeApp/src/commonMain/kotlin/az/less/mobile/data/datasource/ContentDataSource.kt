@@ -1,6 +1,7 @@
 package az.less.mobile.data.datasource
 
 import az.less.mobile.data.remote.model.ContentDto
+import az.less.mobile.data.remote.model.FilterOptionsDto
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.network.safeApiCall
 import io.ktor.client.HttpClient
@@ -12,6 +13,12 @@ class ContentDataSource(
     suspend fun getTerms(): NetworkResult<ContentDto> {
         return safeApiCall {
             httpClient.get("v1/content/terms")
+        }
+    }
+
+    suspend fun getFilterOptions(): NetworkResult<FilterOptionsDto> {
+        return safeApiCall {
+            httpClient.get("v1/common/filter-options")
         }
     }
 }

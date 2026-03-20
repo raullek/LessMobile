@@ -7,13 +7,15 @@ data class BranchUser(
     val id: String,
     val name: String,
     val phoneNumber: String,
-    val email: String
+    val email: String,
+    val avatar: String? = null,
+    val isActive: Boolean = true
 ) {
     /**
      * Encode user data to a simple delimited string for navigation
      */
     fun encode(): String = "$id|$name|$phoneNumber|$email"
-    
+
     companion object {
         /**
          * Decode user data from delimited string
@@ -35,7 +37,8 @@ data class BranchUser(
  * State of the Branch Users Screen
  */
 data class BranchUsersState(
-    val branchName: String = "McDonald's Əhmədli",
+    val venueId: String = "",
+    val branchName: String = "",
     val users: List<BranchUser> = emptyList(),
     val isLoading: Boolean = false
 ) {
@@ -61,4 +64,3 @@ sealed interface BranchUsersIntent {
     data class OnUserClick(val userId: String) : BranchUsersIntent
     data class OnDeleteUserClick(val userId: String) : BranchUsersIntent
 }
-

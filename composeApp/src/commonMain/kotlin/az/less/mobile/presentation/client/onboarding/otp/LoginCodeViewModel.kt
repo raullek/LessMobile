@@ -2,15 +2,16 @@ package az.less.mobile.presentation.client.onboarding.otp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.domain.model.auth.User
+import az.less.mobile.domain.model.auth.AppMode
 import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
 class LoginCodeViewModel(
-    private val userLocalRepository: SessionLocalRepository,
+    private val sessionLocalRepository: SessionLocalRepository,
     private val authorizationRepository: AuthorizationRepository
 ) : ViewModel(), ContainerHost<LoginCodeState, LoginCodeSideEffect> {
 
@@ -45,27 +46,15 @@ class LoginCodeViewModel(
 
             authorizationRepository.verifyOtp(state.email, state.code)
                 .onSuccess { data ->
-                    val user = User(
-                        id = data.user.id,
-                        name = data.user.name,
-                        email = data.user.email,
-                        roles = data.user.roles,
-                        status = data.user.status,
-                        avatarUrl = data.user.avatar,
-                        phone = data.user.phone,
-                        gender = data.user.gender,
-                        birthDay = data.user.birthDay
-                    )
-                    userLocalRepository.saveSession(
-                        user = user,
-                        accessToken = data.accessToken,
-                        refreshToken = data.refreshToken
-                    )
                     reduce { state.copy(isLoading = false) }
 
-                    if (data.user.roles.contains("merchant")) {
+                    val user = sessionLocalRepository.currentUser.first()
+                    val lastMode = sessionLocalRepository.lastUsedMode.first()
+                    if (lastMode == AppMode.MERCHANT && user?.availableModes()?.contains(AppMode.MERCHANT) == true) {
+                        sessionLocalRepository.saveLastUsedMode(AppMode.MERCHANT)
                         postSideEffect(LoginCodeSideEffect.NavigateToMerchant)
                     } else {
+                        sessionLocalRepository.saveLastUsedMode(AppMode.CLIENT)
                         postSideEffect(LoginCodeSideEffect.NavigateToClient)
                     }
                 }

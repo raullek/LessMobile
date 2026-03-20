@@ -12,19 +12,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
@@ -46,11 +50,16 @@ import az.less.mobile.presentation.merchant.add.addlot.model.InputType
 import az.less.mobile.presentation.merchant.add.addlot.model.TextareaSection
 import az.less.mobile.presentation.merchant.add.addlot.model.TimeRangeSelectorSection
 import az.less.mobile.presentation.merchant.add.addlot.model.TwoInputsSection
+import az.less.mobile.presentation.merchant.add.addlot.model.tagValueToIcon
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.add_lot_button
 import lessmobile.composeapp.generated.resources.add_lot_loading
 import lessmobile.composeapp.generated.resources.add_lot_select_time
 import lessmobile.composeapp.generated.resources.add_lot_title
+import lessmobile.composeapp.generated.resources.error_generic
+import lessmobile.composeapp.generated.resources.error_generic_subtitle
+import lessmobile.composeapp.generated.resources.ic_info_24dp
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -109,6 +118,45 @@ fun AddLotScreenContent(
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = LessTheme.colors.elementsPrimaryBrand)
+                }
+            }
+            state.hasError -> {
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = LessTheme.spacing.large),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_info_24dp),
+                            contentDescription = null,
+                            tint = LessTheme.colors.textIconsGrey,
+                            modifier = Modifier.size(48.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+
+                        Text(
+                            text = stringResource(Res.string.error_generic),
+                            style = LessTheme.typography.title24Bold,
+                            color = LessTheme.colors.textIconsBlack,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
+
+                        Text(
+                            text = stringResource(Res.string.error_generic_subtitle),
+                            style = LessTheme.typography.body16Regular,
+                            color = LessTheme.colors.textIconsGrey,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
             state.isEmpty -> {
@@ -208,11 +256,13 @@ private fun ChipsSectionContent(
                     state.getSingleSelection(section.id) == option.id
                 }
 
-                // Use TagChip for options with icons, BoxTypeButton for simple chips
-                if (option.icon != null) {
+                val hasIcon = option.imageUrl != null || option.value?.let { tagValueToIcon(it) } != null
+                if (hasIcon) {
                     TagChip(
-                        option = option,
+                        label = option.label,
                         isSelected = isSelected,
+                        imageUrl = option.imageUrl,
+                        icon = option.value?.let { tagValueToIcon(it) },
                         onToggle = {
                             if (section.multiSelect) {
                                 onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))

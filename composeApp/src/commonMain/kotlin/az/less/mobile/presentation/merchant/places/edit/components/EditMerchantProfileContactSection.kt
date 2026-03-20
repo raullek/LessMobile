@@ -30,10 +30,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import az.less.designsystem.base.LessTheme
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.edit_profile_edit
+import lessmobile.composeapp.generated.resources.edit_profile_location_placeholder
+import lessmobile.composeapp.generated.resources.edit_profile_phone_number
+import lessmobile.composeapp.generated.resources.edit_profile_phone_optional
+import lessmobile.composeapp.generated.resources.edit_profile_view_location
 import lessmobile.composeapp.generated.resources.ic_edit_24dp
 import lessmobile.composeapp.generated.resources.ic_map_24dp
 import lessmobile.composeapp.generated.resources.ic_phone_24dp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Contact section with phone and location
@@ -48,8 +54,8 @@ fun EditMerchantProfileContactSection(
     modifier: Modifier = Modifier
 ) {
     // Edit text with inline edit icon (shared for both fields)
-    val editText = "Edit"
-    val editAnnotatedText = remember {
+    val editText = stringResource(Res.string.edit_profile_edit)
+    val editAnnotatedText = remember(editText) {
         buildAnnotatedString {
             append(editText)
             // Add space before icon
@@ -112,12 +118,12 @@ fun EditMerchantProfileContactSection(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Phone number",
+                    text = stringResource(Res.string.edit_profile_phone_number),
                     style = LessTheme.typography.body16Regular,
                     color = LessTheme.colors.textIconsBlack
                 )
                 Text(
-                    text = if (phoneNumber.isEmpty()) "Optional" else phoneNumber,
+                    text = if (phoneNumber.isEmpty()) stringResource(Res.string.edit_profile_phone_optional) else phoneNumber,
                     style = LessTheme.typography.caption12Regular,
                     color = LessTheme.colors.textIconsGrey
                 )
@@ -160,12 +166,12 @@ fun EditMerchantProfileContactSection(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "View location",
+                    text = stringResource(Res.string.edit_profile_view_location),
                     style = LessTheme.typography.body16Regular,
                     color = LessTheme.colors.textIconsBlack
                 )
                 Text(
-                    text = location.ifEmpty { "Location of your perfect place" },
+                    text = location.ifEmpty { stringResource(Res.string.edit_profile_location_placeholder) },
                     style = LessTheme.typography.caption12Regular,
                     color = LessTheme.colors.textIconsGrey,
                     maxLines = 1

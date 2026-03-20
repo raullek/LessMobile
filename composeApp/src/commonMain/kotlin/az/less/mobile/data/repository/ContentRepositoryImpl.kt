@@ -2,6 +2,7 @@ package az.less.mobile.data.repository
 
 import az.less.mobile.data.datasource.ContentDataSource
 import az.less.mobile.data.remote.model.ContentDto
+import az.less.mobile.data.remote.model.FilterOptionsDto
 import az.less.mobile.domain.model.ContentData
 import az.less.mobile.domain.repository.ContentRepository
 import az.less.mobile.network.NetworkResult
@@ -12,6 +13,10 @@ class ContentRepositoryImpl(
 
     override suspend fun getTerms(): NetworkResult<ContentData> {
         return contentDataSource.getTerms().map { it.toDomain() }
+    }
+
+    override suspend fun getFilterOptions(): NetworkResult<FilterOptionsDto> {
+        return contentDataSource.getFilterOptions()
     }
 }
 

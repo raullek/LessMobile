@@ -1,49 +1,57 @@
 package az.less.mobile.presentation.merchant.orders.model
 
 /**
- * Represents an order item for the merchant orders screen
+ * Bought box (awaiting pickup) - order placed by a client
  */
-data class MerchOrderItem(
+data class BoughtBoxItem(
     val id: String,
+    val orderId: String,
+    val reserveNumber: String,
+    val boxTitle: String,
     val imageUrl: String? = null,
-    val merchantLogoUrl: String? = null,
-    val merchantName: String,
-    val productName: String,
-    val originalPrice: String,
-    val discountedPrice: String,
-    val pickupTimeStart: String,
-    val pickupTimeEnd: String,
-    val orderNumber: String,
-    val rating: String,
-    val distance: String,
-    val itemsLeft: Int,
-    val buttonState: OrderButtonState
+    val originalPrice: Double,
+    val discountedPrice: Double,
+    val clientName: String,
+    val clientAvatar: String? = null,
+    val quantity: Int,
+    val subtotal: Double,
+    val status: String,
+    val pickupTimeFormatted: String,
+    val canDeliver: Boolean = false
 )
 
 /**
- * Represents the different states of the order action button
- * 
- * Translations:
- * - "Təhvil verildi" (Azerbaijani) = "Handed Over"
- * - "Отменить лот" (Russian) = "Cancel Lot"
- * - "Время для отмены завершилось" (Russian) = "Cancellation Time Ended"
+ * Created box (awaiting purchase) - lot posted by the merchant
  */
-enum class OrderButtonState {
-    /** Order can be marked as handed over to customer */
-    HANDED_OVER,
-    /** Order can be cancelled by merchant */
-    CANCEL_LOT,
-    /** Cancellation window has expired */
-    CANCELLATION_TIME_ENDED
+data class CreatedBoxItem(
+    val id: String,
+    val title: String,
+    val description: String? = null,
+    val imageUrl: String? = null,
+    val originalPrice: Double,
+    val discountedPrice: Double,
+    val quantity: Int,
+    val soldCount: Int,
+    val availableItems: Int,
+    val pickupTimeFormatted: String,
+    val status: String? = null,
+    val isActive: Boolean = true,
+    val canCancel: Boolean = false,
+    val timeRemaining: String? = null,
+    val timeRemainingSeconds: Int = 0,
+    val cancellationExpired: Boolean = false,
+    val closeTimeFormatted: String? = null,
+    val cancellationMessage: String? = null,
+    val cancelButtonText: String? = null
+) {
+    val isCancelEnabled: Boolean
+        get() = canCancel && !cancellationExpired && timeRemainingSeconds > 0
 }
 
 /**
  * Order tab for filtering orders
  */
 enum class MerchOrderTab {
-    /** Orders awaiting pickup by customer */
     AWAITING_PICKUP,
-    /** Orders awaiting purchase by customer */
     AWAITING_PURCHASE
 }
-

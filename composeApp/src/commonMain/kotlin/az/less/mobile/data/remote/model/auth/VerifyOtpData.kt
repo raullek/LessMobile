@@ -25,5 +25,18 @@ data class VerifyOtpUser(
     val gender: String? = null,
     val birthDay: String? = null,
     val roles: List<String>,
-    val status: String
+    val status: String,
+    val venue: VerifyOtpVenue? = null
+)
+
+@Serializable
+data class VerifyOtpVenue(
+    val id: String,
+    val name: String,
+    val businessName: String? = null,
+    val businessAddress: String? = null,
+    val rating: Double = 0.0,
+    val totalReviews: Int = 0,
+    val businessLogo: String? = null,
+    val status: String? = null
 )

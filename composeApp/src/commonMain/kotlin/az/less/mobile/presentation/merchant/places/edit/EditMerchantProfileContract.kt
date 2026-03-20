@@ -1,5 +1,7 @@
 package az.less.mobile.presentation.merchant.places.edit
 
+import az.less.designsystem.components.ToastType
+
 /**
  * State of the Edit Merchant Profile Screen
  */
@@ -18,7 +20,8 @@ data class EditMerchantProfileState(
     val defaultBoxDescription: String = "",
     val lotsImageUrl: String? = null,
     val lotsImageBytes: ByteArray? = null, // Selected lots image bytes
-    val manageFromEmail: Boolean = false,
+    val email: String? = null,
+    val makeMeMerchant: Boolean = false,
     val isLoading: Boolean = false,
     // Edit Merch Details Bottom Sheet state
     val isEditMerchDetailsBottomSheetVisible: Boolean = false,
@@ -59,7 +62,8 @@ data class EditMerchantProfileState(
             if (other.lotsImageBytes == null) return false
             if (!lotsImageBytes.contentEquals(other.lotsImageBytes)) return false
         } else if (other.lotsImageBytes != null) return false
-        if (manageFromEmail != other.manageFromEmail) return false
+        if (email != other.email) return false
+        if (makeMeMerchant != other.makeMeMerchant) return false
         if (isLoading != other.isLoading) return false
         if (isEditMerchDetailsBottomSheetVisible != other.isEditMerchDetailsBottomSheetVisible) return false
         if (isEditPhoneNumberBottomSheetVisible != other.isEditPhoneNumberBottomSheetVisible) return false
@@ -85,7 +89,8 @@ data class EditMerchantProfileState(
         result = 31 * result + defaultBoxDescription.hashCode()
         result = 31 * result + (lotsImageUrl?.hashCode() ?: 0)
         result = 31 * result + (lotsImageBytes?.contentHashCode() ?: 0)
-        result = 31 * result + manageFromEmail.hashCode()
+        result = 31 * result + (email?.hashCode() ?: 0)
+        result = 31 * result + makeMeMerchant.hashCode()
         result = 31 * result + isLoading.hashCode()
         result = 31 * result + isEditMerchDetailsBottomSheetVisible.hashCode()
         result = 31 * result + isEditPhoneNumberBottomSheetVisible.hashCode()
@@ -105,9 +110,9 @@ sealed interface EditMerchantProfileSideEffect {
     data object NavigateToLogoPicker : EditMerchantProfileSideEffect
     data object NavigateToLotsPicker : EditMerchantProfileSideEffect
     data class NavigateToLocationPicker(val latitude: Double?, val longitude: Double?, val address: String?) : EditMerchantProfileSideEffect
-    data class ShowError(val message: String) : EditMerchantProfileSideEffect
     data object BranchCreated : EditMerchantProfileSideEffect
     data object BranchUpdated : EditMerchantProfileSideEffect
+    data class ShowToast(val message: String, val type: ToastType) : EditMerchantProfileSideEffect
 }
 
 /**
@@ -127,7 +132,7 @@ sealed interface EditMerchantProfileIntent {
     data class OnLocationChanged(val location: String) : EditMerchantProfileIntent
     data class OnLocationSelected(val latitude: Double, val longitude: Double, val address: String) : EditMerchantProfileIntent
     data class OnDefaultBoxDescriptionChanged(val description: String) : EditMerchantProfileIntent
-    data class OnManageFromEmailToggled(val enabled: Boolean) : EditMerchantProfileIntent
+    data class OnMakeMeMerchantToggled(val enabled: Boolean) : EditMerchantProfileIntent
     data object OnCreateBranchClick : EditMerchantProfileIntent
     // Edit Merch Details Bottom Sheet
     data object OnEditMerchDetailsClick : EditMerchantProfileIntent
