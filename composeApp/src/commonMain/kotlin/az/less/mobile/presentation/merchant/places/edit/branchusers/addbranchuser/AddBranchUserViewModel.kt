@@ -34,7 +34,7 @@ class AddBranchUserViewModel(
                 userId = user?.id,
                 userNumber = userNumber,
                 name = user?.name ?: "",
-                phoneNumber = user?.phoneNumber ?: "",
+                phoneNumber = user?.phoneNumber?.removePrefix("+994") ?: "",
                 email = user?.email ?: ""
             )
         )
@@ -119,13 +119,9 @@ class AddBranchUserViewModel(
             email = state.email,
             phone = phone
         )
-            .onSuccess { response ->
+            .onSuccess {
                 reduce { state.copy(isLoading = false) }
-                postSideEffect(
-                    AddBranchUserSideEffect.UserSaved(
-                        message = response.message ?: "User added successfully"
-                    )
-                )
+                postSideEffect(AddBranchUserSideEffect.UserSaved)
             }
             .onError { error ->
                 reduce { state.copy(isLoading = false) }

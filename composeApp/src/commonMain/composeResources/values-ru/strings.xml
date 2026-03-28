@@ -255,6 +255,19 @@
     <string name="add_lot_loading">Загрузка...</string>
     <string name="add_lot_button">Добавить лоты</string>
     <string name="add_lot_select_time">Выбрать время</string>
+    <string name="add_lot_box_type">Тип коробки</string>
+    <string name="add_lot_choose_category">Выберите категорию</string>
+    <string name="add_lot_tags">Специальные теги (необязательно)</string>
+    <string name="add_lot_choose_time_range">Выберите время</string>
+    <string name="add_lot_box_price">Цена коробки</string>
+    <string name="add_lot_price_before">Цена до</string>
+    <string name="add_lot_price_after">Цена после скидки</string>
+    <string name="add_lot_description">Информация для клиента (необязательно)</string>
+    <string name="add_lot_description_placeholder">Введите информацию о лоте</string>
+    <string name="add_lot_box_count">Количество коробок</string>
+    <string name="add_lot_success">Лот успешно добавлен</string>
+    <string name="add_lot_error_select">Пожалуйста, выберите %1$s</string>
+    <string name="add_lot_error_enter">Пожалуйста, введите %1$s</string>
 
     <!-- Income History Screen -->
     <string name="history_title">История</string>
@@ -317,6 +330,7 @@
     <string name="add_user_name_placeholder">Имя</string>
     <string name="add_user_delete">Удалить пользователя</string>
     <string name="add_user_save">Сохранить изменения</string>
+    <string name="add_user_saved">Пользователь успешно добавлен</string>
 
     <!-- Select Location Screen -->
     <string name="select_location_title">Выберите адрес на карте</string>

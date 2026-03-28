@@ -95,11 +95,11 @@ class BranchUsersViewModel(
 
 private fun VenueMerchantDto.toBranchUser(): BranchUser {
     return BranchUser(
-        id = id,
-        name = userId.name ?: "",
-        phoneNumber = userId.phone ?: "",
-        email = userId.email ?: "",
-        avatar = userId.avatar,
-        isActive = isActive
+        id = id ?: "",
+        name = user?.name ?: "",
+        phoneNumber = user?.phone ?: "",
+        email = user?.email ?: "",
+        avatar = user?.avatar,
+        isActive = isActive ?: true
     )
 }

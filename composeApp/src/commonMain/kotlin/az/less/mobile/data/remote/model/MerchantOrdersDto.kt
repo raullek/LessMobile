@@ -83,7 +83,7 @@ data class CreatedBoxDto(
     val createdAt: String? = null,
     val canCancel: Boolean = false,
     val timeRemaining: String? = null,
-    val timeRemainingSeconds: Int = 0,
+    val timeRemainingSeconds: Int? = null,
     val cancellationExpired: Boolean = false,
     val closeTimeFormatted: String? = null,
     val cancellationMessage: String? = null,

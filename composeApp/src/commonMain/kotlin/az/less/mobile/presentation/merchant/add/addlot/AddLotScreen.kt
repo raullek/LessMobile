@@ -79,8 +79,12 @@ fun AddLotScreen(
         when (sideEffect) {
             is AddLotSideEffect.NavigateBack -> navController.popBackStack()
             is AddLotSideEffect.NavigateToNext -> {}
-            is AddLotSideEffect.ShowError -> {}
-            is AddLotSideEffect.ShowSuccess -> {}
+            is AddLotSideEffect.ShowError -> {
+                // TODO: Show error toast
+            }
+            is AddLotSideEffect.ShowSuccess -> {
+                // TODO: Show success toast
+            }
         }
     }
 
@@ -239,7 +243,7 @@ private fun ChipsSectionContent(
 ) {
     Column(modifier = Modifier.padding(vertical = LessTheme.spacing.small)) {
         Text(
-            text = section.title,
+            text = stringResource(section.titleRes),
             style = LessTheme.typography.body16Bold,
             color = LessTheme.colors.textIconsSecondary,
             modifier = Modifier.padding(bottom = LessTheme.spacing.small)
@@ -297,7 +301,7 @@ private fun IconGridSectionContent(
 ) {
     Column(modifier = Modifier.padding(vertical = LessTheme.spacing.small)) {
         Text(
-            text = section.title,
+            text = stringResource(section.titleRes),
             style = LessTheme.typography.body16Bold,
             color = LessTheme.colors.textIconsSecondary,
             modifier = Modifier.padding(bottom = LessTheme.spacing.small)
@@ -315,12 +319,20 @@ private fun IconGridSectionContent(
                 horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
             ) {
                 firstRowOptions.forEach { option ->
-                    val isSelected = state.getMultiSelection(section.id).contains(option.id)
+                    val isSelected = if (section.multiSelect) {
+                        state.getMultiSelection(section.id).contains(option.id)
+                    } else {
+                        state.getSingleSelection(section.id) == option.id
+                    }
                     CategoryGridItem(
                         option = option,
                         isSelected = isSelected,
                         onSelected = {
-                            onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))
+                            if (section.multiSelect) {
+                                onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))
+                            } else {
+                                onIntent(AddLotIntent.OnSingleSelect(section.id, option.id))
+                            }
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -336,12 +348,20 @@ private fun IconGridSectionContent(
                     horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
                 ) {
                     secondRowOptions.forEach { option ->
-                        val isSelected = state.getMultiSelection(section.id).contains(option.id)
+                        val isSelected = if (section.multiSelect) {
+                            state.getMultiSelection(section.id).contains(option.id)
+                        } else {
+                            state.getSingleSelection(section.id) == option.id
+                        }
                         CategoryGridItem(
                             option = option,
                             isSelected = isSelected,
                             onSelected = {
-                                onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))
+                                if (section.multiSelect) {
+                                    onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))
+                                } else {
+                                    onIntent(AddLotIntent.OnSingleSelect(section.id, option.id))
+                                }
                             },
                             modifier = Modifier.weight(1f)
                         )
@@ -364,7 +384,7 @@ private fun TimeRangeSectionContent(
 ) {
     Column(modifier = Modifier.padding(vertical = LessTheme.spacing.small)) {
         Text(
-            text = section.title,
+            text = stringResource(section.titleRes),
             style = LessTheme.typography.body16Bold,
             color = LessTheme.colors.textIconsSecondary,
             modifier = Modifier.padding(bottom = LessTheme.spacing.small)
@@ -375,12 +395,20 @@ private fun TimeRangeSectionContent(
             verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
         ) {
             section.predefinedRanges.forEach { timeRange ->
-                val isSelected = state.getMultiSelection(section.id).contains(timeRange.id)
+                val isSelected = if (section.multiSelect) {
+                    state.getMultiSelection(section.id).contains(timeRange.id)
+                } else {
+                    state.getSingleSelection(section.id) == timeRange.id
+                }
                 TimeSlotButton(
                     label = timeRange.label,
                     isSelected = isSelected,
                     onClick = {
-                        onIntent(AddLotIntent.OnMultiSelectToggle(section.id, timeRange.id))
+                        if (section.multiSelect) {
+                            onIntent(AddLotIntent.OnMultiSelectToggle(section.id, timeRange.id))
+                        } else {
+                            onIntent(AddLotIntent.OnSingleSelect(section.id, timeRange.id))
+                        }
                     }
                 )
             }
@@ -411,7 +439,7 @@ private fun TwoInputsSectionContent(
 ) {
     Column(modifier = Modifier.padding(vertical = LessTheme.spacing.small)) {
         Text(
-            text = section.title,
+            text = stringResource(section.titleRes),
             style = LessTheme.typography.body16Bold,
             color = LessTheme.colors.textIconsSecondary,
             modifier = Modifier.padding(bottom = LessTheme.spacing.small)
@@ -434,7 +462,7 @@ private fun TwoInputsSectionContent(
                         onIntent(AddLotIntent.OnInputChanged(field.id, newValue))
                     }
                 },
-                placeholder = field.label,
+                placeholder = stringResource(field.labelRes),
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                 onEndIconClick = { onIntent(AddLotIntent.OnInputChanged(field.id, "")) },
                 modifier = Modifier
@@ -459,7 +487,7 @@ private fun TextareaSectionContent(
 ) {
     Column(modifier = Modifier.padding(vertical = LessTheme.spacing.small)) {
         Text(
-            text = section.title,
+            text = stringResource(section.titleRes),
             style = LessTheme.typography.body16Bold,
             color = LessTheme.colors.textIconsSecondary,
             modifier = Modifier.padding(bottom = LessTheme.spacing.small)
@@ -474,7 +502,7 @@ private fun TextareaSectionContent(
                 }
                 onIntent(AddLotIntent.OnInputChanged(section.id, trimmed))
             },
-            placeholder = section.placeholder ?: "",
+            placeholder = section.placeholderRes?.let { stringResource(it) } ?: "",
             singleLine = false,
             maxLines = 5,
             onEndIconClick = { onIntent(AddLotIntent.OnInputChanged(section.id, "")) },
@@ -491,7 +519,7 @@ private fun CounterSectionContent(
 ) {
     Column(modifier = Modifier.padding(vertical = LessTheme.spacing.small)) {
         Text(
-            text = section.title,
+            text = stringResource(section.titleRes),
             style = LessTheme.typography.body16Bold,
             color = LessTheme.colors.textIconsSecondary,
             modifier = Modifier.padding(bottom = LessTheme.spacing.small)

@@ -1,6 +1,5 @@
 package az.less.mobile.domain.repository
 
-import az.less.mobile.data.remote.model.AddVenueMerchantResponseDto
 import az.less.mobile.data.remote.model.AdminVenueDto
 import az.less.mobile.data.remote.model.VenueMerchantDto
 import az.less.mobile.data.remote.model.VenuesDataDto
@@ -50,5 +49,5 @@ interface VenuesRepository {
         name: String,
         email: String,
         phone: String
-    ): NetworkResult<AddVenueMerchantResponseDto>
+    ): NetworkResult<Unit>
 }

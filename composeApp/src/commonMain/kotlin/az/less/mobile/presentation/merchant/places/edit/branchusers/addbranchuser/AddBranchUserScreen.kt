@@ -40,6 +40,7 @@ import lessmobile.composeapp.generated.resources.add_user_delete
 import lessmobile.composeapp.generated.resources.add_user_name_placeholder
 import lessmobile.composeapp.generated.resources.add_user_save
 import lessmobile.composeapp.generated.resources.add_user_title
+import lessmobile.composeapp.generated.resources.add_user_saved
 import lessmobile.composeapp.generated.resources.login_email_placeholder
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -64,6 +65,7 @@ fun AddBranchUserScreen(
     val state by viewModel.collectAsState()
     var toastMessage by remember { mutableStateOf<String?>(null) }
     var toastType by remember { mutableStateOf(ToastType.Success) }
+    val userSavedMessage = stringResource(Res.string.add_user_saved)
 
     // Auto-hide toast after delay
     LaunchedEffect(toastMessage) {
@@ -81,7 +83,7 @@ fun AddBranchUserScreen(
             }
             is AddBranchUserSideEffect.UserSaved -> {
                 toastType = ToastType.Success
-                toastMessage = sideEffect.message
+                toastMessage = userSavedMessage
                 delay(1500)
                 navController.navigate(
                     MerchantRoute.BranchUsers(

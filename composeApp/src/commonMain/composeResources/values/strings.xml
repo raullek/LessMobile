@@ -257,6 +257,19 @@
     <string name="add_lot_loading">Loading...</string>
     <string name="add_lot_button">Add lots</string>
     <string name="add_lot_select_time">Select time</string>
+    <string name="add_lot_box_type">Box type</string>
+    <string name="add_lot_choose_category">Choose category</string>
+    <string name="add_lot_tags">Some specific tags (optional)</string>
+    <string name="add_lot_choose_time_range">Choose time range</string>
+    <string name="add_lot_box_price">Box price</string>
+    <string name="add_lot_price_before">Price before</string>
+    <string name="add_lot_price_after">Price after discount</string>
+    <string name="add_lot_description">Some info for customer (optional)</string>
+    <string name="add_lot_description_placeholder">Input lot information</string>
+    <string name="add_lot_box_count">Box Count</string>
+    <string name="add_lot_success">Lot added successfully</string>
+    <string name="add_lot_error_select">Please select %1$s</string>
+    <string name="add_lot_error_enter">Please enter %1$s</string>
 
     <!-- Income History Screen -->
     <string name="history_title">History</string>
@@ -319,6 +332,7 @@
     <string name="add_user_name_placeholder">Name</string>
     <string name="add_user_delete">Delete user</string>
     <string name="add_user_save">Save changes</string>
+    <string name="add_user_saved">User added successfully</string>
 
     <!-- Select Location Screen -->
     <string name="select_location_title">Select address on map</string>

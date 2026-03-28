@@ -1,12 +1,12 @@
 package az.less.mobile.data.datasource
 
 import az.less.mobile.data.remote.model.AddVenueMerchantRequest
-import az.less.mobile.data.remote.model.AddVenueMerchantResponseDto
 import az.less.mobile.data.remote.model.AdminVenueDto
 import az.less.mobile.data.remote.model.VenueMerchantDto
 import az.less.mobile.data.remote.model.VenuesDataDto
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.network.safeApiCall
+import az.less.mobile.network.safeApiCallUnit
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
@@ -124,8 +124,8 @@ class VenuesDataSource(
         name: String,
         email: String,
         phone: String
-    ): NetworkResult<AddVenueMerchantResponseDto> {
-        return safeApiCall {
+    ): NetworkResult<Unit> {
+        return safeApiCallUnit {
             httpClient.post("v1/venues/$venueId/merchants") {
                 setBody(
                     AddVenueMerchantRequest(

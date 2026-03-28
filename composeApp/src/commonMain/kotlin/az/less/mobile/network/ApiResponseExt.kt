@@ -62,3 +62,50 @@ suspend inline fun <reified T> safeApiCall(
         )
     }
 }
+
+/**
+ * Safe API call that only validates success/error status,
+ * ignoring the data payload. Use for endpoints where response data is not needed.
+ */
+suspend fun safeApiCallUnit(
+    call: suspend () -> HttpResponse
+): NetworkResult<Unit> {
+    return try {
+        val response = call()
+        if (response.status.isSuccess()) {
+            val apiResponse = response.body<ApiResponse<kotlinx.serialization.json.JsonElement>>()
+            if (apiResponse.isSuccess) {
+                NetworkResult.Success(
+                    data = Unit,
+                    message = apiResponse.message,
+                    meta = apiResponse.meta
+                )
+            } else {
+                NetworkResult.Error(
+                    ApiError(
+                        message = apiResponse.message,
+                        errors = apiResponse.errors,
+                        meta = apiResponse.meta
+                    )
+                )
+            }
+        } else {
+            val errorResponse = try {
+                response.body<ApiError>()
+            } catch (_: Exception) {
+                ApiError(message = "Unknown error")
+            }
+            NetworkResult.Error(
+                errorResponse.copy(
+                    meta = (errorResponse.meta ?: ResponseMeta()).copy(
+                        statusCode = response.status.value
+                    )
+                )
+            )
+        }
+    } catch (e: Exception) {
+        NetworkResult.Error(
+            ApiError(message = e.message ?: "Network error")
+        )
+    }
+}

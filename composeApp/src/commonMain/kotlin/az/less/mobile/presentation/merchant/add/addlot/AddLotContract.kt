@@ -1,6 +1,7 @@
 package az.less.mobile.presentation.merchant.add.addlot
 
 import az.less.mobile.presentation.merchant.add.addlot.model.AddLotResponseModel
+import org.jetbrains.compose.resources.StringResource
 
 /**
  * State of the Add Lot Screen
@@ -49,8 +50,8 @@ enum class TimePickerType {
 sealed interface AddLotSideEffect {
     data object NavigateBack : AddLotSideEffect
     data object NavigateToNext : AddLotSideEffect
-    data class ShowError(val message: String) : AddLotSideEffect
-    data class ShowSuccess(val message: String) : AddLotSideEffect
+    data class ShowError(val messageRes: StringResource, val args: List<StringResource> = emptyList()) : AddLotSideEffect
+    data class ShowSuccess(val messageRes: StringResource) : AddLotSideEffect
 }
 
 /**
