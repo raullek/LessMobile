@@ -76,9 +76,10 @@ fun IncomePositionItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 
-                // Time and branch
+                // Time
+                // TODO: Add branch name when branch-specific data is available from API
                 Text(
-                    text = "${position.time}, ${position.branchName}",
+                    text = position.time,
                     style = LessTheme.typography.body14Regular,
                     color = LessTheme.colors.textIconsGrey,
                     maxLines = 1,

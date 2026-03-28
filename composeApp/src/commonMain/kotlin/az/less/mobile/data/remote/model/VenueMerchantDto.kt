@@ -5,18 +5,19 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VenueMerchantDto(
-    @SerialName("_id") val id: String,
-    val venueId: String,
-    val userId: VenueMerchantUserDto,
+    @SerialName("_id") val id: String? = null,
+    val venueId: String? = null,
+    val userId: String? = null,
+    val user: VenueMerchantUserDto? = null,
     val createdBy: String? = null,
-    val isActive: Boolean = true,
+    val isActive: Boolean? = null,
     val createdAt: String? = null,
     val updatedAt: String? = null
 )
 
 @Serializable
 data class VenueMerchantUserDto(
-    val id: String,
+    val id: String? = null,
     val name: String? = null,
     val email: String? = null,
     val phone: String? = null,
@@ -33,20 +34,3 @@ data class AddVenueMerchantRequest(
     val venueId: String
 )
 
-@Serializable
-data class AddVenueMerchantResponseDto(
-    val merchant: AddedMerchantDto,
-    val isNewUser: Boolean = false,
-    val message: String? = null
-)
-
-@Serializable
-data class AddedMerchantDto(
-    @SerialName("_id") val id: String,
-    val userId: String,
-    val venueId: String,
-    val createdBy: String? = null,
-    val isActive: Boolean = true,
-    val createdAt: String? = null,
-    val updatedAt: String? = null
-)

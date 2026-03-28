@@ -1,6 +1,7 @@
 package az.less.mobile.data.datasource
 
 import az.less.mobile.data.remote.model.MerchantOrdersData
+import az.less.mobile.data.remote.model.OrderHistoryDataDto
 import az.less.mobile.data.remote.model.OrdersDataDto
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.network.safeApiCall
@@ -29,6 +30,22 @@ class OrdersDataSource(
         return safeApiCall {
             httpClient.get("v1/orders/merchant-orders") {
                 parameter("venueId", venueId)
+            }
+        }
+    }
+
+    suspend fun getOrderHistory(
+        page: Int = 1,
+        limit: Int = 50,
+        startDate: String? = null,
+        endDate: String? = null
+    ): NetworkResult<OrderHistoryDataDto> {
+        return safeApiCall {
+            httpClient.get("v1/orders/history") {
+                parameter("page", page)
+                parameter("limit", limit)
+                startDate?.let { parameter("startDate", it) }
+                endDate?.let { parameter("endDate", it) }
             }
         }
     }

@@ -8,7 +8,7 @@ data class IncomePosition(
     val customerName: String,
     val customerInitials: String, // e.g., "MP" for "Mahammadali Pashayev"
     val time: String, // e.g., "12:34"
-    val branchName: String, // e.g., "Ahmdali mcdonalds"
+    // TODO: Add branchName when branch-specific data is available from API
     val amount: String // e.g., "2.24"
 )
 
@@ -28,7 +28,8 @@ data class IncomeHistory(
 data class MonthOption(
     val id: String,
     val displayName: String, // e.g., "September", "October"
-    val value: String // e.g., "2024-09"
+    val startDate: String, // e.g., "2024-09-01" (YYYY-MM-DD for API)
+    val endDate: String // e.g., "2024-09-30" (YYYY-MM-DD for API)
 )
 
 /**

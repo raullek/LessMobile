@@ -93,7 +93,7 @@ class MerchOrdersViewModel(
                         isActive = dto.isActive,
                         canCancel = dto.canCancel,
                         timeRemaining = dto.timeRemaining,
-                        timeRemainingSeconds = dto.timeRemainingSeconds,
+                        timeRemainingSeconds = dto.timeRemainingSeconds ?: 0,
                         cancellationExpired = dto.cancellationExpired,
                         closeTimeFormatted = dto.closeTimeFormatted,
                         cancellationMessage = dto.cancellationMessage,

@@ -1,7 +1,6 @@
 package az.less.mobile.data.repository
 
 import az.less.mobile.data.datasource.VenuesDataSource
-import az.less.mobile.data.remote.model.AddVenueMerchantResponseDto
 import az.less.mobile.data.remote.model.AdminVenueDto
 import az.less.mobile.data.remote.model.VenueMerchantDto
 import az.less.mobile.data.remote.model.VenuesDataDto
@@ -92,7 +91,7 @@ class VenuesRepositoryImpl(
         name: String,
         email: String,
         phone: String
-    ): NetworkResult<AddVenueMerchantResponseDto> {
+    ): NetworkResult<Unit> {
         return venuesDataSource.addVenueMerchant(
             venueId = venueId,
             userIdentifier = userIdentifier,

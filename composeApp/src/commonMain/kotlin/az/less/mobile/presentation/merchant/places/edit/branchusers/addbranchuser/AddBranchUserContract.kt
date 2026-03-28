@@ -42,7 +42,7 @@ private fun String.isValidEmail(): Boolean {
  */
 sealed interface AddBranchUserSideEffect {
     data object NavigateBack : AddBranchUserSideEffect
-    data class UserSaved(val message: String) : AddBranchUserSideEffect
+    data object UserSaved : AddBranchUserSideEffect
     data object UserDeleted : AddBranchUserSideEffect
     data class ShowError(val message: String) : AddBranchUserSideEffect
 }

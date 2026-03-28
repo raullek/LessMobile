@@ -6,30 +6,34 @@ import lessmobile.composeapp.generated.resources.ic_gmo24dp
 import lessmobile.composeapp.generated.resources.ic_milk24dp
 import lessmobile.composeapp.generated.resources.ic_sugar24dp
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 
-/**
- * Response model for Add Lot screen
- * Contains dynamic sections that define the form structure
- */
 data class AddLotResponseModel(
     val sections: List<FormSection> = emptyList()
-)
+) {
+    companion object {
+        const val SECTION_BAG_TYPE = "bag_type"
+        const val SECTION_CATEGORIES = "categories"
+        const val SECTION_TAGS = "tags"
+        const val SECTION_PICKUP_TIME = "pickup_time"
+        const val SECTION_PRICE = "price"
+        const val SECTION_DESCRIPTION = "description"
+        const val SECTION_BOX_COUNT = "box_count"
+        const val FIELD_PRICE_BEFORE = "price_before"
+        const val FIELD_PRICE_AFTER = "price_after"
+        const val CURRENCY_AZN = "AZN"
+    }
+}
 
-/**
- * Base sealed class for form sections
- */
 sealed class FormSection {
     abstract val id: String
-    abstract val title: String
+    abstract val titleRes: StringResource
     abstract val required: Boolean
 }
 
-/**
- * Chips section - single or multi select chips
- */
 data class ChipsSection(
     override val id: String,
-    override val title: String,
+    override val titleRes: StringResource,
     override val required: Boolean,
     val multiSelect: Boolean,
     val options: List<ChipOption>
@@ -42,12 +46,9 @@ data class ChipOption(
     val imageUrl: String? = null
 )
 
-/**
- * Icon grid section - grid of selectable items with icons
- */
 data class IconGridSection(
     override val id: String,
-    override val title: String,
+    override val titleRes: StringResource,
     override val required: Boolean,
     val multiSelect: Boolean,
     val options: List<IconGridOption>
@@ -60,12 +61,9 @@ data class IconGridOption(
     val imageUrl: String? = null
 )
 
-/**
- * Time range selector section
- */
 data class TimeRangeSelectorSection(
     override val id: String,
-    override val title: String,
+    override val titleRes: StringResource,
     override val required: Boolean,
     val multiSelect: Boolean,
     val predefinedRanges: List<TimeRange>,
@@ -80,19 +78,16 @@ data class TimeRange(
     val label: String get() = "$from-$to"
 }
 
-/**
- * Two inputs section - for price fields etc.
- */
 data class TwoInputsSection(
     override val id: String,
-    override val title: String,
+    override val titleRes: StringResource,
     override val required: Boolean,
     val fields: List<InputField>
 ) : FormSection()
 
 data class InputField(
     val id: String,
-    val label: String,
+    val labelRes: StringResource,
     val inputType: InputType,
     val currency: String? = null,
     val validation: InputValidation? = null
@@ -107,25 +102,18 @@ data class InputValidation(
     val max: Double? = null
 )
 
-/**
- * Textarea section
- */
 data class TextareaSection(
     override val id: String,
-    override val title: String,
+    override val titleRes: StringResource,
     override val required: Boolean,
     val maxLength: Int,
-    val placeholder: String?,
+    val placeholderRes: StringResource?,
     val defaultValue: String?
 ) : FormSection()
 
-/**
- * Counter section - for box count
- * minValue is always 0, not configurable from backend
- */
 data class CounterSection(
     override val id: String,
-    override val title: String,
+    override val titleRes: StringResource,
     override val required: Boolean = true
 ) : FormSection() {
     val minValue: Int = 0
