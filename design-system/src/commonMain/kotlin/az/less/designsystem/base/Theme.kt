@@ -39,8 +39,7 @@ fun LessTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) LightPalette else
-        LightPalette
+    val colors = if (darkTheme) DarkPalette else LightPalette
 
     CompositionLocalProvider(
         LocalColors provides colors,

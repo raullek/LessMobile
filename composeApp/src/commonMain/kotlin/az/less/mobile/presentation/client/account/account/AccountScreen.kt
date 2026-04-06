@@ -18,8 +18,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +44,8 @@ import coil3.compose.AsyncImage
 import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
 import io.github.skeptick.inputmask.compose.phone.rememberPhoneInputMaskVisualTransformation
-import io.github.skeptick.inputmask.compose.rememberInputMaskVisualTransformation
+import az.less.mobile.utils.displayDateToMillis
+import az.less.mobile.utils.millisToDisplayDate
 import kotlinx.coroutines.launch
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
@@ -79,10 +86,6 @@ import org.orbitmvi.orbit.compose.collectSideEffect
  */
 private const val PHONE_MASK = "+{994} [00] [000] [00] [00]"
 
-/**
- * Date mask for birthday format: DD.MM.YYYY
- */
-private const val DATE_MASK = "[00].[00].[0000]"
 
 @Composable
 fun AccountScreen(
@@ -118,6 +121,7 @@ fun AccountScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccountScreenContent(
     state: AccountState,
@@ -131,12 +135,38 @@ private fun AccountScreenContent(
     // Phone mask with +994 prefix - handles pasting with or without country code
     val phoneVisualTransformation = rememberPhoneInputMaskVisualTransformation(PHONE_MASK)
 
-    // Date mask for birthday field
-    val dateVisualTransformation = rememberInputMaskVisualTransformation(DATE_MASK)
-
     LaunchedEffect(state.showGenderBottomSheet) {
         if (state.showGenderBottomSheet) {
             focusManager.clearFocus()
+        }
+    }
+
+    // Date Picker Dialog
+    if (state.showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = state.birthDate.displayDateToMillis()
+        )
+        DatePickerDialog(
+            onDismissRequest = { onIntent(AccountIntent.OnDatePickerDismiss) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val millis = datePickerState.selectedDateMillis
+                        if (millis != null) {
+                            onIntent(AccountIntent.OnDatePickerConfirm(millis.millisToDisplayDate()))
+                        } else {
+                            onIntent(AccountIntent.OnDatePickerDismiss)
+                        }
+                    }
+                ) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { onIntent(AccountIntent.OnDatePickerDismiss) }
+                ) { Text("Cancel") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 
@@ -291,20 +321,28 @@ private fun AccountScreenContent(
 
                     Spacer(modifier = Modifier.height(LessTheme.spacing.small))
 
-                    DsTextField(
-                        value = state.birthDate,
-                        onValueChange = { newValue ->
-                            val sanitized = dateVisualTransformation.sanitize(newValue)
-                            onIntent(AccountIntent.OnBirthDateChanged(sanitized))
-                        },
-                        onEndIconClick = { onIntent(AccountIntent.OnBirthDateChanged("")) },
+                    DsSelectionField(
+                        value = state.birthDate.ifEmpty { null },
                         placeholder = "DD.MM.YYYY",
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        visualTransformation = dateVisualTransformation
+                        onClick = { onIntent(AccountIntent.OnBirthDateClick) },
+                        onClear = { onIntent(AccountIntent.OnBirthDateClear) },
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.height(LessTheme.spacing.xxLarge))
+
+                    DsButton(
+                        text = stringResource(Res.string.action_save),
+                        onClick = {
+                            focusManager.clearFocus()
+                            onIntent(AccountIntent.OnSaveClicked)
+                        },
+                        isLoading = state.isLoading,
+                        variant = ButtonVariant.Primary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(LessTheme.spacing.small))
 
                     DsButton(
                         text = stringResource(Res.string.account_delete),
@@ -316,23 +354,6 @@ private fun AccountScreenContent(
 
                     Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
                 }
-
-                DsButton(
-                    text = stringResource(Res.string.action_save),
-                    onClick = {
-                        focusManager.clearFocus()
-                        onIntent(AccountIntent.OnSaveClicked)
-                    },
-                    isLoading = state.isLoading,
-                    variant = ButtonVariant.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            start = LessTheme.spacing.medium,
-                            end = LessTheme.spacing.medium,
-                            bottom = LessTheme.spacing.medium
-                        )
-                )
             }
 
             // Toast

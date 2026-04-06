@@ -13,6 +13,7 @@ data class MoreState(
     val userEmail: String? = null,
     val userAvatarUrl: String? = null,
     val notificationEnabled: Boolean = true,
+    val darkModeEnabled: Boolean = false,
     val isLoading: Boolean = false,
     // Ecology stats
     val co2Saved: String? = null,
@@ -41,7 +42,6 @@ sealed interface MoreSideEffect {
     data object NavigateToPaymentMethods :
         az.less.mobile.presentation.client.main.more.root.MoreSideEffect
     data object NavigateToVoucher : az.less.mobile.presentation.client.main.more.root.MoreSideEffect
-    data object NavigateToHistory : az.less.mobile.presentation.client.main.more.root.MoreSideEffect
     data object NavigateToSettings :
         az.less.mobile.presentation.client.main.more.root.MoreSideEffect
     data object NavigateToContactUs :
@@ -69,6 +69,8 @@ sealed interface MoreIntent {
     data class OnCellClick(val cellId: az.less.mobile.presentation.client.main.more.root.models.CellId) :
         az.less.mobile.presentation.client.main.more.root.MoreIntent
     data object OnNotificationToggleClick :
+        az.less.mobile.presentation.client.main.more.root.MoreIntent
+    data object OnDarkModeToggleClick :
         az.less.mobile.presentation.client.main.more.root.MoreIntent
     data object OnContactUsDismiss : az.less.mobile.presentation.client.main.more.root.MoreIntent
     data class OnContactUsItemClick(val itemId: String) :

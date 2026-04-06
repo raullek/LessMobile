@@ -10,6 +10,7 @@ import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.ContentRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import az.less.mobile.presentation.theme.ThemeManager
 import az.less.mobile.presentation.merchant.more.model.MerchCellId
 import az.less.mobile.presentation.merchant.more.model.MerchMoreCellModel
 import az.less.mobile.presentation.merchant.more.model.MerchMoreCellType
@@ -38,7 +39,8 @@ class MerchMoreViewModel(
     private val sessionLocalRepository: SessionLocalRepository,
     private val authorizationRepository: AuthorizationRepository,
     private val contentRepository: ContentRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val themeManager: ThemeManager
 ) : ViewModel(), ContainerHost<MerchMoreState, MerchMoreSideEffect> {
 
     override val container: Container<MerchMoreState, MerchMoreSideEffect> =
@@ -46,7 +48,28 @@ class MerchMoreViewModel(
 
     init {
         observeUserState()
+        observeDarkMode()
         refreshUserInBackground()
+    }
+
+    private fun observeDarkMode() {
+        viewModelScope.launch {
+            themeManager.isDarkMode.collectLatest { isDark ->
+                intent {
+                    reduce {
+                        state.copy(
+                            darkModeEnabled = isDark,
+                            sections = buildSections(
+                                notificationEnabled = state.notificationEnabled,
+                                darkModeEnabled = isDark,
+                                isPartner = state.isPartner,
+                                canSwitchMode = state.canSwitchMode
+                            )
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun refreshUserInBackground() {
@@ -196,14 +219,8 @@ class MerchMoreViewModel(
         }
     }
 
-    private fun handleDarkModeToggleClick() = intent {
-        val newEnabled = !state.darkModeEnabled
-        reduce {
-            state.copy(
-                darkModeEnabled = newEnabled,
-                sections = buildSections(state.notificationEnabled, newEnabled, isPartner = state.isPartner, canSwitchMode = state.canSwitchMode)
-            )
-        }
+    private fun handleDarkModeToggleClick() {
+        themeManager.toggleDarkMode(viewModelScope)
     }
 
     private fun handleLogoutClicked() = intent {

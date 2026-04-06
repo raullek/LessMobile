@@ -3,9 +3,13 @@ package az.less.mobile.presentation.client.account.account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.designsystem.components.ToastType
+import az.less.mobile.data.remote.model.account.UpdateUserRequest
 import az.less.mobile.domain.model.auth.User
+import az.less.mobile.domain.model.auth.UserVenue
 import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import az.less.mobile.utils.displayDateToIsoDateTime
+import az.less.mobile.utils.isoDateToDisplayDate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import org.orbitmvi.orbit.Container
@@ -31,12 +35,11 @@ class AccountViewModel(
             reduce {
                 state.copy(
                     isLoading = false,
-                    userId = user.id,
                     fullName = user.name,
                     email = user.email,
                     phoneNumber = user.phone?.removePrefix("+994") ?: "",
                     gender = Gender.fromApiValue(user.gender),
-                    birthDate = user.birthDay?.take(10)?.isoDateToDisplay() ?: ""
+                    birthDate = user.birthDay?.isoDateToDisplayDate() ?: ""
                 )
             }
         } else {
@@ -60,6 +63,8 @@ class AccountViewModel(
             is AccountIntent.OnGenderClear -> handleGenderClear()
             is AccountIntent.OnBirthDateClick -> handleBirthDateClick()
             is AccountIntent.OnBirthDateClear -> handleBirthDateClear()
+            is AccountIntent.OnDatePickerDismiss -> handleDatePickerDismiss()
+            is AccountIntent.OnDatePickerConfirm -> handleDatePickerConfirm(intent.birthDate)
             is AccountIntent.OnDeleteAccountClicked -> handleDeleteAccountClicked()
             is AccountIntent.OnDeleteAccountConfirmed -> handleDeleteAccountConfirmed()
             is AccountIntent.OnDeleteAccountDismissed -> handleDeleteAccountDismissed()
@@ -179,6 +184,15 @@ class AccountViewModel(
     }
 
     private fun handleBirthDateClick() = intent {
+        reduce { state.copy(showDatePicker = true) }
+    }
+
+    private fun handleDatePickerDismiss() = intent {
+        reduce { state.copy(showDatePicker = false) }
+    }
+
+    private fun handleDatePickerConfirm(birthDate: String) = intent {
+        reduce { state.copy(showDatePicker = false, birthDate = birthDate) }
     }
 
     private fun handleBirthDateClear() = intent {
@@ -232,18 +246,16 @@ class AccountViewModel(
 
         if (phoneError != null) return@intent
 
-        val userId = state.userId ?: return@intent
-
         reduce { state.copy(isLoading = true) }
 
-        accountRepository.updateUser(
-            userId = userId,
+        val request = UpdateUserRequest(
             name = state.fullName.takeIf { it.isNotEmpty() },
             phone = phoneForValidation.takeIf { it.isNotEmpty() },
             gender = state.gender?.apiValue,
-            birthDay = state.birthDate.displayDateToIso(),
-            avatar = state.profilePhotoBytes
+            birthDay = state.birthDate.displayDateToIsoDateTime()
         )
+
+        accountRepository.updateUser(request)
             .onSuccess { data ->
                 val currentUser = sessionLocalRepository.currentUser.first()
                 val updatedUser = User(
@@ -256,9 +268,22 @@ class AccountViewModel(
                     phone = data.phone,
                     gender = data.gender,
                     birthDay = data.birthDay,
-                    emailVerified = currentUser?.emailVerified ?: false,
-                    currentLocation = currentUser?.currentLocation,
-                    venue = currentUser?.venue,
+                    emailVerified = data.emailVerified,
+                    currentLocation = data.currentLocation,
+                    venue = data.venue?.let {
+                        UserVenue(
+                            id = it.id,
+                            name = it.name,
+                            businessName = it.businessName,
+                            businessAddress = it.businessAddress,
+                            businessDescription = it.businessDescription,
+                            businessLogo = it.businessLogo,
+                            coverImage = it.coverImage,
+                            rating = it.rating,
+                            totalReviews = it.totalReviews,
+                            status = it.status
+                        )
+                    },
                     stats = currentUser?.stats,
                     ecoHeroBadge = currentUser?.ecoHeroBadge
                 )

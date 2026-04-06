@@ -1,5 +1,7 @@
 package az.less.mobile.utils
 
+// ── ISO 8601 parsing helpers ─────────────────────────────────────────
+
 /**
  * Extracts HH:mm from an ISO 8601 datetime string.
  * E.g. "2026-03-04T16:45:00.000Z" → "16:45"
@@ -42,4 +44,119 @@ fun formatPickupTimePair(start: String?, end: String?): Pair<String, String>? {
     val startTime = start.extractTime() ?: return null
     val endTime = end.extractTime() ?: return null
     return Pair(startTime, endTime)
+}
+
+// ── ISO ↔ display date conversions ───────────────────────────────────
+
+private const val ISO_DATE_SUFFIX = "T00:00:00.000Z"
+
+/**
+ * Converts an ISO date string to display format.
+ * "1998-02-14" or "1998-02-14T00:00:00.000Z" → "14.02.1998"
+ */
+fun String.isoDateToDisplayDate(): String? {
+    val datePart = extractDate() ?: return null
+    val parts = datePart.split("-")
+    if (parts.size != 3) return null
+    return "${parts[2]}.${parts[1]}.${parts[0]}"
+}
+
+/**
+ * Converts a display date string to full ISO 8601 format.
+ * "14.02.1998" → "1998-02-14T00:00:00.000Z"
+ */
+fun String.displayDateToIsoDateTime(): String? {
+    val parts = split(".")
+    if (parts.size != 3) return null
+    val day = parts[0]
+    val month = parts[1]
+    val year = parts[2]
+    if (day.length != 2 || month.length != 2 || year.length != 4) return null
+    return "$year-$month-$day$ISO_DATE_SUFFIX"
+}
+
+/**
+ * Converts a display date string to ISO date only.
+ * "14.02.1998" → "1998-02-14"
+ */
+fun String.displayDateToIsoDate(): String? {
+    val parts = split(".")
+    if (parts.size != 3) return null
+    val day = parts[0]
+    val month = parts[1]
+    val year = parts[2]
+    if (day.length != 2 || month.length != 2 || year.length != 4) return null
+    return "$year-$month-$day"
+}
+
+// ── Epoch millis ↔ display date conversions ──────────────────────────
+
+private const val MILLIS_PER_DAY = 86_400_000L
+
+private fun isLeapYear(year: Int): Boolean =
+    (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+
+private fun daysInMonth(month: Int, year: Int): Int = when (month) {
+    1 -> 31; 2 -> if (isLeapYear(year)) 29 else 28; 3 -> 31
+    4 -> 30; 5 -> 31; 6 -> 30; 7 -> 31; 8 -> 31
+    9 -> 30; 10 -> 31; 11 -> 30; 12 -> 31
+    else -> 30
+}
+
+/**
+ * Converts UTC epoch millis to display date format.
+ * 887328000000 → "14.02.1998"
+ */
+fun Long.millisToDisplayDate(): String {
+    var days = (this / MILLIS_PER_DAY).toInt()
+    var year = 1970
+    while (true) {
+        val daysInYear = if (isLeapYear(year)) 366 else 365
+        if (days < daysInYear) break
+        days -= daysInYear
+        year++
+    }
+    var month = 1
+    while (true) {
+        val dim = daysInMonth(month, year)
+        if (days < dim) break
+        days -= dim
+        month++
+    }
+    val day = days + 1
+    return "${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.$year"
+}
+
+/**
+ * Converts a display date string to UTC epoch millis.
+ * "14.02.1998" → 887328000000
+ */
+fun String.displayDateToMillis(): Long? {
+    val parts = split(".")
+    if (parts.size != 3) return null
+    return try {
+        val day = parts[0].toInt()
+        val month = parts[1].toInt()
+        val year = parts[2].toInt()
+        var totalDays = 0L
+        for (y in 1970 until year) {
+            totalDays += if (isLeapYear(y)) 366 else 365
+        }
+        for (m in 1 until month) {
+            totalDays += daysInMonth(m, year)
+        }
+        totalDays += (day - 1)
+        totalDays * MILLIS_PER_DAY
+    } catch (_: Exception) {
+        null
+    }
+}
+
+/**
+ * Converts UTC epoch millis to full ISO 8601 datetime string.
+ * 887328000000 → "1998-02-14T00:00:00.000Z"
+ */
+fun Long.millisToIsoDateTime(): String {
+    val display = millisToDisplayDate()
+    return display.displayDateToIsoDateTime() ?: ""
 }

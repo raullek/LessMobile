@@ -31,6 +31,7 @@ import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import org.jetbrains.compose.resources.painterResource
 import az.less.mobile.presentation.client.main.more.root.components.MoreHeader
+import az.less.mobile.presentation.client.main.more.root.models.CellId
 import az.less.mobile.presentation.client.main.more.root.models.MoreCellType
 import az.less.mobile.utils.openAppSettings
 import lessmobile.composeapp.generated.resources.more_contact_us
@@ -39,6 +40,11 @@ import lessmobile.composeapp.generated.resources.contact_tiktok
 import lessmobile.composeapp.generated.resources.contact_facebook
 import lessmobile.composeapp.generated.resources.contact_telegram
 import lessmobile.composeapp.generated.resources.contact_whatsapp
+import lessmobile.composeapp.generated.resources.ic_social_instagram_24dp
+import lessmobile.composeapp.generated.resources.ic_social_tiktok_24dp
+import lessmobile.composeapp.generated.resources.ic_social_facebook_24dp
+import lessmobile.composeapp.generated.resources.ic_social_telegram_24dp
+import lessmobile.composeapp.generated.resources.ic_social_whatsapp_24dp
 import lessmobile.composeapp.generated.resources.terms_title
 import lessmobile.composeapp.generated.resources.action_logout
 import org.jetbrains.compose.resources.stringResource
@@ -72,9 +78,6 @@ fun MoreScreen(
             }
             is MoreSideEffect.NavigateToVoucher -> {
                 navController.navigate(ClientRoute.Voucher)
-            }
-            is MoreSideEffect.NavigateToHistory -> {
-                navigateToMerchant.invoke()
             }
             is MoreSideEffect.NavigateToSettings -> {
                 // navController.navigate("settings")
@@ -115,27 +118,27 @@ fun MoreScreen(
             ListBottomSheetItem(
                 id = "instagram",
                 title = stringResource(Res.string.contact_instagram),
-                icon = null // TODO: Add Instagram icon
+                icon = painterResource(Res.drawable.ic_social_instagram_24dp)
             ),
             ListBottomSheetItem(
                 id = "tiktok",
                 title = stringResource(Res.string.contact_tiktok),
-                icon = null // TODO: Add TikTok icon
+                icon = painterResource(Res.drawable.ic_social_tiktok_24dp)
             ),
             ListBottomSheetItem(
                 id = "facebook",
                 title = stringResource(Res.string.contact_facebook),
-                icon = null // TODO: Add Facebook icon
+                icon = painterResource(Res.drawable.ic_social_facebook_24dp)
             ),
             ListBottomSheetItem(
                 id = "telegram",
                 title = stringResource(Res.string.contact_telegram),
-                icon = null // TODO: Add Telegram icon
+                icon = painterResource(Res.drawable.ic_social_telegram_24dp)
             ),
             ListBottomSheetItem(
                 id = "whatsapp",
                 title = stringResource(Res.string.contact_whatsapp),
-                icon = null // TODO: Add Whatsapp icon
+                icon = painterResource(Res.drawable.ic_social_whatsapp_24dp)
             )
         )
 
@@ -241,7 +244,13 @@ fun MoreScreenContent(
                         )
                         is MoreCellType.Toggle -> CellType.Toggle(
                             checked = cell.type.checked,
-                            onCheckedChange = { onIntent(MoreIntent.OnNotificationToggleClick) }
+                            onCheckedChange = {
+                                when (cell.id) {
+                                    CellId.Notification -> onIntent(MoreIntent.OnNotificationToggleClick)
+                                    CellId.DarkMode -> onIntent(MoreIntent.OnDarkModeToggleClick)
+                                    else -> {}
+                                }
+                            }
                         )
                     },
                     showDivider = cell.showDivider,

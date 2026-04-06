@@ -10,11 +10,13 @@ interface SessionLocalRepository {
     val accessToken: Flow<String?>
     val refreshToken: Flow<String?>
     val lastUsedMode: Flow<AppMode>
+    val isDarkMode: Flow<Boolean>
     suspend fun getAccessToken(): String?
     suspend fun getRefreshToken(): String?
     suspend fun saveSession(user: User, accessToken: String, refreshToken: String)
     suspend fun updateUser(user: User)
     suspend fun updateTokens(accessToken: String, refreshToken: String)
     suspend fun saveLastUsedMode(mode: AppMode)
+    suspend fun saveDarkMode(enabled: Boolean)
     suspend fun clearSession()
 }
