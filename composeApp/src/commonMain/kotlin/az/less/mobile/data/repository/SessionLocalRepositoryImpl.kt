@@ -2,6 +2,7 @@ package az.less.mobile.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import az.less.mobile.data.model.UserEcoHeroBadgeEntity
@@ -26,6 +27,7 @@ class SessionLocalRepositoryImpl(
         val ACCESS_TOKEN = stringPreferencesKey("access_token")
         val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
         val LAST_USED_MODE = stringPreferencesKey("last_used_mode")
+        val DARK_MODE = booleanPreferencesKey("dark_mode")
     }
 
     override val currentUser: Flow<User?> = dataStore.data.map { preferences ->
@@ -52,6 +54,10 @@ class SessionLocalRepositoryImpl(
 
     override val lastUsedMode: Flow<AppMode> = dataStore.data.map { preferences ->
         AppMode.fromString(preferences[LAST_USED_MODE])
+    }
+
+    override val isDarkMode: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[DARK_MODE] ?: false
     }
 
     override suspend fun getAccessToken(): String? {
@@ -132,6 +138,12 @@ class SessionLocalRepositoryImpl(
     override suspend fun saveLastUsedMode(mode: AppMode) {
         dataStore.edit { preferences ->
             preferences[LAST_USED_MODE] = mode.name
+        }
+    }
+
+    override suspend fun saveDarkMode(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[DARK_MODE] = enabled
         }
     }
 

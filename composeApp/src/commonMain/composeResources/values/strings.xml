@@ -96,6 +96,7 @@
     <string name="contact_facebook">Facebook</string>
     <string name="contact_telegram">Telegram</string>
     <string name="contact_whatsapp">Whatsapp</string>
+    <string name="contact_mail">Mail</string>
 
     <!-- Terms Bottom Sheet -->
     <string name="terms_title">Terms &amp; Conditions</string>

@@ -24,7 +24,10 @@
       "Bash(claude mcp:*)",
       "WebFetch(domain:axshambazari.com)",
       "Bash(curl:*)",
-      "Bash(grep -r history_ /c/Users/PC/AndroidStudioProjects/LessMobile/composeApp/src --include=*.xml)"
+      "Bash(grep -r history_ /c/Users/PC/AndroidStudioProjects/LessMobile/composeApp/src --include=*.xml)",
+      "Read(//c/Program Files/Android/Android Studio/jbr/**)",
+      "Read(//c//**)",
+      "Bash(env)"
     ]
   }
 }

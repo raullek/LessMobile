@@ -6,7 +6,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import az.less.mobile.domain.model.SearchVenue
 import az.less.mobile.domain.repository.ExploreRepository
-import az.less.mobile.presentation.client.main.search.models.SearchCategory
 import dev.jordond.compass.geolocation.Geolocator
 import dev.jordond.compass.geolocation.mobile
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,11 +19,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.test_offer_category_burger
-import lessmobile.composeapp.generated.resources.test_offer_category_pasta
-import lessmobile.composeapp.generated.resources.test_offer_category_pizza
-import lessmobile.composeapp.generated.resources.test_offer_category_sushi
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -75,9 +69,6 @@ class SearchViewModel(
     }
 
     private fun loadInitialData() = intent {
-        reduce {
-            state.copy(categories = getMockCategories())
-        }
     }
 
     private fun fetchLocation() {
@@ -122,52 +113,6 @@ class SearchViewModel(
         postSideEffect(SearchSideEffect.NavigateToMerchantProfile(venueId))
     }
 
-    private fun getMockCategories(): List<SearchCategory> {
-        return listOf(
-            SearchCategory(
-                id = "meals",
-                type = "SEARCH_CATEGORY",
-                title = "Meals",
-                testImage = Res.drawable.test_offer_category_burger
-            ),
-            SearchCategory(
-                id = "lunch",
-                type = "SEARCH_CATEGORY",
-                title = "Lunch",
-                testImage = Res.drawable.test_offer_category_pizza
-            ),
-            SearchCategory(
-                id = "dinner",
-                type = "SEARCH_CATEGORY",
-                title = "Dinner",
-                testImage = Res.drawable.test_offer_category_sushi
-            ),
-            SearchCategory(
-                id = "bakery",
-                type = "SEARCH_CATEGORY",
-                title = "Bakery",
-                testImage = Res.drawable.test_offer_category_pasta
-            ),
-            SearchCategory(
-                id = "dessert",
-                type = "SEARCH_CATEGORY",
-                title = "Dessert",
-                testImage = Res.drawable.test_offer_category_burger
-            ),
-            SearchCategory(
-                id = "grocery",
-                type = "SEARCH_CATEGORY",
-                title = "Grocery",
-                testImage = Res.drawable.test_offer_category_pizza
-            ),
-            SearchCategory(
-                id = "healthy",
-                type = "SEARCH_CATEGORY",
-                title = "Healthy",
-                testImage = Res.drawable.test_offer_category_sushi
-            )
-        )
-    }
 }
 
 private data class LocationParams(

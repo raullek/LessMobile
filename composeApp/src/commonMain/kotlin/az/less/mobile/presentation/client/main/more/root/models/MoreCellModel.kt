@@ -10,13 +10,13 @@ enum class CellId {
     Account,
     PaymentMethods,
     Voucher,
-    History,
     Settings,
     ContactUs,
     SignStore,
     TermsOfService,
     HowToUse,
     Notification,
+    DarkMode,
     Location,
     SwitchToMerchant
 }

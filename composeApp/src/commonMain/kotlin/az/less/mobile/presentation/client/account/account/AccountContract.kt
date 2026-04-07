@@ -5,7 +5,6 @@ import az.less.designsystem.components.ToastType
 
 data class AccountState(
     val isLoading: Boolean = false,
-    val userId: String? = null,
     val fullName: String = "",
     val phoneNumber: String = "",
     val email: String = "",
@@ -18,7 +17,8 @@ data class AccountState(
     val profilePhotoBytes: ByteArray? = null,
     val toastMessage: String? = null,
     val toastType: ToastType = ToastType.Success,
-    val showDeleteConfirmation: Boolean = false
+    val showDeleteConfirmation: Boolean = false,
+    val showDatePicker: Boolean = false
 )
 
 sealed interface AccountSideEffect {
@@ -41,6 +41,8 @@ sealed interface AccountIntent {
     data object OnGenderClear : AccountIntent
     data object OnBirthDateClick : AccountIntent
     data object OnBirthDateClear : AccountIntent
+    data object OnDatePickerDismiss : AccountIntent
+    data class OnDatePickerConfirm(val birthDate: String) : AccountIntent
     data object OnDeleteAccountClicked : AccountIntent
     data object OnDeleteAccountConfirmed : AccountIntent
     data object OnDeleteAccountDismissed : AccountIntent

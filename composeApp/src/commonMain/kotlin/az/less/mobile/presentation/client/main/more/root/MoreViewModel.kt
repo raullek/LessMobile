@@ -10,6 +10,7 @@ import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.ContentRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import az.less.mobile.presentation.theme.ThemeManager
 import az.less.mobile.presentation.client.main.more.root.models.CellId
 import dev.jordond.compass.permissions.LocationPermissionController
 import dev.jordond.compass.permissions.mobile
@@ -23,7 +24,6 @@ import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_map_24dp
 import lessmobile.composeapp.generated.resources.ic_account_24dp
 import lessmobile.composeapp.generated.resources.ic_bubble_question_24dp
-import lessmobile.composeapp.generated.resources.ic_clock_24dp
 import lessmobile.composeapp.generated.resources.ic_customer_support_24dp
 import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.ic_notification_24dp
@@ -32,11 +32,12 @@ import lessmobile.composeapp.generated.resources.ic_terms_file_24dp
 import lessmobile.composeapp.generated.resources.ic_voucher_24dp
 import lessmobile.composeapp.generated.resources.more_account
 import lessmobile.composeapp.generated.resources.more_contact_us
-import lessmobile.composeapp.generated.resources.more_history
 import lessmobile.composeapp.generated.resources.more_how_to_use
 import lessmobile.composeapp.generated.resources.more_location
 import lessmobile.composeapp.generated.resources.more_location_granted
 import lessmobile.composeapp.generated.resources.more_location_not_granted
+import lessmobile.composeapp.generated.resources.ic_more_24dp
+import lessmobile.composeapp.generated.resources.merch_more_dark_mode
 import lessmobile.composeapp.generated.resources.more_notification
 import lessmobile.composeapp.generated.resources.more_payment_methods
 import lessmobile.composeapp.generated.resources.more_section_application
@@ -55,7 +56,8 @@ class MoreViewModel(
     private val userLocalRepository: SessionLocalRepository,
     private val authorizationRepository: AuthorizationRepository,
     private val contentRepository: ContentRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val themeManager: ThemeManager
 ) : ViewModel(), ContainerHost<MoreState, MoreSideEffect> {
 
     override val container: Container<MoreState, MoreSideEffect> =
@@ -67,7 +69,27 @@ class MoreViewModel(
         logUserInfo()
         checkLocationPermission()
         observeUserState()
+        observeDarkMode()
         refreshUserInBackground()
+    }
+
+    private fun observeDarkMode() {
+        viewModelScope.launch {
+            themeManager.isDarkMode.collectLatest { isDark ->
+                intent {
+                    reduce {
+                        state.copy(
+                            darkModeEnabled = isDark,
+                            sections = if (state.isLoggedIn) {
+                                buildAuthSections(state.notificationEnabled, isDark, state.locationPermissionGranted, state.canSwitchMode)
+                            } else {
+                                buildNonAuthSections(state.notificationEnabled, isDark, state.locationPermissionGranted)
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun logUserInfo() {
@@ -157,9 +179,9 @@ class MoreViewModel(
                     state.copy(
                         locationPermissionGranted = hasPermission,
                         sections = if (state.isLoggedIn) {
-                            buildAuthSections(state.notificationEnabled, hasPermission, state.canSwitchMode)
+                            buildAuthSections(state.notificationEnabled, state.darkModeEnabled, hasPermission, state.canSwitchMode)
                         } else {
-                            buildNonAuthSections(state.notificationEnabled, hasPermission)
+                            buildNonAuthSections(state.notificationEnabled, state.darkModeEnabled, hasPermission)
                         }
                     )
                 }
@@ -180,7 +202,7 @@ class MoreViewModel(
                                 userName = user.name,
                                 userEmail = user.email,
                                 userAvatarUrl = user.avatarUrl,
-                                sections = buildAuthSections(state.notificationEnabled, state.locationPermissionGranted, canSwitch)
+                                sections = buildAuthSections(state.notificationEnabled, state.darkModeEnabled, state.locationPermissionGranted, canSwitch)
                             )
                         }
                     } else {
@@ -190,7 +212,7 @@ class MoreViewModel(
                                 userName = null,
                                 userEmail = null,
                                 userAvatarUrl = null,
-                                sections = buildNonAuthSections(state.notificationEnabled, state.locationPermissionGranted)
+                                sections = buildNonAuthSections(state.notificationEnabled, state.darkModeEnabled, state.locationPermissionGranted)
                             )
                         }
                     }
@@ -208,6 +230,7 @@ class MoreViewModel(
             is MoreIntent.OnLogoutClicked -> handleLogoutClicked()
             is MoreIntent.OnCellClick -> handleCellClick(intent.cellId)
             is MoreIntent.OnNotificationToggleClick -> handleNotificationToggleClick()
+            is MoreIntent.OnDarkModeToggleClick -> handleDarkModeToggleClick()
             is MoreIntent.OnContactUsDismiss -> handleContactUsDismiss()
             is MoreIntent.OnContactUsItemClick -> handleContactUsItemClick(intent.itemId)
             is MoreIntent.OnTermsDismiss -> handleTermsDismiss()
@@ -234,7 +257,6 @@ class MoreViewModel(
             CellId.Account -> postSideEffect(MoreSideEffect.NavigateToAccount)
             CellId.PaymentMethods -> postSideEffect(MoreSideEffect.NavigateToPaymentMethods)
             CellId.Voucher -> postSideEffect(MoreSideEffect.NavigateToVoucher)
-            CellId.History -> postSideEffect(MoreSideEffect.NavigateToHistory)
             CellId.Settings -> postSideEffect(MoreSideEffect.NavigateToSettings)
             CellId.ContactUs -> {
                 reduce {
@@ -247,6 +269,9 @@ class MoreViewModel(
             CellId.Location -> postSideEffect(MoreSideEffect.NavigateToAppSettings)
             CellId.Notification -> {
                 // Notification is handled separately via toggle
+            }
+            CellId.DarkMode -> {
+                // Dark mode is handled separately via toggle
             }
             CellId.SwitchToMerchant -> postSideEffect(MoreSideEffect.NavigateToMerchantFlow)
         }
@@ -296,18 +321,22 @@ class MoreViewModel(
             state.copy(
                 notificationEnabled = newEnabled,
                 sections = if (state.isLoggedIn) {
-                    buildAuthSections(newEnabled, state.locationPermissionGranted, state.canSwitchMode)
+                    buildAuthSections(newEnabled, state.darkModeEnabled, state.locationPermissionGranted, state.canSwitchMode)
                 } else {
-                    buildNonAuthSections(newEnabled, state.locationPermissionGranted)
+                    buildNonAuthSections(newEnabled, state.darkModeEnabled, state.locationPermissionGranted)
                 }
             )
         }
     }
 
+    private fun handleDarkModeToggleClick() {
+        themeManager.toggleDarkMode(viewModelScope)
+    }
+
     /**
      * Build sections for authenticated users
      */
-    private fun buildAuthSections(notificationEnabled: Boolean, locationGranted: Boolean, canSwitchMode: Boolean): List<MoreSection> {
+    private fun buildAuthSections(notificationEnabled: Boolean, darkModeEnabled: Boolean, locationGranted: Boolean, canSwitchMode: Boolean): List<MoreSection> {
         val appCells = mutableListOf(
             MoreCellModel(
                 id = CellId.Account,
@@ -328,12 +357,6 @@ class MoreViewModel(
                 type = MoreCellType.Navigation
             ),
             MoreCellModel(
-                id = CellId.History,
-                titleRes = Res.string.more_history,
-                icon = Res.drawable.ic_clock_24dp,
-                type = MoreCellType.Navigation,
-            ),
-            MoreCellModel(
                 id = CellId.Location,
                 titleRes = Res.string.more_location,
                 subtitleRes = if (locationGranted) Res.string.more_location_granted else Res.string.more_location_not_granted,
@@ -345,7 +368,13 @@ class MoreViewModel(
                 titleRes = Res.string.more_notification,
                 icon = Res.drawable.ic_notification_24dp,
                 type = MoreCellType.Toggle(notificationEnabled),
-                showDivider = !canSwitchMode
+            ),
+            MoreCellModel(
+                id = CellId.DarkMode,
+                titleRes = Res.string.merch_more_dark_mode,
+                icon = Res.drawable.ic_more_24dp,
+                type = MoreCellType.Toggle(darkModeEnabled),
+                showDivider = canSwitchMode
             )
         )
 
@@ -396,7 +425,7 @@ class MoreViewModel(
     /**
      * Build sections for non-authenticated users
      */
-    private fun buildNonAuthSections(notificationEnabled: Boolean, locationGranted: Boolean): List<MoreSection> {
+    private fun buildNonAuthSections(notificationEnabled: Boolean, darkModeEnabled: Boolean, locationGranted: Boolean): List<MoreSection> {
         return listOf(
             MoreSection(
                 titleRes = Res.string.more_section_application,
@@ -413,6 +442,12 @@ class MoreViewModel(
                         titleRes = Res.string.more_notification,
                         icon = Res.drawable.ic_notification_24dp,
                         type = MoreCellType.Toggle(notificationEnabled),
+                    ),
+                    MoreCellModel(
+                        id = CellId.DarkMode,
+                        titleRes = Res.string.merch_more_dark_mode,
+                        icon = Res.drawable.ic_more_24dp,
+                        type = MoreCellType.Toggle(darkModeEnabled),
                         showDivider = false
                     )
                 )
