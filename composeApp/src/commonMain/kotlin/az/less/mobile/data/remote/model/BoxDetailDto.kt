@@ -17,16 +17,29 @@ data class BoxDetailDto(
     val soldCount: Int = 0,
     val status: String? = null,
     val boxType: String? = null,
-    val category: String? = null,
+    val categoryId: String? = null,
+    val category: BoxDetailCategoryDto? = null,
     val pickupTimeStart: String? = null,
     val pickupTimeEnd: String? = null,
+    val pickupTimeFormatted: String? = null,
     val images: List<String> = emptyList(),
     val dietaryInfo: List<String> = emptyList(),
+    val tagIds: List<String> = emptyList(),
     val tags: List<String> = emptyList(),
+    val isOpenNow: Boolean = false,
     val venue: BoxVenueDto,
     val location: LocationDto? = null,
     val address: String? = null,
     val collectionNotes: String? = null
+)
+
+@Serializable
+data class BoxDetailCategoryDto(
+    val id: String = "",
+    val value: String = "",
+    val title: String = "",
+    val imageUrl: String? = null,
+    val sortOrder: Int = 0
 )
 
 @Serializable
