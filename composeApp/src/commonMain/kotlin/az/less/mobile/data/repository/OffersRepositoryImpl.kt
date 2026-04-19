@@ -4,7 +4,8 @@ import az.less.mobile.data.datasource.OffersDataSource
 import az.less.mobile.data.remote.model.BoxDetailDto
 import az.less.mobile.data.remote.model.BoxVenueDto
 import az.less.mobile.data.remote.model.DefaultPaymentDto
-import az.less.mobile.data.remote.model.PaymentMethodsDto
+import az.less.mobile.data.remote.model.PaymentCardDto
+import az.less.mobile.data.remote.model.PlaceOrderData
 import az.less.mobile.data.remote.model.RegisterCardDto
 import az.less.mobile.data.remote.model.CategoryDto
 import az.less.mobile.data.remote.model.HomepageButtonDto
@@ -14,9 +15,11 @@ import az.less.mobile.data.remote.model.OffersScreenDto
 import az.less.mobile.data.remote.model.SpecialCategoryDto
 import az.less.mobile.data.remote.model.SpecialSegmentDto
 import az.less.mobile.domain.model.BoxDetail
-import az.less.mobile.utils.extractTime
 import az.less.mobile.domain.model.BoxVenue
+import az.less.mobile.domain.model.CardBrand
 import az.less.mobile.domain.model.OffersHomeData
+import az.less.mobile.domain.model.PaymentMethod
+import az.less.mobile.utils.extractTime
 import az.less.mobile.domain.repository.OffersRepository
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.presentation.client.main.offers.models.Category
@@ -49,12 +52,28 @@ class OffersRepositoryImpl(
             .map { it.toDomain() }
     }
 
-    override suspend fun getDefaultPayment(): NetworkResult<DefaultPaymentDto> {
-        return offersDataSource.getDefaultPayment()
+    override suspend fun getDefaultPayment(): NetworkResult<PaymentMethod> {
+        return offersDataSource.getDefaultPayment().map { it.toDomain() }
     }
 
-    override suspend fun getPaymentMethods(): NetworkResult<PaymentMethodsDto> {
-        return offersDataSource.getPaymentMethods()
+    override suspend fun getPaymentMethods(): NetworkResult<List<PaymentMethod>> {
+        return offersDataSource.getPaymentMethods().map { dto ->
+            dto.cards.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun setDefaultPaymentMethod(methodId: String): NetworkResult<PaymentMethod> {
+        return offersDataSource.setDefaultPaymentMethod(methodId).map { it.toDomain() }
+    }
+
+    override suspend fun placeOrder(
+        boxId: String,
+        quantity: Int,
+        paymentMethodId: String,
+        notes: String?,
+        userVoucherId: String?
+    ): NetworkResult<PlaceOrderData> {
+        return offersDataSource.placeOrder(boxId, quantity, paymentMethodId, notes, userVoucherId)
     }
 
     override suspend fun registerCard(): NetworkResult<RegisterCardDto> {
@@ -75,8 +94,8 @@ private fun OffersScreenDto.toDomain() = OffersHomeData(
 
 private fun CategoryDto.toDomain() = Category(
     id = id,
-    type = type,
-    title = title,
+    type = type.orEmpty(),
+    title = title.orEmpty(),
     imageUrl = imageUrl,
     filters = filters.map { CategoryFilter(searchFilterId = it.searchFilterId, values = it.values) },
     searchUrl = searchUrl
@@ -84,16 +103,16 @@ private fun CategoryDto.toDomain() = Category(
 
 private fun SpecialCategoryDto.toDomain() = SpecialDiscountItem(
     id = id,
-    type = type,
-    title = title,
-    description = description,
+    type = type.orEmpty(),
+    title = title.orEmpty(),
+    description = description.orEmpty(),
     imageUrl = imageUrl,
     filters = filters.map { CategoryFilter(searchFilterId = it.searchFilterId, values = it.values) }
 )
 
 private fun SpecialSegmentDto.toDomain() = OfferSection(
     id = id,
-    title = title,
+    title = title.orEmpty(),
     offers = boxes.map { it.toDomain() },
     searchUrl = searchUrl,
     filters = filters.map { CategoryFilter(searchFilterId = it.searchFilterId, values = it.values) }
@@ -108,8 +127,8 @@ private fun HomepageButtonDto.toDomain(index: Int): HomepageButton {
     }
     return HomepageButton(
         id = id,
-        type = type,
-        title = title,
+        type = type.orEmpty(),
+        title = title.orEmpty(),
         searchUrl = searchUrl,
         icon = icon,
         iconTint = iconTint
@@ -118,51 +137,58 @@ private fun HomepageButtonDto.toDomain(index: Int): HomepageButton {
 
 private fun OfferDto.toDomain() = OfferItem(
     id = id,
-    title = title,
-    description = description,
+    title = title ?: defaultBoxTitle.orEmpty(),
+    description = description ?: defaultBoxDescription,
     imageUrl = imageUrl,
     imageBgColor = imageBgColor ?: "#fff2eb",
     quantity = quantity,
     originalPrice = originalPrice.toString(),
     currentPrice = currentPrice.toString(),
     bagType = bagType,
-    category = category,
-    pickupTime = pickupTime,
-    merchant = venue.toDomain()
+    category = category.orEmpty(),
+    pickupTime = pickupTime.orEmpty(),
+    merchant = venue?.toDomain() ?: OfferMerchant(id = "", name = "", rating = 0f)
 )
 
 private fun VenueDto.toDomain() = OfferMerchant(
     id = id,
-    name = name,
+    name = name.orEmpty(),
     logoUrl = logoUrl,
-    latitude = location.coordinates.getOrElse(1) { 0.0 },
-    longitude = location.coordinates.getOrElse(0) { 0.0 },
+    latitude = location?.coordinates?.getOrElse(1) { 0.0 } ?: 0.0,
+    longitude = location?.coordinates?.getOrElse(0) { 0.0 } ?: 0.0,
     rating = rating.toFloat()
 )
 
 private fun BoxDetailDto.toDomain() = BoxDetail(
     id = id,
-    title = title,
-    description = description ?: "",
+    title = title ?: defaultBoxTitle.orEmpty(),
+    description = description ?: defaultBoxDescription ?: "",
     originalPrice = originalPrice,
     discountedPrice = discountedPrice,
     availableQuantity = (quantity - soldCount).coerceAtLeast(0),
     status = status ?: "",
     boxType = boxType ?: "",
-    category = category ?: "",
-    pickupTimeFormatted = formatPickupTime(pickupTimeStart, pickupTimeEnd),
+    category = category?.title ?: "",
+    pickupTimeFormatted = pickupTimeFormatted ?: formatPickupTime(pickupTimeStart, pickupTimeEnd),
     images = images,
     dietaryInfo = dietaryInfo,
-    tags = tags,
-    venue = venue.toDomain(),
+    tags = tags.mapNotNull { it.title ?: it.value },
+    venue = venue?.toDomain() ?: BoxVenue(
+        id = "",
+        name = "",
+        businessName = "",
+        businessLogo = null,
+        businessAddress = "",
+        phone = ""
+    ),
     address = address ?: "",
     collectionNotes = collectionNotes ?: ""
 )
 
 private fun BoxVenueDto.toDomain() = BoxVenue(
     id = id,
-    name = name,
-    businessName = businessName ?: name,
+    name = name.orEmpty(),
+    businessName = businessName.orEmpty(),
     businessLogo = businessLogo,
     businessAddress = businessAddress ?: "",
     phone = phone ?: ""
@@ -174,3 +200,26 @@ private fun formatPickupTime(start: String?, end: String?): String {
     val endTime = end.extractTime() ?: return ""
     return "Pick up from $startTime to $endTime"
 }
+
+private fun String?.toCardBrand(): CardBrand = when (this?.lowercase()) {
+    "visa" -> CardBrand.VISA
+    "mastercard" -> CardBrand.MASTERCARD
+    else -> CardBrand.UNKNOWN
+}
+
+private fun DefaultPaymentDto.toDomain() = PaymentMethod(
+    id = id,
+    brand = brand.toCardBrand(),
+    lastFourDigits = last4 ?: cardMask ?: "",
+    displayName = displayName ?: "",
+    isDefault = isDefault,
+    message = message
+)
+
+private fun PaymentCardDto.toDomain() = PaymentMethod(
+    id = id,
+    brand = brand.toCardBrand(),
+    lastFourDigits = last4 ?: cardMask ?: "",
+    displayName = displayName ?: "",
+    isDefault = isDefault
+)

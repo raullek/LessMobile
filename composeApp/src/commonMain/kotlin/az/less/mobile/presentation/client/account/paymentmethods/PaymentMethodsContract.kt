@@ -1,5 +1,8 @@
 package az.less.mobile.presentation.client.account.paymentmethods
 
+import az.less.designsystem.components.ToastType
+import az.less.mobile.domain.model.CardBrand
+
 data class PaymentMethod(
     val id: String,
     val type: PaymentMethodType,
@@ -20,10 +23,10 @@ data class PaymentMethodsState(
     val cardToDelete: PaymentMethod? = null
 )
 
-interface PaymentMethodsSideEffect {
+sealed interface PaymentMethodsSideEffect {
     data object NavigateBack : PaymentMethodsSideEffect
     data class OpenAddCardWebView(val url: String) : PaymentMethodsSideEffect
-    data class ShowError(val message: String) : PaymentMethodsSideEffect
+    data class ShowToast(val message: String, val type: ToastType) : PaymentMethodsSideEffect
 }
 
 sealed interface PaymentMethodsIntent {
@@ -35,3 +38,16 @@ sealed interface PaymentMethodsIntent {
     data object OnAddNewCardClicked : PaymentMethodsIntent
     data object LoadCards : PaymentMethodsIntent
 }
+
+fun CardBrand.toPaymentMethodType() = when (this) {
+    CardBrand.VISA -> PaymentMethodType.VISA
+    CardBrand.MASTERCARD -> PaymentMethodType.MASTERCARD
+    CardBrand.UNKNOWN -> PaymentMethodType.VISA
+}
+
+fun az.less.mobile.domain.model.PaymentMethod.toPresentation() = PaymentMethod(
+    id = id,
+    type = brand.toPaymentMethodType(),
+    lastFourDigits = lastFourDigits,
+    isSelected = isDefault
+)

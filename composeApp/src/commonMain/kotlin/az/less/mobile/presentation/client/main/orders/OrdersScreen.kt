@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -82,16 +83,14 @@ fun OrdersScreen(
         when (sideEffect) {
             is OrdersSideEffect.ShowReserveInfo -> {
                 val order = sideEffect.order
-                val pickupTime = listOfNotNull(order.pickupTimeStart, order.pickupTimeEnd)
-                    .joinToString(" - ")
                 selectedReserveInfo = ReserveInfo(
                     venueName = order.title,
-                    pickupTime = pickupTime,
+                    pickupTime = order.pickupTimeFormatted,
                     reserveNumber = order.reserveNumber,
-                    date = order.completedDate ?: "",
-                    pricePerPiece = order.price.toDoubleOrNull() ?: 0.0,
-                    serviceFee = 0.20,
-                    subtotal = (order.price.toDoubleOrNull() ?: 0.0) + 0.20
+                    date = order.date,
+                    pricePerPiece = order.pricePerPiece,
+                    serviceFee = order.serviceFee,
+                    subtotal = order.subtotalAmount
                 )
                 isReserveInfoVisible = true
                 scope.launch {
@@ -250,6 +249,7 @@ fun OrdersScreenContent(
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall),
+                            contentPadding = PaddingValues(bottom = LessTheme.size.huge)
                         ) {
                             items(
                                 count = pagingItems.itemCount,

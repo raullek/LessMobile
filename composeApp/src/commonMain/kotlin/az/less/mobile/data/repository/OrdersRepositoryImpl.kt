@@ -5,7 +5,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import az.less.mobile.data.datasource.OrdersDataSource
 import az.less.mobile.data.paging.OrdersPagingSource
-import az.less.mobile.data.remote.model.MerchantOrdersData
+import az.less.mobile.data.remote.model.BoughtBoxesResponse
+import az.less.mobile.data.remote.model.CreatedBoxesResponse
+import az.less.mobile.data.remote.model.OrderDeliveryResponse
 import az.less.mobile.data.remote.model.OrderHistoryDataDto
 import az.less.mobile.domain.repository.OrdersRepository
 import az.less.mobile.network.NetworkResult
@@ -29,8 +31,20 @@ class OrdersRepositoryImpl(
         }
     ).flow
 
-    override suspend fun getMerchantOrders(venueId: String): NetworkResult<MerchantOrdersData> {
-        return ordersDataSource.getMerchantOrders(venueId)
+    override suspend fun getBoughtBoxes(): NetworkResult<BoughtBoxesResponse> {
+        return ordersDataSource.getBoughtBoxes()
+    }
+
+    override suspend fun getCreatedBoxes(): NetworkResult<CreatedBoxesResponse> {
+        return ordersDataSource.getCreatedBoxes()
+    }
+
+    override fun streamBoughtBoxes(): Flow<BoughtBoxesResponse> {
+        return ordersDataSource.streamBoughtBoxes()
+    }
+
+    override suspend fun deliverOrder(orderId: String): NetworkResult<OrderDeliveryResponse> {
+        return ordersDataSource.deliverOrder(orderId)
     }
 
     override suspend fun getOrderHistory(

@@ -2,6 +2,7 @@ package az.less.mobile.presentation.client.account.paymentmethods
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.designsystem.components.ToastType
 import az.less.mobile.domain.repository.OffersRepository
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -35,12 +36,29 @@ class PaymentMethodsViewModel(
     }
 
     private fun handleCardSelected(cardId: String) = intent {
-        reduce {
-            val updatedCards = state.creditDebitCards.map { card ->
-                card.copy(isSelected = card.id == cardId)
+        offersRepository.setDefaultPaymentMethod(cardId)
+            .onSuccess { payment ->
+                reduce {
+                    val updatedCards = state.creditDebitCards.map { card ->
+                        card.copy(isSelected = card.id == cardId)
+                    }
+                    state.copy(creditDebitCards = updatedCards)
+                }
+                postSideEffect(
+                    PaymentMethodsSideEffect.ShowToast(
+                        message = payment.message ?: "Default payment method updated successfully",
+                        type = ToastType.Success
+                    )
+                )
             }
-            state.copy(creditDebitCards = updatedCards)
-        }
+            .onError { error ->
+                postSideEffect(
+                    PaymentMethodsSideEffect.ShowToast(
+                        message = error.message,
+                        type = ToastType.Error
+                    )
+                )
+            }
     }
 
     private fun handleDeleteCardClicked(cardId: String) = intent {
@@ -74,19 +92,7 @@ class PaymentMethodsViewModel(
 
         offersRepository.getPaymentMethods()
             .onSuccess { methods ->
-                val cards = methods.cards.map { card ->
-                    val cardType = when (card.brand?.lowercase()) {
-                        "visa" -> PaymentMethodType.VISA
-                        "mastercard" -> PaymentMethodType.MASTERCARD
-                        else -> PaymentMethodType.VISA
-                    }
-                    PaymentMethod(
-                        id = card.id,
-                        type = cardType,
-                        lastFourDigits = card.last4 ?: card.cardMask ?: "",
-                        isSelected = card.isDefault
-                    )
-                }
+                val cards = methods.map { it.toPresentation() }
                 reduce {
                     state.copy(
                         isLoading = false,
@@ -112,7 +118,7 @@ class PaymentMethodsViewModel(
             }
             .onError { error ->
                 reduce { state.copy(isRegisterCardLoading = false) }
-                postSideEffect(PaymentMethodsSideEffect.ShowError(error.message))
+                postSideEffect(PaymentMethodsSideEffect.ShowToast(error.message, ToastType.Error))
             }
     }
 

@@ -142,6 +142,11 @@
 
     <!-- Voucher Screen -->
     <string name="voucher_title">Ваучер</string>
+    <string name="voucher_discount">Скидка</string>
+    <string name="voucher_expiry_date">Срок действия</string>
+    <string name="voucher_code_label">Код ваучера</string>
+    <string name="voucher_empty_title">У вас нет ваучеров</string>
+    <string name="voucher_empty_description">Чтобы получить ваучер, порекомендуйте наше приложение друзьям — вы получите 2 ₼ за каждого друга после его первой транзакции</string>
 
     <!-- Search Screen -->
     <string name="search_items_on_sale">%1$d товаров со скидкой</string>
@@ -238,15 +243,20 @@
     <string name="more_switch_to_client">Перейти в режим клиента</string>
 
     <!-- Merchant Orders Screen -->
-    <string name="merch_orders_awaiting_pickup">Ожидают выдачи</string>
-    <string name="merch_orders_awaiting_purchase">Ожидают покупки</string>
+    <string name="merch_orders_bought">Купленные</string>
+    <string name="merch_orders_placed_lots">Размещенные лоты</string>
     <string name="merch_orders_lot_added">Лот успешно добавлен</string>
     <string name="merch_orders_lot_remove_info">Вы можете удалить лот только в течение 1 часа</string>
     <string name="merch_orders_items_left">Осталось %1$d</string>
     <string name="merch_orders_pickup_time">Забрать с %1$s до %2$s</string>
     <string name="merch_orders_handed_over">Выдан</string>
+    <string name="merch_orders_delivered">Заказ успешно выдан</string>
     <string name="merch_orders_cancel_lot">Отменить лот</string>
-    <string name="merch_orders_cancellation_ended">Время отмены истекло</string>
+    <string name="merch_orders_cancellation_ended">Время для отмены завершилось, лот закроется в %1$s</string>
+    <string name="merch_orders_create_lot">Создать лот</string>
+    <string name="box_type_small_bag">Маленький Сюрприз Бокс</string>
+    <string name="box_type_medium_bag">Средний Сюрприз Бокс</string>
+    <string name="box_type_large_bag">Большой Сюрприз Бокс</string>
     <string name="merch_boxes_empty_title">Боксов пока нет</string>
     <string name="merch_boxes_empty_description">Ваши боксы появятся здесь</string>
 
@@ -265,9 +275,14 @@
     <string name="add_lot_description">Информация для клиента (необязательно)</string>
     <string name="add_lot_description_placeholder">Введите информацию о лоте</string>
     <string name="add_lot_box_count">Количество коробок</string>
+    <string name="add_lot_box_title">Название</string>
+    <string name="add_lot_box_title_placeholder">Введите название</string>
     <string name="add_lot_success">Лот успешно добавлен</string>
     <string name="add_lot_error_select">Пожалуйста, выберите %1$s</string>
     <string name="add_lot_error_enter">Пожалуйста, введите %1$s</string>
+    <string name="add_lot_error_title">Пожалуйста, введите название</string>
+    <string name="add_lot_error_validation">Пожалуйста, заполните все обязательные поля</string>
+    <string name="add_lot_error_submit">Не удалось добавить лот. Попробуйте снова</string>
 
     <!-- Income History Screen -->
     <string name="history_title">История</string>

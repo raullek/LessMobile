@@ -1,7 +1,6 @@
 package az.less.mobile.presentation.merchant.add.addlot
 
 import az.less.mobile.presentation.merchant.add.addlot.model.AddLotResponseModel
-import org.jetbrains.compose.resources.StringResource
 
 /**
  * State of the Add Lot Screen
@@ -9,6 +8,7 @@ import org.jetbrains.compose.resources.StringResource
  */
 data class AddLotState(
     val isLoading: Boolean = false,
+    val isSubmitting: Boolean = false,
     val error: String? = null,
     val responseModel: AddLotResponseModel? = null,
 
@@ -23,12 +23,8 @@ data class AddLotState(
     // Local fields (not from backend)
     val boxCount: Int = 1,
 
-    // Custom time picker state
-    val customTimeStart: String? = null,
-    val customTimeEnd: String? = null,
-    val showCustomTimePicker: Boolean = false,
-    val timePickerType: TimePickerType? = null,
-    val activeTimeSection: String? = null
+    // Validation errors - set of section/field IDs that failed validation
+    val validationErrors: Set<String> = emptySet()
 ) {
     val isEmpty: Boolean get() = responseModel == null && !isLoading && error == null
     val hasError: Boolean get() = error != null
@@ -37,11 +33,7 @@ data class AddLotState(
     fun getSingleSelection(sectionId: String): String? = singleSelections[sectionId]
     fun getMultiSelection(sectionId: String): Set<String> = multiSelections[sectionId] ?: emptySet()
     fun getInputValue(fieldId: String): String = inputValues[fieldId] ?: ""
-}
-
-enum class TimePickerType {
-    START_TIME,
-    END_TIME
+    fun hasValidationError(sectionId: String): Boolean = validationErrors.contains(sectionId)
 }
 
 /**
@@ -49,9 +41,10 @@ enum class TimePickerType {
  */
 sealed interface AddLotSideEffect {
     data object NavigateBack : AddLotSideEffect
-    data object NavigateToNext : AddLotSideEffect
-    data class ShowError(val messageRes: StringResource, val args: List<StringResource> = emptyList()) : AddLotSideEffect
-    data class ShowSuccess(val messageRes: StringResource) : AddLotSideEffect
+    data object NavigateToPlacedLots : AddLotSideEffect
+    data object ShowValidationError : AddLotSideEffect
+    data object ShowSubmitError : AddLotSideEffect
+    data class ShowSuccess(val message: String, val warning: String?) : AddLotSideEffect
 }
 
 /**
@@ -73,11 +66,6 @@ sealed interface AddLotIntent {
     // Box count (local, not from backend)
     data object OnBoxCountIncrement : AddLotIntent
     data object OnBoxCountDecrement : AddLotIntent
-
-    // Custom time picker
-    data class OnCustomTimeClick(val sectionId: String) : AddLotIntent
-    data class OnTimeSelected(val time: String, val type: TimePickerType) : AddLotIntent
-    data object OnDismissTimePicker : AddLotIntent
 
     // Submit
     data object OnAddLotClick : AddLotIntent

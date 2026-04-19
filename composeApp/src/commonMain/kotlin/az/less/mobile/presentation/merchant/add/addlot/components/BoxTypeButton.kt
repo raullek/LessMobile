@@ -20,26 +20,23 @@ fun BoxTypeButton(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasError: Boolean = false
 ) {
     val backgroundColor = if (isSelected) {
-        LessTheme.colors.elementsSecondaryBrand
+        LessTheme.colors.elementsPrimaryBrand
     } else {
         LessTheme.colors.backgroundSecond
     }
 
     val textColor = if (isSelected) {
-        LessTheme.colors.elementsPrimaryBrand
+        LessTheme.colors.textIconsNested
     } else {
         LessTheme.colors.textIconsBlack
     }
 
-    val borderModifier = if (isSelected) {
-        Modifier.border(
-            width = 2.dp,
-            color = LessTheme.colors.elementsPrimaryBrand,
-            shape = RoundedCornerShape(LessTheme.radius.medium)
-        )
+    val errorModifier = if (hasError && !isSelected) {
+        Modifier.border(1.dp, LessTheme.colors.textIconsError, RoundedCornerShape(LessTheme.radius.medium))
     } else {
         Modifier
     }
@@ -48,7 +45,7 @@ fun BoxTypeButton(
         modifier = modifier
             .height(LessTheme.size.xxLarge)
             .clip(RoundedCornerShape(LessTheme.radius.medium))
-            .then(borderModifier)
+            .then(errorModifier)
             .background(color = backgroundColor)
             .clickable { onClick() }
             .padding(horizontal = LessTheme.spacing.medium, vertical = LessTheme.spacing.small),

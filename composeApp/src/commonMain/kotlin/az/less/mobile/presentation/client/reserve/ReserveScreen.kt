@@ -1,5 +1,6 @@
 package az.less.mobile.presentation.client.reserve
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import az.less.mobile.presentation.client.reserve.components.PaymentMethodShimme
 import az.less.mobile.presentation.client.reserve.components.ReserveScreenShimmer
 import az.less.mobile.presentation.client.reserve.components.SelectPaymentMethodBottomSheet
 import az.less.mobile.presentation.client.reserve.components.SelectVoucherBottomSheet
+import az.less.mobile.presentation.client.reserve.models.CardType
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
@@ -58,7 +60,11 @@ import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import lessmobile.composeapp.generated.resources.ic_gift_24dp
 import lessmobile.composeapp.generated.resources.ic_info_24dp
 import lessmobile.composeapp.generated.resources.ic_minus_24dp
+import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
 import lessmobile.composeapp.generated.resources.ic_plus_24dp
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
+import lessmobile.composeapp.generated.resources.test_master_card_logo
+import lessmobile.composeapp.generated.resources.test_visa_card_logo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -394,7 +400,9 @@ private fun ReserveScreenContent(
                     model = state.venueLogoUrl,
                     contentDescription = state.venueName,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(Res.drawable.ill_venue_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_venue_placeholder)
                 )
             }
 
@@ -506,13 +514,35 @@ private fun ReserveScreenContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Payment icon placeholder
+                        // Payment icon
                         Box(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(RoundedCornerShape(LessTheme.radius.small))
-                                .background(LessTheme.colors.elementsSecondaryElement)
-                        )
+                                .background(LessTheme.colors.elementsSecondaryElement),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            when (state.selectedPaymentCard?.type) {
+                                CardType.VISA -> Image(
+                                    painter = painterResource(Res.drawable.test_visa_card_logo),
+                                    contentDescription = "Visa",
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                CardType.MASTERCARD -> Image(
+                                    painter = painterResource(Res.drawable.test_master_card_logo),
+                                    contentDescription = "Mastercard",
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                else -> Icon(
+                                    imageVector = vectorResource(Res.drawable.ic_payment_card_24dp),
+                                    contentDescription = null,
+                                    tint = LessTheme.colors.textIconsGrey,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
 
                         Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
 
@@ -542,7 +572,9 @@ private fun ReserveScreenContent(
             modifier = Modifier
                 .fillMaxWidth(),
             variant = ButtonVariant.Primary,
-            size = ButtonSize.Large
+            size = ButtonSize.Large,
+            enabled = !state.isLoading,
+            isLoading = state.isLoading
         )
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))

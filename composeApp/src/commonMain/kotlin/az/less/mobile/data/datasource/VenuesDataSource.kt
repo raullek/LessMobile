@@ -2,6 +2,8 @@ package az.less.mobile.data.datasource
 
 import az.less.mobile.data.remote.model.AddVenueMerchantRequest
 import az.less.mobile.data.remote.model.AdminVenueDto
+import az.less.mobile.data.remote.model.CreateBoxRequest
+import az.less.mobile.data.remote.model.CreateBoxResponseDto
 import az.less.mobile.data.remote.model.VenueMerchantDto
 import az.less.mobile.data.remote.model.VenuesDataDto
 import az.less.mobile.network.NetworkResult
@@ -136,6 +138,14 @@ class VenuesDataSource(
                         venueId = venueId
                     )
                 )
+            }
+        }
+    }
+
+    suspend fun createBox(request: CreateBoxRequest): NetworkResult<CreateBoxResponseDto> {
+        return safeApiCall {
+            httpClient.post("v1/boxes") {
+                setBody(request)
             }
         }
     }

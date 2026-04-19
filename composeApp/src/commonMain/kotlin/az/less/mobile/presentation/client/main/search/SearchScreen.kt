@@ -120,14 +120,13 @@ fun SearchScreen(
                     items = state.categories,
                     key = { category -> category.id }
                 ) { category ->
-                    if (category.testImage != null) {
-                        CategoryCard(
-                            title = category.title,
-                            onClick = {
-                                viewModel.onIntent(SearchIntent.OnCategorySelected(category.id))
-                            },
-                        )
-                    }
+                    CategoryCard(
+                        title = category.title,
+                        imageUrl = category.imageUrl,
+                        onClick = {
+                            viewModel.onIntent(SearchIntent.OnCategorySelected(category.id))
+                        },
+                    )
                 }
             }
         }

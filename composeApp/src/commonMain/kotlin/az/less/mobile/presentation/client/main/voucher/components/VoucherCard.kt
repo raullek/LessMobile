@@ -17,22 +17,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.voucher.models.Voucher
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.voucher_discount
+import lessmobile.composeapp.generated.resources.voucher_expiry_date
+import lessmobile.composeapp.generated.resources.voucher_code_label
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Custom shape for voucher card with serrated/zigzag edges on top and bottom
@@ -52,10 +54,8 @@ class VoucherTicketShape(
         val cornerRadiusPx = with(density) { cornerRadius.toPx() }
 
         val path = Path().apply {
-            // Start from top-left corner (after corner radius)
             moveTo(cornerRadiusPx, 0f)
 
-            // Top serrated edge
             var x = cornerRadiusPx
             var goingDown = true
             while (x < size.width - cornerRadiusPx) {
@@ -66,37 +66,24 @@ class VoucherTicketShape(
                 goingDown = !goingDown
             }
 
-            // Top-right corner
             lineTo(size.width - cornerRadiusPx, 0f)
             arcTo(
                 rect = Rect(
-                    size.width - cornerRadiusPx * 2,
-                    0f,
-                    size.width,
-                    cornerRadiusPx * 2
+                    size.width - cornerRadiusPx * 2, 0f,
+                    size.width, cornerRadiusPx * 2
                 ),
-                startAngleDegrees = 270f,
-                sweepAngleDegrees = 90f,
-                forceMoveTo = false
+                startAngleDegrees = 270f, sweepAngleDegrees = 90f, forceMoveTo = false
             )
 
-            // Right edge
             lineTo(size.width, size.height - cornerRadiusPx)
-
-            // Bottom-right corner
             arcTo(
                 rect = Rect(
-                    size.width - cornerRadiusPx * 2,
-                    size.height - cornerRadiusPx * 2,
-                    size.width,
-                    size.height
+                    size.width - cornerRadiusPx * 2, size.height - cornerRadiusPx * 2,
+                    size.width, size.height
                 ),
-                startAngleDegrees = 0f,
-                sweepAngleDegrees = 90f,
-                forceMoveTo = false
+                startAngleDegrees = 0f, sweepAngleDegrees = 90f, forceMoveTo = false
             )
 
-            // Bottom serrated edge (right to left)
             x = size.width - cornerRadiusPx
             goingDown = true
             while (x > cornerRadiusPx) {
@@ -107,34 +94,19 @@ class VoucherTicketShape(
                 goingDown = !goingDown
             }
 
-            // Bottom-left corner
             lineTo(cornerRadiusPx, size.height)
             arcTo(
                 rect = Rect(
-                    0f,
-                    size.height - cornerRadiusPx * 2,
-                    cornerRadiusPx * 2,
-                    size.height
+                    0f, size.height - cornerRadiusPx * 2,
+                    cornerRadiusPx * 2, size.height
                 ),
-                startAngleDegrees = 90f,
-                sweepAngleDegrees = 90f,
-                forceMoveTo = false
+                startAngleDegrees = 90f, sweepAngleDegrees = 90f, forceMoveTo = false
             )
 
-            // Left edge
             lineTo(0f, cornerRadiusPx)
-
-            // Top-left corner
             arcTo(
-                rect = Rect(
-                    0f,
-                    0f,
-                    cornerRadiusPx * 2,
-                    cornerRadiusPx * 2
-                ),
-                startAngleDegrees = 180f,
-                sweepAngleDegrees = 90f,
-                forceMoveTo = false
+                rect = Rect(0f, 0f, cornerRadiusPx * 2, cornerRadiusPx * 2),
+                startAngleDegrees = 180f, sweepAngleDegrees = 90f, forceMoveTo = false
             )
 
             close()
@@ -144,11 +116,6 @@ class VoucherTicketShape(
     }
 }
 
-/**
- * Voucher card component matching Figma design
- * Displays voucher info with title, amount, expiry date, and loyalty code
- * Features serrated/zigzag edges on top and bottom like a ticket
- */
 @Composable
 fun VoucherCard(
     voucher: Voucher,
@@ -176,34 +143,33 @@ fun VoucherCard(
                 color = LessTheme.colors.textIconsBlack
             )
 
+            if (voucher.description.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
+                Text(
+                    text = voucher.description,
+                    style = LessTheme.typography.body14Medium,
+                    color = LessTheme.colors.textIconsGrey
+                )
+            }
+
             Spacer(modifier = Modifier.height(LessTheme.spacing.small))
 
-            // Voucher amount row
+            // Discount row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Vaucher amount:",
+                    text = stringResource(Res.string.voucher_discount),
                     style = LessTheme.typography.body14Medium,
                     color = LessTheme.colors.textIconsGrey
                 )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = voucher.amount,
-                        style = LessTheme.typography.body14Semibold,
-                        color = LessTheme.colors.textIconsBlack
-                    )
-                    Text(
-                        text = "₼",
-                        style = LessTheme.typography.body14Semibold,
-                        color = LessTheme.colors.textIconsBlack
-                    )
-                }
+                Text(
+                    text = voucher.formattedValue,
+                    style = LessTheme.typography.body14Semibold,
+                    color = LessTheme.colors.textIconsBlack
+                )
             }
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
@@ -215,12 +181,12 @@ fun VoucherCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Expare day:",
+                    text = stringResource(Res.string.voucher_expiry_date),
                     style = LessTheme.typography.body14Medium,
                     color = LessTheme.colors.textIconsGrey
                 )
                 Text(
-                    text = voucher.expiryDate,
+                    text = voucher.expiresAt.take(10),
                     style = LessTheme.typography.body14Semibold,
                     color = LessTheme.colors.textIconsBlack
                 )
@@ -247,7 +213,7 @@ fun VoucherCard(
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
-            // Loyalty Code section
+            // Voucher Code section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -261,13 +227,13 @@ fun VoucherCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Loyalty Code",
+                    text = stringResource(Res.string.voucher_code_label),
                     style = LessTheme.typography.caption12Medium,
                     color = LessTheme.colors.textIconsGrey
                 )
                 Spacer(modifier = Modifier.height(LessTheme.spacing.xxSmall))
                 Text(
-                    text = voucher.loyaltyCode,
+                    text = voucher.code,
                     style = LessTheme.typography.body16Semibold,
                     color = LessTheme.colors.textIconsBlack
                 )

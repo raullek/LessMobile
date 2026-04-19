@@ -18,8 +18,8 @@ data class OffersScreenDto(
 @Serializable
 data class CategoryDto(
     val id: String,
-    val type: String,
-    val title: String,
+    val type: String? = null,
+    val title: String? = null,
     val titles: String? = null,
     val imageUrl: String? = null,
     val filters: List<CategoryFilterDto> = emptyList(),
@@ -35,10 +35,10 @@ data class CategoryFilterDto(
 @Serializable
 data class SpecialCategoryDto(
     val id: String,
-    val type: String,
-    val title: String,
+    val type: String? = null,
+    val title: String? = null,
     val titles: String? = null,
-    val description: String,
+    val description: String? = null,
     val descriptions: String? = null,
     val imageUrl: String? = null,
     val filters: List<CategoryFilterDto> = emptyList(),
@@ -48,7 +48,7 @@ data class SpecialCategoryDto(
 @Serializable
 data class SpecialSegmentDto(
     val id: String,
-    val title: String,
+    val title: String? = null,
     val titles: String? = null,
     val order: Int = 0,
     val filters: List<CategoryFilterDto> = emptyList(),
@@ -59,8 +59,8 @@ data class SpecialSegmentDto(
 @Serializable
 data class HomepageButtonDto(
     val id: String,
-    val type: String,
-    val title: String,
+    val type: String? = null,
+    val title: String? = null,
     val titles: String? = null,
     val searchUrl: String? = null
 )
@@ -68,33 +68,35 @@ data class HomepageButtonDto(
 @Serializable
 data class OfferDto(
     val id: String,
-    val title: String,
+    val title: String? = null,
     val description: String? = null,
+    val defaultBoxTitle: String? = null,
+    val defaultBoxDescription: String? = null,
     val imageUrl: String? = null,
     val imageBgColor: String? = null,
-    val quantity: Int,
-    val originalPrice: Double,
-    val currentPrice: Double,
+    val quantity: Int = 0,
+    val originalPrice: Double = 0.0,
+    val currentPrice: Double = 0.0,
     val bagType: String? = null,
-    val category: String,
-    val pickupTime: String,
+    val category: String? = null,
+    val pickupTime: String? = null,
     @SerialName("venue")
-    val venue: VenueDto
+    val venue: VenueDto? = null
 )
 
 @Serializable
 data class VenueDto(
     val id: String,
-    val name: String,
+    val name: String? = null,
     val logoUrl: String? = null,
-    val location: LocationDto,
-    val rating: Double,
+    val location: LocationDto? = null,
+    val rating: Double = 0.0,
     val distanceText: String? = null,
     val distanceKm: Double? = null
 )
 
 @Serializable
 data class LocationDto(
-    val type: String,
-    val coordinates: List<Double>
+    val type: String? = null,
+    val coordinates: List<Double> = emptyList()
 )

@@ -143,6 +143,11 @@
 
     <!-- Voucher Screen -->
     <string name="voucher_title">Voucher</string>
+    <string name="voucher_discount">Discount</string>
+    <string name="voucher_expiry_date">Expiry date</string>
+    <string name="voucher_code_label">Voucher Code</string>
+    <string name="voucher_empty_title">You don\'t have vouchers</string>
+    <string name="voucher_empty_description">To earn voucher refer our app to your friends, you will get 2 ₼ for each friend after his first transaction</string>
 
     <!-- Search Screen -->
     <string name="search_items_on_sale">%1$d items on sale</string>
@@ -241,15 +246,20 @@
     <string name="more_switch_to_client">Switch to Client</string>
 
     <!-- Merchant Orders Screen -->
-    <string name="merch_orders_awaiting_pickup">Awaiting Pickup</string>
-    <string name="merch_orders_awaiting_purchase">Awaiting Purchase</string>
+    <string name="merch_orders_bought">Purchased</string>
+    <string name="merch_orders_placed_lots">Placed Lots</string>
     <string name="merch_orders_lot_added">Lot successfully added</string>
     <string name="merch_orders_lot_remove_info">You can remove lot only in 1 hour</string>
     <string name="merch_orders_items_left">%1$d left</string>
     <string name="merch_orders_pickup_time">Pick up from %1$s to %2$s</string>
     <string name="merch_orders_handed_over">Handed Over</string>
+    <string name="merch_orders_delivered">Order delivered successfully</string>
     <string name="merch_orders_cancel_lot">Cancel Lot</string>
-    <string name="merch_orders_cancellation_ended">Cancellation Time Ended</string>
+    <string name="merch_orders_cancellation_ended">Cancellation time ended, lot closes at %1$s</string>
+    <string name="merch_orders_create_lot">Create Lot</string>
+    <string name="box_type_small_bag">Small Surprise Bag</string>
+    <string name="box_type_medium_bag">Medium Surprise Bag</string>
+    <string name="box_type_large_bag">Large Surprise Bag</string>
     <string name="merch_boxes_empty_title">No boxes yet</string>
     <string name="merch_boxes_empty_description">Your boxes will appear here</string>
 
@@ -268,9 +278,14 @@
     <string name="add_lot_description">Some info for customer (optional)</string>
     <string name="add_lot_description_placeholder">Input lot information</string>
     <string name="add_lot_box_count">Box Count</string>
+    <string name="add_lot_box_title">Title</string>
+    <string name="add_lot_box_title_placeholder">Enter box title</string>
     <string name="add_lot_success">Lot added successfully</string>
     <string name="add_lot_error_select">Please select %1$s</string>
     <string name="add_lot_error_enter">Please enter %1$s</string>
+    <string name="add_lot_error_title">Please enter a title</string>
+    <string name="add_lot_error_validation">Please fill in all required fields</string>
+    <string name="add_lot_error_submit">Failed to add lot. Please try again</string>
 
     <!-- Income History Screen -->
     <string name="history_title">History</string>

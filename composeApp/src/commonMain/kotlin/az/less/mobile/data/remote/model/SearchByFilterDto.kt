@@ -41,13 +41,32 @@ data class FilterBoxDto(
     val imageBgColor: String? = null,
     val originalPrice: Double = 0.0,
     val discountedPrice: Double = 0.0,
+    val discountPercentage: Double = 0.0,
     val currentPrice: Double? = null,
     val quantity: Int = 0,
+    val soldCount: Int = 0,
     val availableItems: Int = 0,
     val bagType: String? = null,
-    val category: String? = null,
+    val boxType: String? = null,
+    val categoryId: String? = null,
+    val category: FilterBoxCategoryDto? = null,
+    val tagIds: List<String> = emptyList(),
+    val tags: List<String> = emptyList(),
+    val isOpenNow: Boolean = false,
     val pickupTime: String? = null,
+    val pickupTimeStart: String? = null,
+    val pickupTimeEnd: String? = null,
+    val pickupTimeFormatted: String? = null,
     val venue: SearchBoxVenueDto? = null
+)
+
+@Serializable
+data class FilterBoxCategoryDto(
+    val id: String = "",
+    val value: String = "",
+    val title: String = "",
+    val imageUrl: String? = null,
+    val sortOrder: Int = 0
 )
 
 @Serializable

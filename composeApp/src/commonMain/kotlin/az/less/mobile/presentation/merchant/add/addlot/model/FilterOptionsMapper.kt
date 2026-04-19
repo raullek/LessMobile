@@ -77,7 +77,7 @@ private fun FilterOptionsDto.mapCategoriesSection(): IconGridSection? {
         id = SECTION_CATEGORIES,
         titleRes = Res.string.add_lot_choose_category,
         required = true,
-        multiSelect = section.selection == SelectionType.MULTI,
+        multiSelect = false, // POST /api/v1/boxes expects single categoryId
         options = options
     )
 }
@@ -128,8 +128,7 @@ private fun FilterOptionsDto.mapPickupRangesSection(): TimeRangeSelectorSection?
         titleRes = Res.string.add_lot_choose_time_range,
         required = true,
         multiSelect = section.selection == SelectionType.MULTI,
-        predefinedRanges = ranges,
-        allowCustom = true
+        predefinedRanges = ranges
     )
 }
 

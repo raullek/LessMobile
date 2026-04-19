@@ -22,12 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.mobile.presentation.client.reserve.models.ReserveInfo
+import az.less.mobile.utils.formatPrice
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.reserve_info_reserve_number
 import lessmobile.composeapp.generated.resources.reserve_info_date
@@ -102,42 +102,40 @@ private fun ReserveInfoBottomSheetContent(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = LessTheme.spacing.xxxLarge), // Home indicator space
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-
-        // Header section
+        // Header section - pb=20 from design
         HeaderSection(
             venueName = reserveInfo.venueName,
             pickupTime = reserveInfo.pickupTime
         )
 
-        Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-
+        // Divider + 28dp gap
         Divider()
 
-        Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
+        Spacer(modifier = Modifier.height(28.dp))
 
         // Reserve number section
         ReserveNumberSection(reserveNumber = reserveInfo.reserveNumber)
 
-        Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+        Spacer(modifier = Modifier.height(28.dp))
 
+        // Divider + 28dp gap
         Divider()
 
-        Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
+        Spacer(modifier = Modifier.height(28.dp))
 
-        // Details section
+        // Details section + 24dp gap to button
         DetailsSection(reserveInfo = reserveInfo)
 
-        Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
+        Spacer(modifier = Modifier.height(LessTheme.spacing.large))
 
-        // Action button
+        // Action button - px=16, pb=16
         ActionButton(onClick = onShowLocationClicked)
 
-        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
+        // Home indicator space - 34dp
+        Spacer(modifier = Modifier.height(34.dp))
     }
 }
 
@@ -153,8 +151,9 @@ private fun HeaderSection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = LessTheme.spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall)
+            .padding(horizontal = LessTheme.spacing.medium)
+            .padding(top = LessTheme.spacing.xSmall, bottom = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
             text = venueName,
@@ -182,20 +181,20 @@ private fun ReserveNumberSection(
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.large)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Reserve number badge
+        // Reserve number badge - h=56, px=20, py=12, rounded=12
         Box(
             modifier = Modifier
+                .height(56.dp)
                 .clip(RoundedCornerShape(LessTheme.radius.small))
                 .background(LessTheme.colors.textIconsBrand)
-                .padding(horizontal = LessTheme.spacing.large, vertical = LessTheme.spacing.small)
+                .padding(horizontal = 20.dp, vertical = LessTheme.spacing.small),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = reserveNumber,
-                style = LessTheme.typography.display36Semibold.copy(
-                    fontSize = 28.sp
-                ),
+                style = LessTheme.typography.title28Medium,
                 color = LessTheme.colors.textIconsNested,
                 textAlign = TextAlign.Center
             )
@@ -233,17 +232,17 @@ private fun DetailsSection(
 
         DetailRow(
             label = stringResource(Res.string.reserve_price_per_piece),
-            value = "${reserveInfo.pricePerPiece} ₼"
+            value = "${reserveInfo.pricePerPiece.formatPrice()} ₼"
         )
 
         DetailRow(
             label = stringResource(Res.string.reserve_service_fee),
-            value = "${reserveInfo.serviceFee} ₼"
+            value = "${reserveInfo.serviceFee.formatPrice()} ₼"
         )
 
         DetailRow(
             label = stringResource(Res.string.reserve_subtotal),
-            value = "${reserveInfo.subtotal} ₼"
+            value = "${reserveInfo.subtotal.formatPrice()} ₼"
         )
     }
 }
@@ -301,7 +300,7 @@ private fun DetailRow(
         )
         Text(
             text = value,
-            style = LessTheme.typography.body16Medium,
+            style = LessTheme.typography.body16Bold,
             color = LessTheme.colors.textIconsBlack
         )
     }

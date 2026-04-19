@@ -1,5 +1,6 @@
 package az.less.mobile.presentation.client.reserve.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
@@ -41,6 +43,9 @@ import lessmobile.composeapp.generated.resources.payment_add_new_card
 import lessmobile.composeapp.generated.resources.payment_continue
 import lessmobile.composeapp.generated.resources.payment_credit_debit_cards
 import lessmobile.composeapp.generated.resources.payment_selected
+import lessmobile.composeapp.generated.resources.test_master_card_logo
+import lessmobile.composeapp.generated.resources.test_visa_card_logo
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -188,12 +193,26 @@ private fun PaymentCardItem(
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = vectorResource(Res.drawable.ic_payment_card_24dp),
-                contentDescription = null,
-                tint = LessTheme.colors.textIconsGrey,
-                modifier = Modifier.size(24.dp)
-            )
+            when (card.type) {
+                CardType.VISA -> Image(
+                    painter = painterResource(Res.drawable.test_visa_card_logo),
+                    contentDescription = "Visa",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(24.dp)
+                )
+                CardType.MASTERCARD -> Image(
+                    painter = painterResource(Res.drawable.test_master_card_logo),
+                    contentDescription = "Mastercard",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(24.dp)
+                )
+                CardType.ADD_NEW -> Icon(
+                    imageVector = vectorResource(Res.drawable.ic_payment_card_24dp),
+                    contentDescription = null,
+                    tint = LessTheme.colors.textIconsGrey,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(12.dp))

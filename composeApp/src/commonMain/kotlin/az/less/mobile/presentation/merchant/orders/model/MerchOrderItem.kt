@@ -8,6 +8,7 @@ data class BoughtBoxItem(
     val orderId: String,
     val reserveNumber: String,
     val boxTitle: String,
+    val boxType: String? = null,
     val imageUrl: String? = null,
     val originalPrice: Double,
     val discountedPrice: Double,
@@ -26,6 +27,7 @@ data class BoughtBoxItem(
 data class CreatedBoxItem(
     val id: String,
     val title: String,
+    val boxType: String? = null,
     val description: String? = null,
     val imageUrl: String? = null,
     val originalPrice: Double,

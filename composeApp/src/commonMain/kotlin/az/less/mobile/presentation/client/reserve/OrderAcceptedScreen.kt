@@ -31,6 +31,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
+import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.order_accepted_title
@@ -53,14 +54,17 @@ fun OrderAcceptedScreen(
     OrderAcceptedScreenContent(
         orderInfo = orderInfo,
         onGoToOrdersClicked = {
-            navController.navigate("orders",navOptions {
-            popUpTo("offers"){inclusive =true}
-            launchSingleTop = true
-        })},
-
-        onGoToHomeClicked = { navController.navigate("offers",navOptions {
-            popUpTo("offers"){inclusive =true}
-            launchSingleTop = true })  }
+            navController.navigate(ClientRoute.Orders, navOptions {
+                popUpTo<ClientRoute.Offers> { inclusive = true }
+                launchSingleTop = true
+            })
+        },
+        onGoToHomeClicked = {
+            navController.navigate(ClientRoute.Offers, navOptions {
+                popUpTo<ClientRoute.Offers> { inclusive = true }
+                launchSingleTop = true
+            })
+        }
     )
 }
 

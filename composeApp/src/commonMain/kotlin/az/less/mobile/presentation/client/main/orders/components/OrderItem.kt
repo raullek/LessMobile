@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -125,7 +126,7 @@ fun OrderItem(
                         withStyle(style = SpanStyle(color = LessTheme.colors.textIconsGrey)) {
                             append(stringResource(Res.string.orders_reserve_number))
                         }
-                        withStyle(style = SpanStyle(color = LessTheme.colors.textIconsBlack)) {
+                        withStyle(style = SpanStyle(color = LessTheme.colors.textIconsBlack, fontWeight = FontWeight.Bold)) {
                             append(item.reserveNumber)
                         }
                     },
@@ -160,7 +161,7 @@ fun OrderItem(
                 verticalAlignment = Alignment.Top,
             ) {
                 Text(
-                    text = item.price,
+                    text = item.subtotal,
                     style = LessTheme.typography.body16Semibold,
                     color = LessTheme.colors.textIconsBrand
                 )

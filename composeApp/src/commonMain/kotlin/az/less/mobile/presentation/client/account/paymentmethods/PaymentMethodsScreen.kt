@@ -22,7 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,10 +34,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.DsIcons
 import az.less.designsystem.base.LessTheme
+import az.less.designsystem.components.AnimatedToast
 import az.less.designsystem.components.DsConfirmationBottomSheet
 import az.less.designsystem.components.DsSectionHeader
 import az.less.designsystem.components.DsToolBar
+import az.less.designsystem.components.ToastType
 import az.less.mobile.navigation.ClientRoute
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
@@ -54,6 +61,11 @@ fun PaymentMethodsScreen(
 ) {
     val state by viewModel.collectAsState()
     val addCardTitle = stringResource(Res.string.add_card_title)
+
+    var toastVisible by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
+    var toastType by remember { mutableStateOf(ToastType.Success) }
+    val coroutineScope = rememberCoroutineScope()
 
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     LaunchedEffect(savedStateHandle) {
@@ -78,16 +90,31 @@ fun PaymentMethodsScreen(
                     )
                 )
             }
-            is PaymentMethodsSideEffect.ShowError -> {
-                // TODO: Show error message
+            is PaymentMethodsSideEffect.ShowToast -> {
+                toastMessage = sideEffect.message
+                toastType = sideEffect.type
+                toastVisible = true
+                coroutineScope.launch {
+                    delay(3000)
+                    toastVisible = false
+                }
             }
         }
     }
 
-    PaymentMethodsScreenContent(
-        state = state,
-        onIntent = viewModel::onIntent
-    )
+    Box {
+        PaymentMethodsScreenContent(
+            state = state,
+            onIntent = viewModel::onIntent
+        )
+
+        AnimatedToast(
+            visible = toastVisible,
+            title = toastMessage,
+            type = toastType,
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp)
+        )
+    }
     
     // Show delete confirmation bottom sheet
     state.cardToDelete?.let { cardToDelete ->
@@ -179,7 +206,8 @@ fun PaymentMethodsScreenContent(
                     },
                     onDeleteClick = null,
                     isLoading = state.isRegisterCardLoading,
-                    modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
+                    modifier = Modifier.padding(horizontal = LessTheme.spacing.medium),
+                    showDivider = false
                 )
             }
 
@@ -196,7 +224,8 @@ private fun PaymentMethodItem(
     onItemClick: () -> Unit,
     onDeleteClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    showDivider: Boolean = true
 ) {
     val displayName = when (paymentMethod.type) {
         PaymentMethodType.MASTERCARD -> "Mastercard${paymentMethod.lastFourDigits?.let { " .... $it" } ?: ""}"
@@ -332,13 +361,15 @@ private fun PaymentMethodItem(
         }
 
         // Bottom divider
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .padding(start = LessTheme.spacing.xxLarge)
-                .background(LessTheme.colors.borderPrimary)
-        )
+        if (showDivider) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(start = LessTheme.spacing.xxLarge)
+                    .background(LessTheme.colors.borderPrimary)
+            )
+        }
     }
 }
 

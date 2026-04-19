@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import az.less.mobile.domain.model.SearchVenue
 import az.less.mobile.domain.repository.ExploreRepository
+import az.less.mobile.presentation.client.main.search.models.SearchCategory
 import dev.jordond.compass.geolocation.Geolocator
 import dev.jordond.compass.geolocation.mobile
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,6 +70,23 @@ class SearchViewModel(
     }
 
     private fun loadInitialData() = intent {
+        reduce { state.copy(isLoading = true) }
+        exploreRepository.getCategories()
+            .onSuccess { response ->
+                val categories = response.data.map { item ->
+                    SearchCategory(
+                        id = item.id,
+                        type = item.value,
+                        title = item.title,
+                        imageUrl = item.imageUrl
+                    )
+                }
+                reduce { state.copy(categories = categories, isLoading = false) }
+            }
+            .onError { error ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(SearchSideEffect.ShowError(error.message))
+            }
     }
 
     private fun fetchLocation() {

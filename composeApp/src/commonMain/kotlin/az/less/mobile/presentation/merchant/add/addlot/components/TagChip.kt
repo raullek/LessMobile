@@ -1,7 +1,6 @@
 package az.less.mobile.presentation.merchant.add.addlot.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -16,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.DrawableResource
@@ -32,32 +30,27 @@ fun TagChip(
     imageUrl: String? = null
 ) {
     val backgroundColor = if (isSelected) {
-        LessTheme.colors.elementsSecondaryBrand
+        LessTheme.colors.elementsPrimaryBrand
     } else {
         LessTheme.colors.backgroundSecond
     }
 
-    val textColor = if (isSelected) {
-        LessTheme.colors.elementsPrimaryBrand
+    val contentColor = if (isSelected) {
+        LessTheme.colors.textIconsNested
     } else {
         LessTheme.colors.textIconsBlack
     }
 
-    val borderModifier = if (isSelected) {
-        Modifier.border(
-            width = 2.dp,
-            color = LessTheme.colors.elementsPrimaryBrand,
-            shape = RoundedCornerShape(LessTheme.radius.medium)
-        )
+    val iconTint = if (isSelected) {
+        LessTheme.colors.textIconsNested
     } else {
-        Modifier
+        Color.Unspecified
     }
 
     Row(
         modifier = modifier
             .height(LessTheme.size.xxLarge)
             .clip(RoundedCornerShape(LessTheme.radius.medium))
-            .then(borderModifier)
             .background(color = backgroundColor)
             .clickable { onToggle() }
             .padding(LessTheme.spacing.small),
@@ -76,7 +69,7 @@ fun TagChip(
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = label,
-                    tint = Color.Unspecified,
+                    tint = iconTint,
                     modifier = Modifier.size(LessTheme.size.medium)
                 )
             }
@@ -84,7 +77,7 @@ fun TagChip(
         Text(
             text = label,
             style = LessTheme.typography.body14Semibold,
-            color = textColor
+            color = contentColor
         )
     }
 }

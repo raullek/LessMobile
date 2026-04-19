@@ -26,20 +26,23 @@ fun CategoryGridItem(
     option: IconGridOption,
     isSelected: Boolean,
     onSelected: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasError: Boolean = false
 ) {
     val backgroundColor = if (isSelected) {
-        LessTheme.colors.elementsSecondaryBrand
+        LessTheme.colors.elementsPrimaryBrand
     } else {
         LessTheme.colors.elementsPrimaryElement
     }
 
-    val borderModifier = if (isSelected) {
-        Modifier.border(
-            width = 2.dp,
-            color = LessTheme.colors.elementsPrimaryBrand,
-            shape = RoundedCornerShape(LessTheme.radius.small)
-        )
+    val textColor = if (isSelected) {
+        LessTheme.colors.textIconsNested
+    } else {
+        LessTheme.colors.textIconsBlack
+    }
+
+    val errorModifier = if (hasError && !isSelected) {
+        Modifier.border(1.dp, LessTheme.colors.textIconsError, RoundedCornerShape(LessTheme.radius.small))
     } else {
         Modifier
     }
@@ -47,7 +50,7 @@ fun CategoryGridItem(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(LessTheme.radius.small))
-            .then(borderModifier)
+            .then(errorModifier)
             .background(color = backgroundColor)
             .clickable { onSelected() }
             .padding(top = LessTheme.spacing.xxSmall, bottom = LessTheme.spacing.small),
@@ -86,7 +89,7 @@ fun CategoryGridItem(
         Text(
             text = option.label,
             style = LessTheme.typography.body14Semibold,
-            color = LessTheme.colors.textIconsBlack
+            color = textColor
         )
     }
 }

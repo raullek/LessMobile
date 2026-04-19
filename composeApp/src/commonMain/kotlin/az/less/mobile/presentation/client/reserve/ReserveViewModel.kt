@@ -2,18 +2,16 @@ package az.less.mobile.presentation.client.reserve
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.data.remote.model.DefaultPaymentDto
-import az.less.mobile.data.remote.model.PaymentCardDto
 import az.less.mobile.domain.repository.OffersRepository
 import az.less.mobile.presentation.client.reserve.models.CardType
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
 import az.less.mobile.presentation.client.reserve.models.PaymentCard
 import az.less.mobile.presentation.client.reserve.models.Voucher
+import az.less.mobile.presentation.client.reserve.models.toPaymentCard
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 import az.less.mobile.utils.roundPrice
-import kotlin.random.Random
 
 /**
  * ViewModel for Reserve Screen using Orbit MVI
@@ -127,34 +125,18 @@ class ReserveViewModel(
 
         offersRepository.getDefaultPayment()
             .onSuccess { payment ->
-                val card = payment.toPaymentCard()
+                val card = payment.toPaymentCard(isSelected = true)
                 reduce {
                     state.copy(
                         isPaymentLoading = false,
                         selectedPaymentCard = card,
-                        paymentMethodDisplay = payment.displayName ?: ""
+                        paymentMethodDisplay = payment.displayName
                     )
                 }
             }
             .onError {
                 reduce { state.copy(isPaymentLoading = false) }
             }
-    }
-
-    private fun DefaultPaymentDto.toPaymentCard(): PaymentCard {
-        val cardType = when (brand?.lowercase()) {
-            "visa" -> CardType.VISA
-            "mastercard" -> CardType.MASTERCARD
-            else -> CardType.VISA
-        }
-        return PaymentCard(
-            id = id,
-            type = cardType,
-            lastFourDigits = last4 ?: cardMask ?: "",
-            brand = brand ?: "",
-            displayName = displayName ?: "",
-            isSelected = true
-        )
     }
 
     private fun calculateSubtotal(quantity: Int, pricePerPiece: Double): Double {
@@ -166,23 +148,33 @@ class ReserveViewModel(
     }
 
     private fun handlePlaceOrderClicked() = intent {
-        if (state.paymentMethodDisplay.isEmpty()) {
+        val paymentCard = state.selectedPaymentCard
+        if (paymentCard == null) {
             postSideEffect(ReserveSideEffect.ShowError("Please select a payment method"))
             return@intent
         }
 
-        // Generate order number (6 digits)
-        val orderNumber = Random.nextInt(100000, 999999).toString()
+        reduce { state.copy(isLoading = true) }
 
-        // Create order info
-        val orderInfo = OrderAccepted(
-            orderNumber = orderNumber,
-            venueName = state.venueName,
-            pickupTime = state.pickupTime
+        offersRepository.placeOrder(
+            boxId = state.boxId,
+            quantity = state.quantity,
+            paymentMethodId = paymentCard.id,
+            userVoucherId = state.selectedVoucher?.id
         )
-
-        // Place order and navigate to success screen
-        postSideEffect(ReserveSideEffect.OrderPlaced(orderInfo))
+            .onSuccess { data ->
+                reduce { state.copy(isLoading = false) }
+                val orderInfo = OrderAccepted(
+                    orderNumber = data.order?.reserveNumber ?: "",
+                    venueName = state.venueName,
+                    pickupTime = state.pickupTime
+                )
+                postSideEffect(ReserveSideEffect.OrderPlaced(orderInfo))
+            }
+            .onError { error ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(ReserveSideEffect.ShowError(error.message))
+            }
     }
 
     private fun handlePaymentMethodClicked() = intent {
@@ -193,7 +185,7 @@ class ReserveViewModel(
     private fun loadAllPaymentCards() = intent {
         offersRepository.getPaymentMethods()
             .onSuccess { methods ->
-                val cards = methods.cards.map { it.toPaymentCard() }
+                val cards = methods.map { it.toPaymentCard() }
                 reduce {
                     state.copy(
                         isPaymentCardsLoading = false,
@@ -204,22 +196,6 @@ class ReserveViewModel(
             .onError {
                 reduce { state.copy(isPaymentCardsLoading = false) }
             }
-    }
-
-    private fun PaymentCardDto.toPaymentCard(): PaymentCard {
-        val cardType = when (brand?.lowercase()) {
-            "visa" -> CardType.VISA
-            "mastercard" -> CardType.MASTERCARD
-            else -> CardType.VISA
-        }
-        return PaymentCard(
-            id = id,
-            type = cardType,
-            lastFourDigits = last4 ?: cardMask ?: "",
-            brand = brand ?: "",
-            displayName = displayName ?: "",
-            isSelected = isDefault
-        )
     }
 
     private fun handlePaymentSheetDismissed() = intent {
