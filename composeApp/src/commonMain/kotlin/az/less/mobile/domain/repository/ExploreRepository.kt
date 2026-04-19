@@ -1,6 +1,7 @@
 package az.less.mobile.domain.repository
 
 import androidx.paging.PagingData
+import az.less.mobile.data.remote.model.CategoriesResponseDto
 import az.less.mobile.data.remote.model.SearchFilterDto
 import az.less.mobile.domain.model.FilterBox
 import az.less.mobile.domain.model.SearchBoxesResult
@@ -39,6 +40,11 @@ interface ExploreRepository {
     ): NetworkResult<SearchBoxesResult>
 
     suspend fun getBoxesForVenue(venueId: String): NetworkResult<SearchBoxesResult>
+
+    suspend fun getCategories(
+        page: Int? = null,
+        limit: Int? = null
+    ): NetworkResult<CategoriesResponseDto>
 
     suspend fun getSearchFilters(): NetworkResult<List<SearchFilterDto>>
 

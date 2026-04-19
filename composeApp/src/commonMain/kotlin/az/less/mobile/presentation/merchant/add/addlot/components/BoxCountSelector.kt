@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.unit.sp
 import az.less.designsystem.base.LessTheme
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_minus_24dp
@@ -64,7 +63,7 @@ fun BoxCountSelector(
         // Count display
         Text(
             text = count.toString(),
-            style = LessTheme.typography.display36Medium.copy(fontSize = 48.sp),
+            style = LessTheme.typography.display48Medium,
             color = LessTheme.colors.textIconsBlack
         )
 

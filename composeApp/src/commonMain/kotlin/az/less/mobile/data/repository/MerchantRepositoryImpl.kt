@@ -36,9 +36,9 @@ class MerchantRepositoryImpl(
 }
 
 private fun MerchantProfileDto.toDomain() = MerchantProfile(
-    id = id,
-    name = name,
-    businessName = businessName ?: name,
+    id = id.orEmpty(),
+    name = name.orEmpty(),
+    businessName = businessName.orEmpty(),
     businessAddress = businessAddress ?: "",
     businessDescription = businessDescription ?: "",
     businessLogo = businessLogo,
@@ -65,8 +65,8 @@ private fun MerchantProfileDto.toDomain() = MerchantProfile(
 )
 
 private fun VenueOfferDto.toDomain() = MerchantOffer(
-    id = id,
-    title = title,
+    id = id.orEmpty(),
+    title = title.orEmpty(),
     description = description,
     images = images,
     originalPrice = originalPrice,
@@ -74,12 +74,12 @@ private fun VenueOfferDto.toDomain() = MerchantOffer(
     availableItems = availableItems,
     pickupTimeStart = pickupTimeStart,
     pickupTimeEnd = pickupTimeEnd,
-    category = category
+    category = category?.title
 )
 
 private fun VenueReviewItemDto.toDomain() = MerchantReview(
-    id = id,
-    rating = rating,
+    id = id.orEmpty(),
+    rating = rating ?: 0,
     comment = comment ?: "",
     createdAt = createdAt ?: "",
     clientName = client?.name ?: "",

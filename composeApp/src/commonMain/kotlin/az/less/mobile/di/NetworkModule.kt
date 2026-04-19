@@ -10,6 +10,7 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -44,6 +45,7 @@ val networkModule = module {
                 }
                 level = LogLevel.ALL
             }
+            install(SSE)
             install(Auth) {
                 bearer {
                     loadTokens {

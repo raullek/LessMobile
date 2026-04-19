@@ -171,7 +171,8 @@ fun AddBranchUserScreenContent(
                 placeholder = stringResource(Res.string.add_user_name_placeholder),
                 isError = state.nameError != null,
                 errorMessage = state.nameError,
-                onEndIconClick = { onIntent(AddBranchUserIntent.OnNameChange("")) },
+                enabled = !state.isExistingUser,
+                onEndIconClick = if (!state.isExistingUser) {{ onIntent(AddBranchUserIntent.OnNameChange("")) }} else null,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -185,9 +186,10 @@ fun AddBranchUserScreenContent(
                 },
                 isError = state.phoneError != null,
                 errorMessage = state.phoneError,
+                enabled = !state.isExistingUser,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 visualTransformation = phoneVisualTransformation,
-                onEndIconClick = { onIntent(AddBranchUserIntent.OnPhoneNumberChange("")) },
+                onEndIconClick = if (!state.isExistingUser) {{ onIntent(AddBranchUserIntent.OnPhoneNumberChange("")) }} else null,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -198,8 +200,9 @@ fun AddBranchUserScreenContent(
                 placeholder = stringResource(Res.string.login_email_placeholder),
                 isError = state.emailError != null,
                 errorMessage = state.emailError,
+                enabled = !state.isExistingUser,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                onEndIconClick = { onIntent(AddBranchUserIntent.OnEmailChange("")) },
+                onEndIconClick = if (!state.isExistingUser) {{ onIntent(AddBranchUserIntent.OnEmailChange("")) }} else null,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -216,25 +219,27 @@ fun AddBranchUserScreenContent(
             verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
         ) {
 
-            if (state.isEditMode) {
+            if (state.isExistingUser) {
+                // Edit mode: only delete, no save
                 DsButton(
                     text = stringResource(Res.string.add_user_delete),
                     onClick = { onIntent(AddBranchUserIntent.OnDeleteClick) },
                     textColor = LessTheme.colors.textIconsError,
                     variant = ButtonVariant.Secondary,
                     modifier = Modifier.fillMaxWidth()
-                    )
+                )
+            } else {
+                // Add mode: save button
+                DsButton(
+                    text = stringResource(Res.string.add_user_save),
+                    onClick = { onIntent(AddBranchUserIntent.OnSaveClick) },
+                    modifier = Modifier.fillMaxWidth(),
+                    variant = ButtonVariant.Primary,
+                    size = ButtonSize.Large,
+                    enabled = !state.isLoading,
+                    isLoading = state.isLoading
+                )
             }
-            // Save button
-            DsButton(
-                text = stringResource(Res.string.add_user_save),
-                onClick = { onIntent(AddBranchUserIntent.OnSaveClick) },
-                modifier = Modifier.fillMaxWidth(),
-                variant = ButtonVariant.Primary,
-                size = ButtonSize.Large,
-                enabled = !state.isLoading,
-                isLoading = state.isLoading
-            )
 
         }
     }

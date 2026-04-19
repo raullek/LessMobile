@@ -66,8 +66,7 @@ data class TimeRangeSelectorSection(
     override val titleRes: StringResource,
     override val required: Boolean,
     val multiSelect: Boolean,
-    val predefinedRanges: List<TimeRange>,
-    val allowCustom: Boolean
+    val predefinedRanges: List<TimeRange>
 ) : FormSection()
 
 data class TimeRange(
@@ -116,7 +115,7 @@ data class CounterSection(
     override val titleRes: StringResource,
     override val required: Boolean = true
 ) : FormSection() {
-    val minValue: Int = 0
+    val minValue: Int = 1
 }
 
 fun tagValueToIcon(value: String): DrawableResource? = when (value) {

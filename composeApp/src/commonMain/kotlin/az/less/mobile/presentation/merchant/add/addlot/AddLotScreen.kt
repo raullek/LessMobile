@@ -24,11 +24,20 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
@@ -36,12 +45,17 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
+import az.less.designsystem.components.AnimatedToast
 import az.less.designsystem.components.DsToolBar
+import az.less.designsystem.components.ToastType
+import kotlinx.coroutines.delay
 import az.less.mobile.presentation.merchant.add.addlot.components.BoxCountSelector
 import az.less.mobile.presentation.merchant.add.addlot.components.BoxTypeButton
 import az.less.mobile.presentation.merchant.add.addlot.components.CategoryGridItem
 import az.less.mobile.presentation.merchant.add.addlot.components.TagChip
 import az.less.mobile.presentation.merchant.add.addlot.components.TimeSlotButton
+import az.less.mobile.presentation.merchant.orders.MERCH_ORDERS_SELECT_TAB_KEY
+import az.less.mobile.presentation.merchant.orders.model.MerchOrderTab
 import az.less.mobile.presentation.merchant.add.addlot.model.ChipsSection
 import az.less.mobile.presentation.merchant.add.addlot.model.CounterSection
 import az.less.mobile.presentation.merchant.add.addlot.model.FormSection
@@ -50,11 +64,14 @@ import az.less.mobile.presentation.merchant.add.addlot.model.InputType
 import az.less.mobile.presentation.merchant.add.addlot.model.TextareaSection
 import az.less.mobile.presentation.merchant.add.addlot.model.TimeRangeSelectorSection
 import az.less.mobile.presentation.merchant.add.addlot.model.TwoInputsSection
+import az.less.mobile.presentation.merchant.add.addlot.model.AddLotResponseModel.Companion.FIELD_PRICE_BEFORE
 import az.less.mobile.presentation.merchant.add.addlot.model.tagValueToIcon
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.add_lot_button
+import lessmobile.composeapp.generated.resources.add_lot_error_submit
+import lessmobile.composeapp.generated.resources.add_lot_error_validation
+import lessmobile.composeapp.generated.resources.add_lot_success
 import lessmobile.composeapp.generated.resources.add_lot_loading
-import lessmobile.composeapp.generated.resources.add_lot_select_time
 import lessmobile.composeapp.generated.resources.add_lot_title
 import lessmobile.composeapp.generated.resources.error_generic
 import lessmobile.composeapp.generated.resources.error_generic_subtitle
@@ -74,24 +91,63 @@ fun AddLotScreen(
     navController: NavController
 ) {
     val state by viewModel.collectAsState()
+    var toastMessage by remember { mutableStateOf<String?>(null) }
+    var toastType by remember { mutableStateOf(ToastType.Success) }
+
+    val validationErrorMsg = stringResource(Res.string.add_lot_error_validation)
+    val submitErrorMsg = stringResource(Res.string.add_lot_error_submit)
+    val fallbackSuccessMsg = stringResource(Res.string.add_lot_success)
+
+    LaunchedEffect(toastMessage) {
+        if (toastMessage != null) {
+            delay(2000)
+            toastMessage = null
+        }
+    }
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is AddLotSideEffect.NavigateBack -> navController.popBackStack()
-            is AddLotSideEffect.NavigateToNext -> {}
-            is AddLotSideEffect.ShowError -> {
-                // TODO: Show error toast
+            is AddLotSideEffect.NavigateToPlacedLots -> {
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(MERCH_ORDERS_SELECT_TAB_KEY, MerchOrderTab.AWAITING_PURCHASE.name)
+                navController.popBackStack()
+            }
+            is AddLotSideEffect.ShowValidationError -> {
+                toastType = ToastType.Error
+                toastMessage = validationErrorMsg
+            }
+            is AddLotSideEffect.ShowSubmitError -> {
+                toastType = ToastType.Error
+                toastMessage = submitErrorMsg
             }
             is AddLotSideEffect.ShowSuccess -> {
-                // TODO: Show success toast
+                toastType = ToastType.Success
+                val msg = sideEffect.message.ifEmpty { fallbackSuccessMsg }
+                toastMessage = if (sideEffect.warning != null) {
+                    "$msg\n${sideEffect.warning}"
+                } else {
+                    msg
+                }
             }
         }
     }
 
-    AddLotScreenContent(
-        state = state,
-        onIntent = viewModel::onIntent
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        AddLotScreenContent(
+            state = state,
+            onIntent = viewModel::onIntent
+        )
+
+        AnimatedToast(
+            visible = toastMessage != null,
+            title = toastMessage ?: "",
+            type = toastType,
+            modifier = Modifier.align(Alignment.TopCenter),
+            showGradientScrim = false
+        )
+    }
 }
 
 /**
@@ -188,6 +244,7 @@ fun AddLotScreenContent(
                     ),
                     verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
                 ) {
+                    // Dynamic sections from backend
                     items(sections, key = { it.id }) { section ->
                         SectionRenderer(
                             section = section,
@@ -196,7 +253,7 @@ fun AddLotScreenContent(
                         )
                     }
 
-                    // Add Lots Button (local, not from backend)
+                    // Add Lots Button
                     item(key = "addButton") {
                         DsButton(
                             text = stringResource(Res.string.add_lot_button),
@@ -205,16 +262,13 @@ fun AddLotScreenContent(
                                 .fillMaxWidth()
                                 .padding(vertical = LessTheme.spacing.medium),
                             variant = ButtonVariant.Primary,
-                            size = ButtonSize.Large
+                            size = ButtonSize.Large,
+                            isLoading = state.isSubmitting
                         )
                     }
                 }
             }
         }
-    }
-
-    if (state.showCustomTimePicker) {
-        // TODO: Show time picker bottom sheet
     }
 }
 
@@ -261,6 +315,7 @@ private fun ChipsSectionContent(
                 }
 
                 val hasIcon = option.imageUrl != null || option.value?.let { tagValueToIcon(it) } != null
+                val sectionHasError = state.hasValidationError(section.id)
                 if (hasIcon) {
                     TagChip(
                         label = option.label,
@@ -279,6 +334,7 @@ private fun ChipsSectionContent(
                     BoxTypeButton(
                         text = option.label,
                         isSelected = isSelected,
+                        hasError = sectionHasError,
                         onClick = {
                             if (section.multiSelect) {
                                 onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))
@@ -307,6 +363,8 @@ private fun IconGridSectionContent(
             modifier = Modifier.padding(bottom = LessTheme.spacing.small)
         )
 
+        val sectionHasError = state.hasValidationError(section.id)
+
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
@@ -327,6 +385,7 @@ private fun IconGridSectionContent(
                     CategoryGridItem(
                         option = option,
                         isSelected = isSelected,
+                        hasError = sectionHasError,
                         onSelected = {
                             if (section.multiSelect) {
                                 onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))
@@ -356,6 +415,7 @@ private fun IconGridSectionContent(
                         CategoryGridItem(
                             option = option,
                             isSelected = isSelected,
+                            hasError = sectionHasError,
                             onSelected = {
                                 if (section.multiSelect) {
                                     onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))
@@ -403,6 +463,7 @@ private fun TimeRangeSectionContent(
                 TimeSlotButton(
                     label = timeRange.label,
                     isSelected = isSelected,
+                    hasError = state.hasValidationError(section.id),
                     onClick = {
                         if (section.multiSelect) {
                             onIntent(AddLotIntent.OnMultiSelectToggle(section.id, timeRange.id))
@@ -410,21 +471,6 @@ private fun TimeRangeSectionContent(
                             onIntent(AddLotIntent.OnSingleSelect(section.id, timeRange.id))
                         }
                     }
-                )
-            }
-
-            if (section.allowCustom) {
-                val selectTimeLabel = stringResource(Res.string.add_lot_select_time)
-                val customLabel = if (state.customTimeStart != null && state.customTimeEnd != null) {
-                    "${state.customTimeStart}-${state.customTimeEnd}"
-                } else {
-                    selectTimeLabel
-                }
-                val isCustomSelected = state.customTimeStart != null && state.customTimeEnd != null
-                TimeSlotButton(
-                    label = customLabel,
-                    isSelected = isCustomSelected,
-                    onClick = { onIntent(AddLotIntent.OnCustomTimeClick(section.id)) }
                 )
             }
         }
@@ -451,6 +497,12 @@ private fun TwoInputsSectionContent(
                 InputType.TEXT -> KeyboardType.Text
             }
 
+            val visualTransformation = if (field.id == FIELD_PRICE_BEFORE) {
+                StrikethroughTransformation
+            } else {
+                VisualTransformation.None
+            }
+
             DsTextField(
                 value = state.getInputValue(field.id),
                 onValueChange = { newValue ->
@@ -463,7 +515,9 @@ private fun TwoInputsSectionContent(
                     }
                 },
                 placeholder = stringResource(field.labelRes),
+                isError = state.hasValidationError(field.id),
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                visualTransformation = visualTransformation,
                 onEndIconClick = { onIntent(AddLotIntent.OnInputChanged(field.id, "")) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -530,5 +584,23 @@ private fun CounterSectionContent(
             onIncrement = { onIntent(AddLotIntent.OnBoxCountIncrement) },
             onDecrement = { onIntent(AddLotIntent.OnBoxCountDecrement) }
         )
+    }
+}
+
+private object StrikethroughTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val styled = AnnotatedString(
+            text = text.text,
+            spanStyles = text.spanStyles + listOf(
+                AnnotatedString.Range(
+                    item = androidx.compose.ui.text.SpanStyle(
+                        textDecoration = TextDecoration.LineThrough
+                    ),
+                    start = 0,
+                    end = text.length
+                )
+            )
+        )
+        return TransformedText(styled, OffsetMapping.Identity)
     }
 }

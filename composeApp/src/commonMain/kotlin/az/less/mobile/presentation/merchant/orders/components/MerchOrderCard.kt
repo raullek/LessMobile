@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -25,10 +23,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
+import az.less.mobile.domain.model.BoxType
 import az.less.mobile.presentation.merchant.orders.model.BoughtBoxItem
 import az.less.mobile.presentation.merchant.orders.model.CreatedBoxItem
 import coil3.compose.AsyncImage
@@ -39,167 +39,45 @@ import lessmobile.composeapp.generated.resources.merch_orders_items_left
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Card for bought boxes (awaiting pickup tab)
+ * Card for bought boxes (Purchased tab).
+ * Layout matches Figma: image + badge, price, title, box type + pickup + reserve#, button.
  */
 @Composable
 fun BoughtBoxCard(
     item: BoughtBoxItem,
     onCardClick: () -> Unit,
     onHandedOverClick: () -> Unit,
+    isDelivering: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    MerchBoxCardContainer(
+        imageUrl = item.imageUrl,
+        imageContentDescription = item.boxTitle,
+        availableItems = null,
+        originalPrice = item.originalPrice,
+        discountedPrice = item.discountedPrice,
+        title = item.boxTitle,
+        boxType = item.boxType,
+        pickupTimeFormatted = item.pickupTimeFormatted,
+        reserveNumber = item.reserveNumber,
+        onCardClick = onCardClick,
         modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 16.dp,
-                spotColor = Color.Black.copy(alpha = 0.08f),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                shape = RoundedCornerShape(LessTheme.radius.medium)
-            )
-            .clip(RoundedCornerShape(LessTheme.radius.medium))
-            .background(LessTheme.colors.backgroundPrimary)
-            .clickable { onCardClick() }
     ) {
-        // Image section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(140.dp)
-                .padding(2.dp)
-                .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
-                .background(Color(0xFFFFF2EB))
-        ) {
-            AsyncImage(
-                model = item.imageUrl,
-                contentDescription = item.boxTitle,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-
-        // Content
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LessTheme.spacing.small, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // Price row
-            PriceRow(originalPrice = item.originalPrice, discountedPrice = item.discountedPrice)
-
-            // Box title
-            Text(
-                text = item.boxTitle,
-                style = LessTheme.typography.body16Semibold,
-                color = LessTheme.colors.textIconsBlack,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            HorizontalDivider(color = LessTheme.colors.backgroundSecond, thickness = 1.dp)
-
-            // Client info + reserve number
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Client info
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xSmall),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Client avatar
-                    Box(
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clip(CircleShape)
-                            .background(LessTheme.colors.elementsSecondaryElement),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (item.clientAvatar != null) {
-                            AsyncImage(
-                                model = item.clientAvatar,
-                                contentDescription = item.clientName,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize().clip(CircleShape)
-                            )
-                        } else {
-                            Text(
-                                text = item.clientName.firstOrNull()?.toString() ?: "",
-                                style = LessTheme.typography.caption12Bold,
-                                color = LessTheme.colors.textIconsGrey
-                            )
-                        }
-                    }
-                    Text(
-                        text = item.clientName,
-                        style = LessTheme.typography.body14Medium,
-                        color = LessTheme.colors.textIconsBlack,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                // Reserve number badge
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = LessTheme.colors.backgroundSecond,
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = LessTheme.spacing.xxSmall)
-                ) {
-                    Text(
-                        text = "#${item.reserveNumber}",
-                        style = LessTheme.typography.body16Medium,
-                        color = LessTheme.colors.textIconsBlack
-                    )
-                }
-            }
-
-            HorizontalDivider(color = LessTheme.colors.backgroundSecond, thickness = 1.dp)
-
-            // Pickup time + quantity
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = item.pickupTimeFormatted,
-                    style = LessTheme.typography.body14Medium,
-                    color = LessTheme.colors.textIconsGrey
-                )
-                Text(
-                    text = "x${item.quantity}",
-                    style = LessTheme.typography.body14Semibold,
-                    color = LessTheme.colors.textIconsBlack
-                )
-            }
-        }
-
         // Handed Over button
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LessTheme.spacing.small)
-                .padding(bottom = LessTheme.spacing.small)
-        ) {
-            DsButton(
-                text = stringResource(Res.string.merch_orders_handed_over),
-                onClick = onHandedOverClick,
-                modifier = Modifier.fillMaxWidth(),
-                variant = ButtonVariant.Primary,
-                size = ButtonSize.Medium
-            )
-        }
+        DsButton(
+            text = stringResource(Res.string.merch_orders_handed_over),
+            onClick = onHandedOverClick,
+            modifier = Modifier.fillMaxWidth(),
+            variant = ButtonVariant.Primary,
+            size = ButtonSize.Medium,
+            isLoading = isDelivering
+        )
     }
 }
 
 /**
- * Card for created boxes (awaiting purchase tab)
+ * Card for created boxes (Placed Lots tab).
+ * Same layout as BoughtBoxCard but with cancel button / expired state.
  */
 @Composable
 fun CreatedBoxCard(
@@ -207,6 +85,77 @@ fun CreatedBoxCard(
     onCardClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
+) {
+    MerchBoxCardContainer(
+        imageUrl = item.imageUrl,
+        imageContentDescription = item.title,
+        availableItems = item.availableItems,
+        originalPrice = item.originalPrice,
+        discountedPrice = item.discountedPrice,
+        title = item.title,
+        boxType = item.boxType,
+        pickupTimeFormatted = item.pickupTimeFormatted,
+        reserveNumber = null,
+        onCardClick = onCardClick,
+        modifier = modifier
+    ) {
+        if (item.isCancelEnabled) {
+            // Active cancel: red text on light red surface/error background
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(LessTheme.radius.medium))
+                    .background(LessTheme.colors.surfaceError)
+                    .clickable { onCancelClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = item.cancelButtonText ?: "",
+                    style = LessTheme.typography.body16Semibold,
+                    color = LessTheme.colors.textIconsError
+                )
+            }
+        } else {
+            // Expired: black text, no background, with close time
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(
+                        Res.string.merch_orders_cancellation_ended,
+                        item.closeTimeFormatted ?: ""
+                    ),
+                    style = LessTheme.typography.body16Semibold,
+                    color = LessTheme.colors.textIconsBlack
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Shared card container matching Figma design.
+ * Both Purchased and Placed Lots cards use identical layout,
+ * only the bottom button slot differs.
+ */
+@Composable
+private fun MerchBoxCardContainer(
+    imageUrl: String?,
+    imageContentDescription: String,
+    availableItems: Int?,
+    originalPrice: Double,
+    discountedPrice: Double,
+    title: String,
+    boxType: String?,
+    pickupTimeFormatted: String,
+    reserveNumber: String?,
+    onCardClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    buttonSlot: @Composable () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -235,29 +184,34 @@ fun CreatedBoxCard(
                     .background(Color(0xFFFFF2EB))
             ) {
                 AsyncImage(
-                    model = item.imageUrl,
-                    contentDescription = item.title,
+                    model = imageUrl,
+                    contentDescription = imageContentDescription,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
             }
 
-            // Available items badge
-            Box(
-                modifier = Modifier
-                    .padding(start = 14.dp, top = 14.dp)
-                    .align(Alignment.TopStart)
-                    .background(
-                        color = Color.Black.copy(alpha = 0.4f),
-                        shape = RoundedCornerShape(1000.dp)
+            // "X left" badge
+            if (availableItems != null) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 14.dp, top = 14.dp)
+                        .align(Alignment.TopStart)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.4f),
+                            shape = RoundedCornerShape(1000.dp)
+                        )
+                        .padding(
+                            horizontal = LessTheme.spacing.xSmall,
+                            vertical = LessTheme.spacing.xxSmall
+                        )
+                ) {
+                    Text(
+                        text = stringResource(Res.string.merch_orders_items_left, availableItems),
+                        style = LessTheme.typography.caption12Semibold,
+                        color = LessTheme.colors.textIconsNested
                     )
-                    .padding(horizontal = LessTheme.spacing.xSmall, vertical = LessTheme.spacing.xxSmall)
-            ) {
-                Text(
-                    text = stringResource(Res.string.merch_orders_items_left, item.availableItems),
-                    style = LessTheme.typography.caption12Semibold,
-                    color = LessTheme.colors.textIconsNested
-                )
+                }
             }
         }
 
@@ -265,15 +219,16 @@ fun CreatedBoxCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = LessTheme.spacing.small, vertical = 14.dp),
+                .padding(horizontal = LessTheme.spacing.small)
+                .padding(top = 14.dp, bottom = 14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // Price row
-            PriceRow(originalPrice = item.originalPrice, discountedPrice = item.discountedPrice)
+            PriceRow(originalPrice = originalPrice, discountedPrice = discountedPrice)
 
-            // Box title
+            // Title
             Text(
-                text = item.title,
+                text = title,
                 style = LessTheme.typography.body16Semibold,
                 color = LessTheme.colors.textIconsBlack,
                 maxLines = 1,
@@ -282,60 +237,63 @@ fun CreatedBoxCard(
 
             HorizontalDivider(color = LessTheme.colors.backgroundSecond, thickness = 1.dp)
 
-            // Pickup time + sold/total
+            // Box type + pickup time + reserve number
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
             ) {
-                Text(
-                    text = item.pickupTimeFormatted,
-                    style = LessTheme.typography.body14Medium,
-                    color = LessTheme.colors.textIconsGrey
-                )
-                Text(
-                    text = "${item.soldCount}/${item.quantity}",
-                    style = LessTheme.typography.body14Semibold,
-                    color = LessTheme.colors.textIconsBlack
-                )
-            }
+                // Box type + pickup time (left side, takes remaining space)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
+                ) {
+                    val boxTypeEnum = BoxType.fromApi(boxType)
+                    if (boxTypeEnum != null) {
+                        Text(
+                            text = stringResource(boxTypeEnum.labelRes),
+                            style = LessTheme.typography.body14Medium,
+                            color = LessTheme.colors.textIconsBrand,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Text(
+                        text = pickupTimeFormatted,
+                        style = LessTheme.typography.body14Medium,
+                        color = LessTheme.colors.textIconsGrey,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
-            // Cancellation message if present
-            if (item.cancellationMessage != null) {
-                Text(
-                    text = item.cancellationMessage,
-                    style = LessTheme.typography.caption12Regular,
-                    color = LessTheme.colors.textIconsGrey
-                )
+                // Reserve number badge (right side)
+                if (reserveNumber != null && reserveNumber.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = LessTheme.colors.backgroundSecond,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .padding(horizontal = 10.dp, vertical = LessTheme.spacing.xxSmall)
+                    ) {
+                        Text(
+                            text = "#$reserveNumber",
+                            style = LessTheme.typography.body16Medium,
+                            color = LessTheme.colors.textIconsBlack
+                        )
+                    }
+                }
             }
         }
 
-        // Cancel button
+        // Button slot
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = LessTheme.spacing.small)
                 .padding(bottom = LessTheme.spacing.small)
         ) {
-            if (item.isCancelEnabled) {
-                DsButton(
-                    text = item.cancelButtonText ?: "",
-                    onClick = onCancelClick,
-                    modifier = Modifier.fillMaxWidth(),
-                    variant = ButtonVariant.Secondary,
-                    size = ButtonSize.Medium,
-                    textColor = LessTheme.colors.textIconsError
-                )
-            } else {
-                DsButton(
-                    text = stringResource(Res.string.merch_orders_cancellation_ended),
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth(),
-                    variant = ButtonVariant.Secondary,
-                    size = ButtonSize.Medium,
-                    enabled = false
-                )
-            }
+            buttonSlot()
         }
     }
 }
@@ -349,24 +307,29 @@ private fun PriceRow(
         horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Original price (strikethrough)
+        // Original price (strikethrough, 13sp per design)
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "%.2f".format(originalPrice),
-                style = LessTheme.typography.body14Semibold.copy(textDecoration = TextDecoration.LineThrough),
+                style = LessTheme.typography.body14Semibold.copy(
+                    fontSize = 13.sp,
+                    textDecoration = TextDecoration.LineThrough
+                ),
                 color = LessTheme.colors.textIconsGrey
             )
             Text(
                 text = "₼",
-                style = LessTheme.typography.caption12Semibold.copy(textDecoration = TextDecoration.LineThrough),
+                style = LessTheme.typography.caption12Semibold.copy(
+                    textDecoration = TextDecoration.LineThrough
+                ),
                 color = LessTheme.colors.textIconsGrey
             )
         }
 
-        // Discounted price
+        // Discounted price (16sp, brand color)
         Row(
             horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
             verticalAlignment = Alignment.CenterVertically

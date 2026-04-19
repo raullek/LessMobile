@@ -16,5 +16,6 @@ data class DefaultPaymentDto(
     val cardholderName: String? = null,
     val displayName: String? = null,
     val status: String? = null,
-    val expiryDate: String? = null
+    val expiryDate: String? = null,
+    val message: String? = null
 )

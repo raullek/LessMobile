@@ -3,23 +3,19 @@ package az.less.mobile.presentation.merchant.add.addlot
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.mobile.domain.repository.ContentRepository
-import az.less.mobile.presentation.merchant.add.addlot.model.ChipsSection
-import az.less.mobile.presentation.merchant.add.addlot.model.CounterSection
-import az.less.mobile.presentation.merchant.add.addlot.model.IconGridSection
-import az.less.mobile.presentation.merchant.add.addlot.model.TextareaSection
-import az.less.mobile.presentation.merchant.add.addlot.model.TimeRangeSelectorSection
-import az.less.mobile.presentation.merchant.add.addlot.model.TwoInputsSection
+import az.less.mobile.domain.repository.VenuesRepository
+import az.less.mobile.domain.usecase.ValidateAndBuildBoxRequestUseCase
+import az.less.mobile.presentation.merchant.add.addlot.model.AddLotResponseModel.Companion.SECTION_DESCRIPTION
+import az.less.mobile.presentation.merchant.add.addlot.model.AddLotResponseModel.Companion.SECTION_TAGS
 import az.less.mobile.presentation.merchant.add.addlot.model.toAddLotResponseModel
-import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.add_lot_error_enter
-import lessmobile.composeapp.generated.resources.add_lot_error_select
-import lessmobile.composeapp.generated.resources.add_lot_success
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
 
 class AddLotViewModel(
-    private val contentRepository: ContentRepository
+    private val contentRepository: ContentRepository,
+    private val venuesRepository: VenuesRepository,
+    private val validateAndBuildBoxRequest: ValidateAndBuildBoxRequestUseCase
 ) : ViewModel(), ContainerHost<AddLotState, AddLotSideEffect> {
 
     override val container: Container<AddLotState, AddLotSideEffect> =
@@ -61,9 +57,6 @@ class AddLotViewModel(
             is AddLotIntent.OnInputChanged -> handleInputChanged(intent.fieldId, intent.value)
             is AddLotIntent.OnBoxCountIncrement -> handleBoxCountIncrement()
             is AddLotIntent.OnBoxCountDecrement -> handleBoxCountDecrement()
-            is AddLotIntent.OnCustomTimeClick -> handleCustomTimeClick(intent.sectionId)
-            is AddLotIntent.OnTimeSelected -> handleTimeSelected(intent.time, intent.type)
-            is AddLotIntent.OnDismissTimePicker -> handleDismissTimePicker()
             is AddLotIntent.OnAddLotClick -> handleAddLotClick()
         }
     }
@@ -75,7 +68,12 @@ class AddLotViewModel(
     private fun handleSingleSelect(sectionId: String, optionId: String) = intent {
         val newSelections = state.singleSelections.toMutableMap()
         newSelections[sectionId] = optionId
-        reduce { state.copy(singleSelections = newSelections) }
+        reduce {
+            state.copy(
+                singleSelections = newSelections,
+                validationErrors = state.validationErrors - sectionId
+            )
+        }
     }
 
     private fun handleMultiSelectToggle(sectionId: String, optionId: String) = intent {
@@ -87,13 +85,23 @@ class AddLotViewModel(
         }
         val newSelections = state.multiSelections.toMutableMap()
         newSelections[sectionId] = newSet
-        reduce { state.copy(multiSelections = newSelections) }
+        reduce {
+            state.copy(
+                multiSelections = newSelections,
+                validationErrors = state.validationErrors - sectionId
+            )
+        }
     }
 
     private fun handleInputChanged(fieldId: String, value: String) = intent {
         val newValues = state.inputValues.toMutableMap()
         newValues[fieldId] = value
-        reduce { state.copy(inputValues = newValues) }
+        reduce {
+            state.copy(
+                inputValues = newValues,
+                validationErrors = state.validationErrors - fieldId
+            )
+        }
     }
 
     private fun handleBoxCountIncrement() = intent {
@@ -101,108 +109,49 @@ class AddLotViewModel(
     }
 
     private fun handleBoxCountDecrement() = intent {
-        if (state.boxCount > 0) {
+        if (state.boxCount > 1) {
             reduce { state.copy(boxCount = state.boxCount - 1) }
         }
     }
 
-    private fun handleCustomTimeClick(sectionId: String) = intent {
-        reduce {
-            state.copy(
-                showCustomTimePicker = true,
-                activeTimeSection = sectionId
-            )
-        }
-    }
-
-    private fun handleTimeSelected(time: String, type: TimePickerType) = intent {
-        reduce {
-            when (type) {
-                TimePickerType.START_TIME -> state.copy(
-                    customTimeStart = time,
-                    showCustomTimePicker = false,
-                    timePickerType = null
-                )
-                TimePickerType.END_TIME -> state.copy(
-                    customTimeEnd = time,
-                    showCustomTimePicker = false,
-                    timePickerType = null
-                )
-            }
-        }
-    }
-
-    private fun handleDismissTimePicker() = intent {
-        reduce {
-            state.copy(
-                showCustomTimePicker = false,
-                timePickerType = null
-            )
-        }
-    }
-
     private fun handleAddLotClick() = intent {
-        val sections = state.responseModel?.sections ?: return@intent
+        if (state.isSubmitting) return@intent
 
-        for (section in sections) {
-            if (!section.required) continue
+        val params = ValidateAndBuildBoxRequestUseCase.Params(
+            boxType = state.getSingleSelection(ValidateAndBuildBoxRequestUseCase.SECTION_BAG_TYPE),
+            categoryId = state.getSingleSelection(ValidateAndBuildBoxRequestUseCase.SECTION_CATEGORIES),
+            tagIds = state.getMultiSelection(SECTION_TAGS).toList(),
+            pickupRange = state.getSingleSelection(ValidateAndBuildBoxRequestUseCase.SECTION_PICKUP_TIME),
+            originalPriceText = state.getInputValue(ValidateAndBuildBoxRequestUseCase.FIELD_PRICE_BEFORE),
+            discountedPriceText = state.getInputValue(ValidateAndBuildBoxRequestUseCase.FIELD_PRICE_AFTER),
+            description = state.getInputValue(SECTION_DESCRIPTION),
+            quantity = state.boxCount
+        )
 
-            when (section) {
-                is ChipsSection -> {
-                    val hasSelection = if (section.multiSelect) {
-                        state.getMultiSelection(section.id).isNotEmpty()
-                    } else {
-                        state.getSingleSelection(section.id) != null
+        when (val result = validateAndBuildBoxRequest.execute(params)) {
+            is ValidateAndBuildBoxRequestUseCase.Result.ValidationErrors -> {
+                reduce { state.copy(validationErrors = result.errors) }
+                postSideEffect(AddLotSideEffect.ShowValidationError)
+            }
+            is ValidateAndBuildBoxRequestUseCase.Result.Success -> {
+                reduce { state.copy(isSubmitting = true, validationErrors = emptySet()) }
+
+                venuesRepository.createBox(result.request)
+                    .onSuccess { data ->
+                        reduce { state.copy(isSubmitting = false) }
+                        postSideEffect(
+                            AddLotSideEffect.ShowSuccess(
+                                message = data.message ?: "",
+                                warning = data.warning
+                            )
+                        )
+                        postSideEffect(AddLotSideEffect.NavigateToPlacedLots)
                     }
-                    if (!hasSelection) {
-                        postSideEffect(AddLotSideEffect.ShowError(Res.string.add_lot_error_select, listOf(section.titleRes)))
-                        return@intent
+                    .onError {
+                        reduce { state.copy(isSubmitting = false) }
+                        postSideEffect(AddLotSideEffect.ShowSubmitError)
                     }
-                }
-                is IconGridSection -> {
-                    val hasSelection = if (section.multiSelect) {
-                        state.getMultiSelection(section.id).isNotEmpty()
-                    } else {
-                        state.getSingleSelection(section.id) != null
-                    }
-                    if (!hasSelection) {
-                        postSideEffect(AddLotSideEffect.ShowError(Res.string.add_lot_error_select, listOf(section.titleRes)))
-                        return@intent
-                    }
-                }
-                is TimeRangeSelectorSection -> {
-                    val hasSelection = if (section.multiSelect) {
-                        state.getMultiSelection(section.id).isNotEmpty()
-                    } else {
-                        state.getSingleSelection(section.id) != null
-                    } || (state.customTimeStart != null && state.customTimeEnd != null)
-                    if (!hasSelection) {
-                        postSideEffect(AddLotSideEffect.ShowError(Res.string.add_lot_error_select, listOf(section.titleRes)))
-                        return@intent
-                    }
-                }
-                is TwoInputsSection -> {
-                    for (field in section.fields) {
-                        if (state.getInputValue(field.id).isEmpty()) {
-                            postSideEffect(AddLotSideEffect.ShowError(Res.string.add_lot_error_enter, listOf(field.labelRes)))
-                            return@intent
-                        }
-                    }
-                }
-                is TextareaSection -> {
-                    if (state.getInputValue(section.id).isEmpty()) {
-                        postSideEffect(AddLotSideEffect.ShowError(Res.string.add_lot_error_enter, listOf(section.titleRes)))
-                        return@intent
-                    }
-                }
-                is CounterSection -> {
-                    // Counter always has a value
-                }
             }
         }
-
-        // TODO: Submit to API
-        postSideEffect(AddLotSideEffect.ShowSuccess(Res.string.add_lot_success))
-        postSideEffect(AddLotSideEffect.NavigateBack)
     }
 }

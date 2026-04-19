@@ -8,8 +8,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class MerchantProfileDto(
-    val id: String,
-    val name: String,
+    val id: String? = null,
+    val name: String? = null,
     val businessName: String? = null,
     val businessAddress: String? = null,
     val businessDescription: String? = null,
@@ -52,8 +52,8 @@ data class RatingPercentageDto(
 
 @Serializable
 data class VenueReviewItemDto(
-    val id: String,
-    val rating: Int,
+    val id: String? = null,
+    val rating: Int? = null,
     val comment: String? = null,
     val createdAt: String? = null,
     val client: VenueReviewClientDto? = null,
@@ -62,14 +62,14 @@ data class VenueReviewItemDto(
 
 @Serializable
 data class VenueReviewClientDto(
-    val id: String,
-    val name: String,
+    val id: String? = null,
+    val name: String? = null,
     val avatar: String? = null
 )
 
 @Serializable
 data class VenueReviewReplyDto(
-    val text: String,
+    val text: String? = null,
     val repliedAt: String? = null,
     val venueLogo: String? = null
 )
@@ -87,14 +87,14 @@ data class BusinessHoursDto(
 
 @Serializable
 data class DayHoursDto(
-    val open: String,
-    val close: String
+    val open: String? = null,
+    val close: String? = null
 )
 
 @Serializable
 data class VenueOfferDto(
-    val id: String,
-    val title: String,
+    val id: String? = null,
+    val title: String? = null,
     val description: String? = null,
     val images: List<String> = emptyList(),
     val originalPrice: Double = 0.0,
@@ -102,5 +102,5 @@ data class VenueOfferDto(
     val availableItems: Int = 0,
     val pickupTimeStart: String? = null,
     val pickupTimeEnd: String? = null,
-    val category: String? = null
+    val category: BoxDetailCategoryDto? = null
 )

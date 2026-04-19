@@ -17,7 +17,7 @@ data class AddBranchUserState(
     val emailError: String? = null,
     val isLoading: Boolean = false
 ) {
-    val isEditMode: Boolean get() = userId != null
+    val isExistingUser: Boolean get() = userId != null
     
     val isFormValid: Boolean
         get() = name.isNotBlank() && 

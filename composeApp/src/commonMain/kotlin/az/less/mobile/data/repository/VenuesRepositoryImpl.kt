@@ -2,6 +2,8 @@ package az.less.mobile.data.repository
 
 import az.less.mobile.data.datasource.VenuesDataSource
 import az.less.mobile.data.remote.model.AdminVenueDto
+import az.less.mobile.data.remote.model.CreateBoxRequest
+import az.less.mobile.data.remote.model.CreateBoxResponseDto
 import az.less.mobile.data.remote.model.VenueMerchantDto
 import az.less.mobile.data.remote.model.VenuesDataDto
 import az.less.mobile.domain.repository.VenuesRepository
@@ -99,5 +101,9 @@ class VenuesRepositoryImpl(
             email = email,
             phone = phone
         )
+    }
+
+    override suspend fun createBox(request: CreateBoxRequest): NetworkResult<CreateBoxResponseDto> {
+        return venuesDataSource.createBox(request)
     }
 }

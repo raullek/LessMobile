@@ -1,6 +1,8 @@
 package az.less.mobile.domain.repository
 
 import az.less.mobile.data.remote.model.AdminVenueDto
+import az.less.mobile.data.remote.model.CreateBoxRequest
+import az.less.mobile.data.remote.model.CreateBoxResponseDto
 import az.less.mobile.data.remote.model.VenueMerchantDto
 import az.less.mobile.data.remote.model.VenuesDataDto
 import az.less.mobile.network.NetworkResult
@@ -50,4 +52,6 @@ interface VenuesRepository {
         email: String,
         phone: String
     ): NetworkResult<Unit>
+
+    suspend fun createBox(request: CreateBoxRequest): NetworkResult<CreateBoxResponseDto>
 }

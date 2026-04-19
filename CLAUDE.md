@@ -281,6 +281,95 @@ DsButton(
 )
 ```
 
+### Image Picker (imagepickerkmp)
+
+Used for selecting images from gallery in merchant flows:
+```kotlin
+import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
+import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
+
+// In Screen composable - controlled by state boolean (e.g. state.showImagePicker)
+Box {
+    if (state.showImagePicker) {
+        GalleryPickerLauncher(
+            onPhotosSelected = { photos ->
+                photos.firstOrNull()?.let { photo ->
+                    coroutineScope.launch {
+                        val bytes = photo.loadBytes()
+                        if (bytes != null) {
+                            onIntent(MyIntent.OnImageSelected(bytes))
+                        } else {
+                            onIntent(MyIntent.OnImagePickerDismiss)
+                        }
+                    }
+                } ?: onIntent(MyIntent.OnImagePickerDismiss)
+            },
+            onError = { onIntent(MyIntent.OnImagePickerDismiss) },
+            onDismiss = { onIntent(MyIntent.OnImagePickerDismiss) },
+            allowMultiple = false
+        )
+    }
+}
+```
+
+### Multipart Form Data Upload
+
+For endpoints requiring file uploads (e.g. venue creation with images):
+```kotlin
+// In DataSource - use submitFormWithBinaryData
+suspend fun createVenue(name: String, image: ByteArray?): NetworkResult<VenueDto> {
+    return safeApiCall {
+        httpClient.submitFormWithBinaryData(
+            url = "v1/venues",
+            formData = formData {
+                append("name", name)
+                image?.let {
+                    append("image", it, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"image.jpg\"")
+                    })
+                }
+            }
+        ) {
+            method = HttpMethod.Post
+        }
+    }
+}
+```
+
+### JSON Request Body (Preferred for non-file endpoints)
+
+For POST/PUT endpoints without file uploads, use `@Serializable` request DTOs with `setBody()`:
+```kotlin
+// Create request DTO
+@Serializable data class CreateBoxRequest(
+    val title: String,
+    val boxType: String,
+    val quantity: Int
+)
+
+// In DataSource - simple and clean
+suspend fun createBox(request: CreateBoxRequest): NetworkResult<CreateBoxResponseDto> {
+    return safeApiCall {
+        httpClient.post("v1/boxes") { setBody(request) }
+    }
+}
+```
+
+### DTO Naming Conventions
+
+- **Request body:** `XxxRequest` (e.g. `CreateBoxRequest`, `EmailLoginRequest`)
+- **Response data:** `XxxDto` or `XxxData` (e.g. `CreateBoxResponseDto`, `EmailLoginData`)
+- **Avoid duplicate class names** across DTO files — Kotlin sees all classes in the same package. Check existing DTOs before naming.
+- **Don't duplicate fields handled by the network layer** — `safeApiCall` already parses `ApiResponse<T>` wrapping (`status`, `message`, `errors`, `meta`). DTOs should only model the `data` payload.
+
+### Localization
+
+String resources in 3 languages — always add to all:
+- `composeApp/src/commonMain/composeResources/values/strings.xml` (English)
+- `composeApp/src/commonMain/composeResources/values-az/strings.xml` (Azerbaijani)
+- `composeApp/src/commonMain/composeResources/values-ru/strings.xml` (Russian)
+
 ## Key Paths
 
 | Purpose | Path |

@@ -6,6 +6,7 @@ import az.less.mobile.data.datasource.OrdersDataSource
 import az.less.mobile.data.remote.model.OrderItemDto
 import az.less.mobile.network.NetworkResult
 import az.less.mobile.presentation.client.main.orders.models.Order
+import az.less.mobile.utils.extractTime
 
 class OrdersPagingSource(
     private val dataSource: OrdersDataSource,
@@ -46,13 +47,26 @@ class OrdersPagingSource(
     }
 }
 
+private fun Double.formatAmount(): String {
+    val whole = toLong()
+    val truncatedWhole = if (whole > 99999) 99999 else whole
+    val fraction = ((this - whole) * 100).toLong()
+    return if (fraction == 0L) "$truncatedWhole" else "$truncatedWhole.${fraction.toString().padStart(2, '0')}"
+}
+
 private fun OrderItemDto.toDomain() = Order(
     id = id,
     title = item?.name ?: venue?.name ?: "",
     imageUrl = item?.image,
-    pickupTimeStart = pickupTimeStart,
-    pickupTimeEnd = pickupTimeEnd,
-    price = price.toString(),
+    pickupTimeStart = pickupTimeStart?.extractTime(),
+    pickupTimeEnd = pickupTimeEnd?.extractTime(),
+    pickupTimeFormatted = pickupTimeFormatted ?: "",
+    date = dateFormatted ?: "",
+    price = price.formatAmount(),
+    pricePerPiece = pricePerPiece,
+    serviceFee = serviceFee,
+    subtotal = subtotal.formatAmount(),
+    subtotalAmount = subtotal,
     quantity = quantity,
     reserveNumber = reserveNumber ?: orderNumber ?: "",
     isCompleted = status == "completed" || status == "picked_up",

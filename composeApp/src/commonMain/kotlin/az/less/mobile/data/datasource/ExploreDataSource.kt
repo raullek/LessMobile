@@ -1,5 +1,6 @@
 package az.less.mobile.data.datasource
 
+import az.less.mobile.data.remote.model.CategoriesResponseDto
 import az.less.mobile.data.remote.model.SearchByFilterBoxesDto
 import az.less.mobile.data.remote.model.SearchByFilterVenuesDto
 import az.less.mobile.data.remote.model.SearchFilterDto
@@ -88,6 +89,18 @@ class ExploreDataSource(
     suspend fun getSearchFilters(): NetworkResult<List<SearchFilterDto>> {
         return safeApiCall {
             httpClient.get("v1/search/filters")
+        }
+    }
+
+    suspend fun getCategories(
+        page: Int? = null,
+        limit: Int? = null
+    ): NetworkResult<CategoriesResponseDto> {
+        return safeApiCall {
+            httpClient.get("v1/categories") {
+                page?.let { parameter("page", it) }
+                limit?.let { parameter("limit", it) }
+            }
         }
     }
 

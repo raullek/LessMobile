@@ -16,12 +16,11 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_gift_48dp
+import lessmobile.composeapp.generated.resources.voucher_empty_title
+import lessmobile.composeapp.generated.resources.voucher_empty_description
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
-/**
- * Empty state component for Voucher screen
- * Shown when user has no vouchers
- */
 @Composable
 fun VoucherEmptyState(
     modifier: Modifier = Modifier
@@ -31,18 +30,16 @@ fun VoucherEmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Gift icon
         Image(
             painter = painterResource(Res.drawable.ic_gift_48dp),
-            contentDescription = "Gift",
+            contentDescription = null,
             modifier = Modifier.size(48.dp)
         )
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
 
-        // Title
         Text(
-            text = "You don't have vouchers",
+            text = stringResource(Res.string.voucher_empty_title),
             style = LessTheme.typography.title24Bold,
             color = LessTheme.colors.textIconsBlack,
             textAlign = TextAlign.Center
@@ -50,9 +47,8 @@ fun VoucherEmptyState(
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.xSmall))
 
-        // Description
         Text(
-            text = "To earn voucher refer our app to your friends, you will 2 ₼ for each friend after his first transaction",
+            text = stringResource(Res.string.voucher_empty_description),
             style = LessTheme.typography.body16Medium,
             color = LessTheme.colors.textIconsGrey,
             textAlign = TextAlign.Center
