@@ -2,6 +2,8 @@ package az.less.mobile.data.datasource
 
 import az.less.mobile.data.remote.model.auth.EmailLoginData
 import az.less.mobile.data.remote.model.auth.EmailLoginRequest
+import az.less.mobile.data.remote.model.auth.LoginPasswordData
+import az.less.mobile.data.remote.model.auth.LoginPasswordRequest
 import az.less.mobile.data.remote.model.auth.LogoutData
 import az.less.mobile.data.remote.model.auth.RefreshTokenData
 import az.less.mobile.data.remote.model.auth.RefreshTokenRequest
@@ -38,6 +40,14 @@ class AuthDataSource(
         return safeApiCall {
             httpClient.post("v1/auth/resend-otp") {
                 setBody(ResendOtpRequest(email = email))
+            }
+        }
+    }
+
+    suspend fun loginWithPassword(email: String, password: String): NetworkResult<LoginPasswordData> {
+        return safeApiCall {
+            httpClient.post("v1/auth/login") {
+                setBody(LoginPasswordRequest(email = email, password = password))
             }
         }
     }

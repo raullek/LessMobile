@@ -100,7 +100,7 @@ fun SearchByFilterBoxesDto.toDomain() = SearchBoxesResult(
 
 fun FilterBoxDto.toDomain() = FilterBox(
     id = id,
-    title = title,
+    title = title.orEmpty(),
     description = description,
     images = images,
     imageUrl = imageUrl,

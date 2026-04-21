@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import az.less.mobile.data.model.AppDefaultsEntity
 import az.less.mobile.data.model.UserEcoHeroBadgeEntity
 import az.less.mobile.data.model.UserEntity
 import az.less.mobile.data.model.UserStatsEntity
@@ -124,6 +125,11 @@ class SessionLocalRepositoryImpl(
                 mealsSaved = it.mealsSaved,
                 icon = it.icon,
                 color = it.color
+            )
+        },
+        appDefaults = appDefaults?.let {
+            AppDefaultsEntity(
+                serviceFeeRate = it.serviceeFeeRate
             )
         }
     )

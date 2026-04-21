@@ -14,7 +14,8 @@ data class User(
     val currentLocation: String? = null,
     val venue: UserVenue? = null,
     val stats: UserStats? = null,
-    val ecoHeroBadge: UserEcoHeroBadge? = null
+    val ecoHeroBadge: UserEcoHeroBadge? = null,
+    val appDefaults: AppDefaults? = null
 ) {
     val isPartner: Boolean get() = roles.contains("partner")
     val isMerchant: Boolean get() = roles.contains("merchant")
@@ -55,4 +56,8 @@ data class UserEcoHeroBadge(
     val mealsSaved: Int = 0,
     val icon: String? = null,
     val color: String? = null
+)
+
+data class AppDefaults(
+    val serviceeFeeRate: Double = 0.0
 )

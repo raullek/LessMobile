@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -35,7 +37,10 @@ import az.less.designsystem.components.DsRadioButton
 import az.less.mobile.presentation.client.reserve.models.Voucher
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_gift_24dp
+import lessmobile.composeapp.generated.resources.select_voucher_title
+import lessmobile.composeapp.generated.resources.payment_continue
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Bottom sheet for selecting a voucher
@@ -87,7 +92,7 @@ fun SelectVoucherBottomSheet(
 
                 // Title
                 Text(
-                    text = "Select voucher",
+                    text = stringResource(Res.string.select_voucher_title),
                     style = LessTheme.typography.body16Medium,
                     color = LessTheme.colors.textIconsBlack,
                     modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
@@ -95,10 +100,12 @@ fun SelectVoucherBottomSheet(
 
                 Spacer(modifier = Modifier.height(LessTheme.spacing.small))
 
-                // Vouchers list
+                // Vouchers list (scrollable)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .weight(1f, fill = false)
+                        .verticalScroll(rememberScrollState())
                         .padding(bottom = LessTheme.spacing.large)
                 ) {
                     vouchers.forEachIndexed { index, voucher ->
@@ -115,7 +122,7 @@ fun SelectVoucherBottomSheet(
 
                 // Continue button
                 DsButton(
-                    text = "Continue",
+                    text = stringResource(Res.string.payment_continue),
                     onClick = {
                         val selectedVoucher = vouchers.firstOrNull { it.id == selectedVoucherId }
                         if (selectedVoucher != null) {

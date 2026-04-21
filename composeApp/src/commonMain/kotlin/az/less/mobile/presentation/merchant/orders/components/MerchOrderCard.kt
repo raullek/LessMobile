@@ -29,6 +29,7 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.mobile.domain.model.BoxType
+import az.less.mobile.utils.formatPrice
 import az.less.mobile.presentation.merchant.orders.model.BoughtBoxItem
 import az.less.mobile.presentation.merchant.orders.model.CreatedBoxItem
 import coil3.compose.AsyncImage
@@ -313,7 +314,7 @@ private fun PriceRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "%.2f".format(originalPrice),
+                text = originalPrice.formatPrice(),
                 style = LessTheme.typography.body14Semibold.copy(
                     fontSize = 13.sp,
                     textDecoration = TextDecoration.LineThrough
@@ -335,7 +336,7 @@ private fun PriceRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "%.2f".format(discountedPrice),
+                text = discountedPrice.formatPrice(),
                 style = LessTheme.typography.body16Semibold,
                 color = LessTheme.colors.textIconsBrand
             )

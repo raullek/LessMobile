@@ -28,7 +28,8 @@
       "Read(//c/Program Files/Android/Android Studio/jbr/**)",
       "Read(//c//**)",
       "Bash(env)",
-      "WebFetch(domain:api.ktor.io)"
+      "WebFetch(domain:api.ktor.io)",
+      "mcp__claude_ai_Figma__get_design_context"
     ]
   }
 }

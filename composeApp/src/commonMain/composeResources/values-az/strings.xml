@@ -34,6 +34,12 @@
     <string name="login_email_title">E-poçt</string>
     <string name="login_email_placeholder">E-poçt</string>
 
+    <!-- Login Password Screen -->
+    <string name="welcome_login_password">Şifrə ilə daxil ol</string>
+    <string name="login_password_title">Daxil ol</string>
+    <string name="login_password_placeholder">Şifrə</string>
+    <string name="login_password_button">Daxil ol</string>
+
     <!-- Login Code Screen -->
     <string name="login_code_title">6 rəqəmli kodu daxil edin</string>
     <string name="login_code_subtitle">Biz onu %1$s ünvanına göndərdik</string>

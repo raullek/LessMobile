@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.domain.model.MerchantOffer
 import az.less.mobile.utils.formatPickupTimePair
@@ -44,6 +45,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun MerchantOfferCard(
     offer: MerchantOffer,
+    merchantName: String,
     merchantLogoUrl: String?,
     rating: Float,
     distance: String,
@@ -140,60 +142,69 @@ fun MerchantOfferCard(
                 .padding(top = 2.dp, bottom = 14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Price row
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
-                verticalAlignment = Alignment.CenterVertically
+            // Price + Venue name (grouped together)
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                // Original price (strikethrough)
-                if (offer.originalPrice > offer.discountedPrice) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = offer.originalPrice.formatPrice(),
-                            style = LessTheme.typography.body14Semibold.copy(
-                                textDecoration = TextDecoration.LineThrough
-                            ),
-                            color = LessTheme.colors.textIconsGrey
-                        )
-                        Text(
-                            text = "₼",
-                            style = LessTheme.typography.caption12Semibold.copy(
-                                textDecoration = TextDecoration.LineThrough
-                            ),
-                            color = LessTheme.colors.textIconsGrey
-                        )
-                    }
-                }
-
-                // Discounted price
+                // Price row
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Original price (strikethrough, 13sp)
+                    if (offer.originalPrice > offer.discountedPrice) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = offer.originalPrice.formatPrice(),
+                                style = LessTheme.typography.body14Semibold.copy(
+                                    fontSize = 13.sp,
+                                    textDecoration = TextDecoration.LineThrough
+                                ),
+                                color = LessTheme.colors.textIconsGrey
+                            )
+                            Text(
+                                text = "₼",
+                                style = LessTheme.typography.caption12Semibold.copy(
+                                    textDecoration = TextDecoration.LineThrough
+                                ),
+                                color = LessTheme.colors.textIconsGrey
+                            )
+                        }
+                    }
+
+                    // Discounted price
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = offer.discountedPrice.formatPrice(),
+                            style = LessTheme.typography.body16Semibold,
+                            color = LessTheme.colors.textIconsBrand
+                        )
+                        Text(
+                            text = "₼",
+                            style = LessTheme.typography.body14Semibold,
+                            color = LessTheme.colors.textIconsBrand
+                        )
+                    }
+                }
+
+                // Venue name
+                if (merchantName.isNotEmpty()) {
                     Text(
-                        text = offer.discountedPrice.formatPrice(),
-                        style = LessTheme.typography.body16Semibold,
-                        color = LessTheme.colors.textIconsBrand
-                    )
-                    Text(
-                        text = "₼",
-                        style = LessTheme.typography.body14Semibold,
-                        color = LessTheme.colors.textIconsBrand
+                        modifier = Modifier.padding(top = LessTheme.spacing.xSmall),
+                        text = merchantName,
+                        style = LessTheme.typography.body16Bold,
+                        color = LessTheme.colors.textIconsBlack,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
-
-            // Title
-            Text(
-                text = offer.title,
-                style = LessTheme.typography.body16Semibold,
-                color = LessTheme.colors.textIconsBlack,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
 
             // Divider
             HorizontalDivider(
@@ -210,7 +221,9 @@ fun MerchantOfferCard(
                     Text(
                         text = offer.category.replaceFirstChar { it.uppercase() },
                         style = LessTheme.typography.body14Medium,
-                        color = LessTheme.colors.textIconsBlack
+                        color = LessTheme.colors.textIconsBlack,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 

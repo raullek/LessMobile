@@ -34,7 +34,7 @@ data class SearchByFilterBoxesDto(
 @Serializable
 data class FilterBoxDto(
     val id: String,
-    val title: String,
+    val title: String? = null,
     val description: String? = null,
     val images: List<String> = emptyList(),
     val imageUrl: String? = null,
@@ -51,13 +51,22 @@ data class FilterBoxDto(
     val categoryId: String? = null,
     val category: FilterBoxCategoryDto? = null,
     val tagIds: List<String> = emptyList(),
-    val tags: List<String> = emptyList(),
+    val tags: List<FilterBoxTagDto> = emptyList(),
     val isOpenNow: Boolean = false,
     val pickupTime: String? = null,
     val pickupTimeStart: String? = null,
     val pickupTimeEnd: String? = null,
     val pickupTimeFormatted: String? = null,
     val venue: SearchBoxVenueDto? = null
+)
+
+@Serializable
+data class FilterBoxTagDto(
+    val id: String = "",
+    val value: String = "",
+    val title: String = "",
+    val imageUrl: String? = null,
+    val sortOrder: Int = 0
 )
 
 @Serializable

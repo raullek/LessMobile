@@ -29,21 +29,21 @@ class AccountViewModel(
     }
 
     private fun loadUserData() = intent {
-        reduce { state.copy(isLoading = true) }
+        reduce { state.copy(isDataLoading = true) }
         val user = sessionLocalRepository.currentUser.firstOrNull()
         if (user != null) {
             reduce {
                 state.copy(
-                    isLoading = false,
+                    isDataLoading = false,
                     fullName = user.name,
                     email = user.email,
-                    phoneNumber = user.phone?.removePrefix("+994") ?: "",
+                    phoneNumber = user.phone ?: "",
                     gender = Gender.fromApiValue(user.gender),
                     birthDate = user.birthDay?.isoDateToDisplayDate() ?: ""
                 )
             }
         } else {
-            reduce { state.copy(isLoading = false) }
+            reduce { state.copy(isDataLoading = false) }
         }
     }
 
@@ -105,14 +105,9 @@ class AccountViewModel(
     }
 
     private fun handlePhoneChanged(phone: String) = intent {
-        val cleanedPhone = if (phone.startsWith("+994")) {
-            phone.substring(4)
-        } else {
-            phone
-        }
         reduce {
             state.copy(
-                phoneNumber = cleanedPhone,
+                phoneNumber = phone,
                 phoneNumberError = null
             )
         }
@@ -130,13 +125,11 @@ class AccountViewModel(
     private fun validatePhoneNumber(phone: String): String? {
         if (phone.isEmpty()) return null
 
-        val cleanedPhone = phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+        val digits = phone.filter { it.isDigit() }
 
         return when {
-            !cleanedPhone.startsWith("+994") -> "Phone number must start with +994"
-            cleanedPhone.length < 13 -> "Phone number is too short"
-            cleanedPhone.length > 13 -> "Phone number is too long"
-            !cleanedPhone.substring(4).all { it.isDigit() } -> "Phone number contains invalid characters"
+            digits.length < 7 -> "Phone number is too short"
+            digits.length > 15 -> "Phone number is too long"
             else -> null
         }
     }
@@ -234,12 +227,7 @@ class AccountViewModel(
     }
 
     private fun handleSaveClicked() = intent {
-        val phoneForValidation = if (state.phoneNumber.isNotEmpty() && !state.phoneNumber.startsWith("+994")) {
-            "+994${state.phoneNumber}"
-        } else {
-            state.phoneNumber
-        }
-        val phoneError = validatePhoneNumber(phoneForValidation)
+        val phoneError = validatePhoneNumber(state.phoneNumber)
         reduce {
             state.copy(phoneNumberError = phoneError)
         }
@@ -250,7 +238,7 @@ class AccountViewModel(
 
         val request = UpdateUserRequest(
             name = state.fullName.takeIf { it.isNotEmpty() },
-            phone = phoneForValidation.takeIf { it.isNotEmpty() },
+            phone = state.phoneNumber.takeIf { it.isNotEmpty() },
             gender = state.gender?.apiValue,
             birthDay = state.birthDate.displayDateToIsoDateTime()
         )

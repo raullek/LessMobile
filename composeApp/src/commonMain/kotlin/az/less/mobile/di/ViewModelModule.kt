@@ -13,6 +13,7 @@ import az.less.mobile.presentation.client.main.favorites.FavoritesViewModel
 import az.less.mobile.presentation.client.main.search.SearchViewModel
 import az.less.mobile.presentation.client.main.voucher.VoucherViewModel
 import az.less.mobile.presentation.client.onboarding.loginemail.LoginEmailViewModel
+import az.less.mobile.presentation.client.onboarding.loginpassword.LoginPasswordViewModel
 import az.less.mobile.presentation.client.onboarding.otp.LoginCodeViewModel
 import az.less.mobile.presentation.client.reserve.ReserveViewModel
 import az.less.mobile.presentation.main.more.paymentmethods.addnewcard.AddNewCardViewModel
@@ -52,6 +53,7 @@ val viewModelModule = module {
     viewModelOf(::ReserveViewModel)
     viewModelOf(::SearchViewModel)
     viewModelOf(::LoginEmailViewModel)
+    viewModelOf(::LoginPasswordViewModel)
     viewModelOf(::LoginCodeViewModel)
     viewModelOf(::CategoryOffersViewModel)
     viewModelOf(::MerchantProfileViewModel)

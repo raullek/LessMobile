@@ -24,7 +24,12 @@ data class ReserveState(
     val itemsLeft: Int = 0,
     val pricePerPiece: Double = 0.0,
     val originalPrice: Double = 0.0,
+    val serviceFeeRate: Double = 0.0,
+    val serviceFee: Double = 0.0,
+    val discount: Double = 0.0,
     val subtotal: Double = 0.0,
+    val subtotalBeforeDiscount: Double = 0.0,
+    val voucherWarning: String? = null,
     val paymentMethodDisplay: String = "",
     val selectedPaymentCard: PaymentCard? = null,
     val availablePaymentCards: List<PaymentCard> = emptyList(),
@@ -73,6 +78,7 @@ sealed interface ReserveIntent {
     data object OnLotInfoDismissed : ReserveIntent
     data object OnSelectVoucherClicked : ReserveIntent
     data class OnVoucherSelected(val voucher: Voucher) : ReserveIntent
+    data object OnVoucherRemoved : ReserveIntent
     data object OnVoucherBottomSheetDismissed : ReserveIntent
     data object OnAddNewCardClicked : ReserveIntent
     data object OnPaymentSheetDismissed : ReserveIntent
