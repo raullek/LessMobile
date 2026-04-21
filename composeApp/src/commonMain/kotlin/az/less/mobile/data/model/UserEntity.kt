@@ -1,5 +1,6 @@
 package az.less.mobile.data.model
 
+import az.less.mobile.domain.model.auth.AppDefaults
 import az.less.mobile.domain.model.auth.User
 import az.less.mobile.domain.model.auth.UserEcoHeroBadge
 import az.less.mobile.domain.model.auth.UserStats
@@ -21,7 +22,8 @@ data class UserEntity(
     val currentLocation: String? = null,
     val venue: UserVenueEntity? = null,
     val stats: UserStatsEntity? = null,
-    val ecoHeroBadge: UserEcoHeroBadgeEntity? = null
+    val ecoHeroBadge: UserEcoHeroBadgeEntity? = null,
+    val appDefaults: AppDefaultsEntity? = null
 ) {
     fun toUser(): User = User(
         id = id,
@@ -37,7 +39,8 @@ data class UserEntity(
         currentLocation = currentLocation,
         venue = venue?.toUserVenue(),
         stats = stats?.toUserStats(),
-        ecoHeroBadge = ecoHeroBadge?.toUserEcoHeroBadge()
+        ecoHeroBadge = ecoHeroBadge?.toUserEcoHeroBadge(),
+        appDefaults = appDefaults?.toAppDefaults()
     )
 }
 
@@ -95,5 +98,14 @@ data class UserEcoHeroBadgeEntity(
         mealsSaved = mealsSaved,
         icon = icon,
         color = color
+    )
+}
+
+@Serializable
+data class AppDefaultsEntity(
+    val serviceFeeRate: Double = 0.0
+) {
+    fun toAppDefaults(): AppDefaults = AppDefaults(
+        serviceeFeeRate = serviceFeeRate
     )
 }

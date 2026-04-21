@@ -22,6 +22,7 @@ import az.less.mobile.presentation.client.main.orders.OrdersScreen
 import az.less.mobile.presentation.client.main.search.SearchScreen
 import az.less.mobile.presentation.client.main.voucher.VoucherScreen
 import az.less.mobile.presentation.client.onboarding.loginemail.LoginEmailScreen
+import az.less.mobile.presentation.client.onboarding.loginpassword.LoginPasswordScreen
 import az.less.mobile.presentation.client.onboarding.otp.LoginCodeScreen
 import az.less.mobile.presentation.client.onboarding.welcome.WelcomeScreen
 import az.less.mobile.presentation.client.reserve.OrderAcceptedScreen
@@ -101,6 +102,9 @@ sealed interface ClientRoute {
 
     @Serializable
     data class LoginCode(val email: String) : ClientRoute
+
+    @Serializable
+    data object LoginPassword : ClientRoute
 }
 
 /**
@@ -218,6 +222,15 @@ fun NavGraphBuilder.moreGraph(
         LoginCodeScreen(
             navController = navController,
             email = args.email,
+            navigateToMerchant = {
+                rootNavController.navigate(ROOT_MERCHANT)
+            }
+        )
+    }
+
+    composable<ClientRoute.LoginPassword> {
+        LoginPasswordScreen(
+            navController = navController,
             navigateToMerchant = {
                 rootNavController.navigate(ROOT_MERCHANT)
             }

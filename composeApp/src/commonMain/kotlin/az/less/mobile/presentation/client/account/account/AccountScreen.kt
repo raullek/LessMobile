@@ -43,7 +43,6 @@ import az.less.mobile.navigation.ClientRoute
 import coil3.compose.AsyncImage
 import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
-import io.github.skeptick.inputmask.compose.phone.rememberPhoneInputMaskVisualTransformation
 import az.less.mobile.utils.displayDateToMillis
 import az.less.mobile.utils.millisToDisplayDate
 import kotlinx.coroutines.launch
@@ -58,6 +57,7 @@ import az.less.designsystem.components.DsSelectionField
 import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.TextFieldColors
 import az.less.designsystem.components.DsToolBar
+import az.less.mobile.presentation.client.account.account.components.AccountScreenShimmer
 import kotlinx.coroutines.delay
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.account_title
@@ -81,10 +81,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-/**
- * Phone number mask for Azerbaijan format: +994 XX XXX XX XX
- */
-private const val PHONE_MASK = "+{994} [00] [000] [00] [00]"
 
 
 @Composable
@@ -131,9 +127,6 @@ private fun AccountScreenContent(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
-
-    // Phone mask with +994 prefix - handles pasting with or without country code
-    val phoneVisualTransformation = rememberPhoneInputMaskVisualTransformation(PHONE_MASK)
 
     LaunchedEffect(state.showGenderBottomSheet) {
         if (state.showGenderBottomSheet) {
@@ -206,6 +199,9 @@ private fun AccountScreenContent(
                 .padding(innerPadding)
                 .imePadding()
         ) {
+            if (state.isDataLoading) {
+                AccountScreenShimmer()
+            } else {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -286,16 +282,16 @@ private fun AccountScreenContent(
                     DsTextField(
                         value = state.phoneNumber,
                         onValueChange = { newValue ->
-                            val sanitized = phoneVisualTransformation.sanitize(newValue)
-                            onIntent(AccountIntent.OnPhoneChanged(sanitized))
+                            // Allow only digits, +, spaces, dashes, parentheses
+                            val filtered = newValue.filter { it.isDigit() || it in "+- ()" }
+                            onIntent(AccountIntent.OnPhoneChanged(filtered))
                         },
                         onEndIconClick = { onIntent(AccountIntent.OnPhoneChanged("")) },
-                        placeholder = "+994 XX XXX XX XX",
+                        placeholder = stringResource(Res.string.account_phone_placeholder),
                         isError = state.phoneNumberError != null,
                         errorMessage = state.phoneNumberError,
                         modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        visualTransformation = phoneVisualTransformation
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                     )
 
                     Spacer(modifier = Modifier.height(LessTheme.spacing.small))
@@ -355,6 +351,8 @@ private fun AccountScreenContent(
                     Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
                 }
             }
+
+            } // else
 
             // Toast
             AnimatedToast(

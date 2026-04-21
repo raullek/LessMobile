@@ -34,6 +34,12 @@
     <string name="login_email_title">Email</string>
     <string name="login_email_placeholder">Почта</string>
 
+    <!-- Login Password Screen -->
+    <string name="welcome_login_password">Войти с паролем</string>
+    <string name="login_password_title">Вход</string>
+    <string name="login_password_placeholder">Пароль</string>
+    <string name="login_password_button">Войти</string>
+
     <!-- Login Code Screen -->
     <string name="login_code_title">Введите 6-значный код</string>
     <string name="login_code_subtitle">Мы отправили его на %1$s по почте</string>

@@ -6,17 +6,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -38,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
@@ -55,7 +60,7 @@ import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_down24dp
-import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
+import lessmobile.composeapp.generated.resources.ic_close_24dp
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import lessmobile.composeapp.generated.resources.ic_gift_24dp
 import lessmobile.composeapp.generated.resources.ic_info_24dp
@@ -63,9 +68,16 @@ import lessmobile.composeapp.generated.resources.ic_minus_24dp
 import lessmobile.composeapp.generated.resources.ic_payment_card_24dp
 import lessmobile.composeapp.generated.resources.ic_plus_24dp
 import lessmobile.composeapp.generated.resources.ill_venue_placeholder
+import lessmobile.composeapp.generated.resources.reserve_and_pay
+import lessmobile.composeapp.generated.resources.reserve_price_per_piece
+import lessmobile.composeapp.generated.resources.reserve_select_voucher
+import lessmobile.composeapp.generated.resources.reserve_service_fee
+import lessmobile.composeapp.generated.resources.reserve_subtotal
+import lessmobile.composeapp.generated.resources.voucher_discount
 import lessmobile.composeapp.generated.resources.test_master_card_logo
 import lessmobile.composeapp.generated.resources.test_visa_card_logo
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -138,54 +150,29 @@ fun ReserveScreen(
     // Only render ModalBottomSheet when visible
     if (isVisible) {
         ModalBottomSheet(
-            onDismissRequest = {
-                onDismiss()
-                // Prevent dismiss on outside click or drag
-                // Only allow dismiss via back button
-            },
+            onDismissRequest = onDismiss,
             sheetState = sheetState,
-            containerColor = Color.Transparent,
+            containerColor = LessTheme.colors.backgroundSecond,
             contentColor = LessTheme.colors.textIconsBlack,
-            sheetGesturesEnabled = false,
             shape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp),
             dragHandle = null,
-            scrimColor = Color.Black.copy(alpha = 0.5f),
-            contentWindowInsets = {WindowInsets(0, 0, 0, 0)}
+            contentWindowInsets = { WindowInsets(0, 0, 0, 0) }
         ) {
-            // Cancel button in transparent area (similar to Stack Overflow example)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(paddingValues = PaddingValues(bottom = LessTheme.spacing.xxLarge, start = LessTheme.spacing.medium)),
-                contentAlignment = Alignment.TopStart
-            ) {
-                FilledIconButton(
-                    modifier = Modifier.size(LessTheme.size.xxLarge),
-                    onClick = {
-                        viewModel.onIntent(ReserveIntent.OnBackClicked)
-                    },
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = LessTheme.colors.backgroundPrimary
-                    )
-                ) {
-                    Icon(
-                        modifier = Modifier.size(LessTheme.size.medium).fillMaxSize(),
-                        imageVector = vectorResource(Res.drawable.ic_chevron_left_24dp),
-                        tint = LessTheme.colors.textIconsBrand,
-                        contentDescription ="")
-                }
-            }
+            BoxWithConstraints {
+                val maxSheetHeight = maxHeight * 0.9f
 
-            if (state.isLoading) {
-                ReserveScreenShimmer()
-            } else {
-                ReserveScreenContent(
-                    state = state,
-                    onIntent = viewModel::onIntent,
-                    onBackClicked = {
-                        viewModel.onIntent(ReserveIntent.OnBackClicked)
+                Column(
+                    modifier = Modifier.heightIn(max = maxSheetHeight)
+                ) {
+                    if (state.isLoading) {
+                        ReserveScreenShimmer()
+                    } else {
+                        ReserveScreenContent(
+                            state = state,
+                            onIntent = viewModel::onIntent
+                        )
                     }
-                )
+                }
             }
         }
     }
@@ -241,16 +228,36 @@ fun ReserveScreen(
 private fun ReserveScreenContent(
     state: ReserveState,
     onIntent: (ReserveIntent) -> Unit,
-    onBackClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
-            .background(color = LessTheme.colors.backgroundSecond)
             .fillMaxWidth()
-            .padding(LessTheme.spacing.medium) // Inner padding
     ) {
+        // Drag handle
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(3.dp)
+                    .clip(RoundedCornerShape(100.dp))
+                    .background(LessTheme.colors.borderPrimary)
+            )
+        }
+
+        // Scrollable content
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f, fill = false)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = LessTheme.spacing.medium)
+        ) {
 
         // Header with venue info
         Column(
@@ -432,45 +439,73 @@ private fun ReserveScreenContent(
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onIntent(ReserveIntent.OnSelectVoucherClicked) },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Gift icon
-            Box(
+        // Select voucher row — only show if vouchers available
+        if (state.availableVouchers.isNotEmpty()) {
+            Row(
                 modifier = Modifier
-                    .size(24.dp)
-                    .clip(RoundedCornerShape(LessTheme.radius.small))
-                    .background(LessTheme.colors.elementsSecondaryElement)
-            ){
-                Icon(
-                    painter = painterResource(Res.drawable.ic_gift_24dp),
-                    tint = LessTheme.colors.textIconsBrand,
-                    modifier = Modifier.fillMaxSize(),
-                    contentDescription = "")
-            }
+                    .fillMaxWidth()
+                    .clickable { onIntent(ReserveIntent.OnSelectVoucherClicked) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Gift icon
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(RoundedCornerShape(LessTheme.radius.small))
+                        .background(LessTheme.colors.elementsSecondaryElement)
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_gift_24dp),
+                        tint = LessTheme.colors.textIconsBrand,
+                        modifier = Modifier.fillMaxSize(),
+                        contentDescription = ""
+                    )
+                }
 
-            Spacer(modifier = Modifier.width(LessTheme.spacing.medium))
+                Spacer(modifier = Modifier.width(LessTheme.spacing.xSmall))
 
-            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = state.selectedVoucher?.name ?: "Select voucher",
-                    style = LessTheme.typography.body16Regular,
-                    color = LessTheme.colors.textIconsBlack
+                    text = state.selectedVoucher?.name
+                        ?: stringResource(Res.string.reserve_select_voucher),
+                    style = LessTheme.typography.body16Medium,
+                    color = LessTheme.colors.textIconsBlack,
+                    modifier = Modifier.weight(1f)
                 )
+
+                if (state.selectedVoucher != null) {
+                    // X to remove voucher
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_close_24dp),
+                        contentDescription = "Remove voucher",
+                        tint = LessTheme.colors.textIconsGrey,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { onIntent(ReserveIntent.OnVoucherRemoved) }
+                    )
+                } else {
+                    Icon(
+                        imageVector = vectorResource(Res.drawable.ic_chevron_down24dp),
+                        contentDescription = "Select voucher",
+                        tint = LessTheme.colors.textIconsBrand,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
 
-            Icon(
-                imageVector = vectorResource(Res.drawable.ic_chevron_down24dp),
-                contentDescription = "Select voucher",
-                tint = LessTheme.colors.textIconsBrand,
-                modifier = Modifier.size(24.dp)
-            )
+            Spacer(modifier = Modifier.height(LessTheme.spacing.large))
         }
 
-        Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+        // Voucher warning
+        if (state.voucherWarning != null) {
+            Text(
+                text = state.voucherWarning,
+                style = LessTheme.typography.body14Medium,
+                color = LessTheme.colors.textIconsError,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
+        }
 
         // Price breakdown
         Column(
@@ -479,17 +514,68 @@ private fun ReserveScreenContent(
         ) {
             // Price per piece
             PriceRow(
-                label = "Price per piece",
+                label = stringResource(Res.string.reserve_price_per_piece),
                 value = "${state.pricePerPiece.formatPrice()} ₼"
             )
 
-            Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
+            // Service fee — show row if rate is configured
+            if (state.serviceFeeRate > 0.0) {
+                Spacer(modifier = Modifier.height(LessTheme.spacing.small))
 
-            // Subtotal
-            PriceRow(
-                label = "Subtotal",
-                value = "${state.subtotal.formatPrice()} ₼",
-            )
+                PriceRow(
+                    label = stringResource(Res.string.reserve_service_fee),
+                    value = "${state.serviceFee.formatPrice()} ₼"
+                )
+            }
+
+            // Discount row — only when voucher selected
+            if (state.discount > 0.0) {
+                Spacer(modifier = Modifier.height(LessTheme.spacing.small))
+
+                PriceRow(
+                    label = stringResource(Res.string.voucher_discount),
+                    value = "${state.discount.formatPrice()} ₼"
+                )
+            }
+
+            Spacer(modifier = Modifier.height(LessTheme.spacing.small))
+
+            // Subtotal — with strikethrough if discount applied
+            if (state.discount > 0.0) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(Res.string.reserve_subtotal),
+                        style = LessTheme.typography.body16Medium,
+                        color = LessTheme.colors.textIconsGrey
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${state.subtotalBeforeDiscount.formatPrice()} ₼",
+                            style = LessTheme.typography.body16Medium.copy(
+                                textDecoration = TextDecoration.LineThrough
+                            ),
+                            color = LessTheme.colors.textIconsGrey
+                        )
+                        Text(
+                            text = "${state.subtotal.formatPrice()} ₼",
+                            style = LessTheme.typography.body16Medium,
+                            color = LessTheme.colors.textIconsBlack
+                        )
+                    }
+                }
+            } else {
+                PriceRow(
+                    label = stringResource(Res.string.reserve_subtotal),
+                    value = "${state.subtotal.formatPrice()} ₼"
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
@@ -564,20 +650,22 @@ private fun ReserveScreenContent(
         }
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+        } // end scrollable content
 
-        // Reserve and pay button
+        // Reserve and pay button — pinned at bottom, safe from nav bar
         DsButton(
-            text = "Reserve and pay",
+            text = stringResource(Res.string.reserve_and_pay),
             onClick = { onIntent(ReserveIntent.OnPlaceOrderClicked) },
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(horizontal = LessTheme.spacing.medium)
+                .padding(bottom = 8.dp)
+                .navigationBarsPadding(),
             variant = ButtonVariant.Primary,
             size = ButtonSize.Large,
             enabled = !state.isLoading,
             isLoading = state.isLoading
         )
-
-        Spacer(modifier = Modifier.height(LessTheme.spacing.medium))
     }
 }
 

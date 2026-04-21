@@ -2,6 +2,7 @@ package az.less.mobile.presentation.merchant.more
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.domain.model.auth.AppDefaults
 import az.less.mobile.domain.model.auth.User
 import az.less.mobile.domain.model.auth.UserEcoHeroBadge
 import az.less.mobile.domain.model.auth.UserStats
@@ -117,6 +118,11 @@ class MerchMoreViewModel(
                                 mealsSaved = it.mealsSaved,
                                 icon = it.icon,
                                 color = it.color
+                            )
+                        },
+                        appDefaults = profileData.appDefaults?.let {
+                            AppDefaults(
+                                serviceeFeeRate = it.serviceFee?.rate ?: 0.0
                             )
                         }
                     )

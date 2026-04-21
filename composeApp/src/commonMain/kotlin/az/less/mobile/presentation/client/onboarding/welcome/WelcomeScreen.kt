@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import az.less.designsystem.base.LessTheme
+import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.mobile.navigation.ClientRoute
 import lessmobile.composeapp.generated.resources.Res
@@ -26,6 +27,7 @@ import lessmobile.composeapp.generated.resources.ill_welcome_screen_320dp
 import lessmobile.composeapp.generated.resources.welcome_title
 import lessmobile.composeapp.generated.resources.welcome_subtitle
 import lessmobile.composeapp.generated.resources.welcome_login_email
+import lessmobile.composeapp.generated.resources.welcome_login_password
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -39,6 +41,9 @@ fun WelcomeScreen(
     WelcomeScreenContent(
         onLoginClick = {
             navController.navigate(ClientRoute.LoginEmail)
+        },
+        onLoginPasswordClick = {
+            navController.navigate(ClientRoute.LoginPassword)
         }
     )
 }
@@ -46,6 +51,7 @@ fun WelcomeScreen(
 @Composable
 fun WelcomeScreenContent(
     onLoginClick: () -> Unit,
+    onLoginPasswordClick: () -> Unit = {},
 ) {
     Column (
         modifier = Modifier
@@ -101,6 +107,17 @@ fun WelcomeScreenContent(
                 onLoginClick()
             },
             leadingIcon = vectorResource(Res.drawable.ic_mail_24dp)
+        )
+
+        Spacer(modifier = Modifier.height(LessTheme.spacing.small))
+
+        DsButton(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(Res.string.welcome_login_password),
+            onClick = {
+                onLoginPasswordClick()
+            },
+            variant = ButtonVariant.Secondary
         )
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.medium))

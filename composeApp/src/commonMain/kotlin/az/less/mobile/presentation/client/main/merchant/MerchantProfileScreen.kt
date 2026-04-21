@@ -223,6 +223,7 @@ fun MerchantProfileScreenContent(
                         ) { offer ->
                             MerchantOfferCard(
                                 offer = offer,
+                                merchantName = state.merchantName,
                                 merchantLogoUrl = state.merchantLogoUrl,
                                 rating = state.rating,
                                 distance = state.distance,

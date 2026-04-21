@@ -1,6 +1,7 @@
 package az.less.mobile.presentation.client.main.voucher.models
 
 import az.less.mobile.data.remote.model.VoucherItemDto
+import az.less.mobile.utils.formatPrice
 
 data class Voucher(
     val id: String,
@@ -17,7 +18,7 @@ data class Voucher(
     val formattedValue: String
         get() = when (type) {
             "percent" -> "${(value * 100).toInt()}%"
-            "fixed" -> "${"%.2f".format(value)} $currency"
+            "fixed" -> "${value.formatPrice()} $currency"
             else -> value.toString()
         }
 }

@@ -31,7 +31,20 @@ data class OrderItemDto(
     val completedAt: String? = null,
     val createdAt: String? = null,
     val venue: OrderVenueDto? = null,
-    val item: OrderItemSnapshotDto? = null
+    val item: OrderItemSnapshotDto? = null,
+    val box: OrderBoxDto? = null
+)
+
+@Serializable
+data class OrderBoxDto(
+    val id: String? = null,
+    val title: String? = null,
+    val description: String? = null,
+    val defaultBoxTitle: String? = null,
+    val defaultBoxDescription: String? = null,
+    val images: List<String> = emptyList(),
+    val originalPrice: Double = 0.0,
+    val discountedPrice: Double = 0.0
 )
 
 @Serializable

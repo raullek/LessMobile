@@ -10,7 +10,8 @@ import kotlinx.serialization.Serializable
 data class UserProfileData(
     val user: UserProfileUser,
     val stats: UserProfileStats? = null,
-    val ecoHeroBadge: UserProfileEcoBadge? = null
+    val ecoHeroBadge: UserProfileEcoBadge? = null,
+    val appDefaults: AppDefaultsDto? = null
 )
 
 @Serializable
@@ -89,4 +90,14 @@ data class UserPreferences(
     val notifications: Boolean = true,
     val darkMode: Boolean = false,
     val locale: String? = null
+)
+
+@Serializable
+data class AppDefaultsDto(
+    val serviceFee: ServiceFeeDto? = null
+)
+
+@Serializable
+data class ServiceFeeDto(
+    val rate: Double = 0.0
 )

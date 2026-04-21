@@ -342,7 +342,7 @@ private fun BoughtBoxDto.toBoughtBoxItem() = BoughtBoxItem(
     id = id,
     orderId = orderId ?: id,
     reserveNumber = reserveNumber ?: "",
-    boxTitle = box?.description ?: box?.defaultBoxDescription ?: box?.title ?: box?.defaultBoxTitle ?: "",
+    boxTitle = box?.title ?: box?.defaultBoxTitle ?: "",
     boxType = box?.boxType,
     imageUrl = box?.image ?: box?.defaultBoxImage,
     originalPrice = box?.originalPrice ?: 0.0,
@@ -358,7 +358,7 @@ private fun BoughtBoxDto.toBoughtBoxItem() = BoughtBoxItem(
 
 private fun CreatedBoxDto.toCreatedBoxItem() = CreatedBoxItem(
     id = id,
-    title = description ?: defaultBoxDescription ?: title ?: defaultBoxTitle ?: "",
+    title = title ?: defaultBoxTitle ?: "",
     boxType = boxType,
     description = description,
     imageUrl = image ?: defaultBoxImage,

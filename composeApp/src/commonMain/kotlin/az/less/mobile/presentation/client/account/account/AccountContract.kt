@@ -4,6 +4,7 @@ import az.less.designsystem.components.ToastType
 
 
 data class AccountState(
+    val isDataLoading: Boolean = true,
     val isLoading: Boolean = false,
     val fullName: String = "",
     val phoneNumber: String = "",

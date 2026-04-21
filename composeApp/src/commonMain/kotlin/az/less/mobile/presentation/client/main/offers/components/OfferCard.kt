@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.client.main.offers.models.OfferItem
 import coil3.compose.AsyncImage
@@ -42,7 +43,7 @@ import org.jetbrains.compose.resources.stringResource
 
 /**
  * Vertical offer card component for Top Rated and Top Picks sections
- * Based on Figma design with image, pricing, restaurant info, pickup time, rating, and distance
+ * Based on Figma design: node-id=2121-38423
  */
 @Composable
 fun OfferCard(
@@ -68,7 +69,7 @@ fun OfferCard(
                 .fillMaxWidth()
                 .height(140.dp)
         ) {
-            // Main image
+            // Main image with 2dp outer padding, 14dp top corners
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -76,17 +77,19 @@ fun OfferCard(
                     .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
                     .background(Color(0xFFFFF2EB))
             ) {
-                    AsyncImage(
-                        model = offerItem.imageUrl,
-                        contentDescription = offerItem.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                        error = painterResource(Res.drawable.ill_box_placeholder),
-                        placeholder = painterResource(Res.drawable.ill_box_placeholder)
-                    )
-                }
+                AsyncImage(
+                    model = offerItem.imageUrl,
+                    contentDescription = offerItem.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 4.dp),
+                    error = painterResource(Res.drawable.ill_box_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_box_placeholder)
+                )
+            }
 
-            // "X left" badge - top left
+            // "X left" badge - top left, px=8 py=4
             if (offerItem.itemsLeft > 0) {
                 Box(
                     modifier = Modifier
@@ -106,7 +109,7 @@ fun OfferCard(
                 }
             }
 
-            // Merchant logo - bottom right overlapping
+            // Merchant logo - bottom right overlapping, 40dp, rounded 12.5dp
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -120,20 +123,18 @@ fun OfferCard(
                         shape = RoundedCornerShape(12.5.dp)
                     )
             ) {
-
-                    AsyncImage(
-                        model = offerItem.restaurantLogoUrl,
-                        contentDescription = "${offerItem.restaurantName} logo",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                        error = painterResource(Res.drawable.ill_venue_placeholder),
-                        placeholder = painterResource(Res.drawable.ill_venue_placeholder)
-                    )
-
+                AsyncImage(
+                    model = offerItem.restaurantLogoUrl,
+                    contentDescription = "${offerItem.restaurantName} logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(Res.drawable.ill_venue_placeholder),
+                    placeholder = painterResource(Res.drawable.ill_venue_placeholder)
+                )
             }
         }
 
-        // Content section
+        // Content section - px=12, pt=2, pb=14, gap=10
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,58 +142,67 @@ fun OfferCard(
                 .padding(top = 2.dp, bottom = 14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Price row
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
-                verticalAlignment = Alignment.CenterVertically
+            // Price + Title + Venue name (grouped together per Figma)
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                // Original price (strikethrough)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = offerItem.originalPrice,
-                        style = LessTheme.typography.body14Semibold.copy(
-                            textDecoration = TextDecoration.LineThrough
-                        ),
-                        color = LessTheme.colors.textIconsGrey
-                    )
-                    Text(
-                        text = "₼",
-                        style = LessTheme.typography.caption12Semibold.copy(
-                            textDecoration = TextDecoration.LineThrough
-                        ),
-                        color = LessTheme.colors.textIconsGrey
-                    )
-                }
-
-                // Discounted price
+                // Price row - gap=4 between original and discounted
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Original price (strikethrough, 13sp per Figma)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = offerItem.originalPrice,
+                            style = LessTheme.typography.body14Semibold.copy(
+                                fontSize = 13.sp,
+                                textDecoration = TextDecoration.LineThrough
+                            ),
+                            color = LessTheme.colors.textIconsGrey
+                        )
+                        Text(
+                            text = "₼",
+                            style = LessTheme.typography.caption12Semibold.copy(
+                                textDecoration = TextDecoration.LineThrough
+                            ),
+                            color = LessTheme.colors.textIconsGrey
+                        )
+                    }
+
+                    // Discounted price (16sp semibold, green)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = offerItem.currentPrice,
+                            style = LessTheme.typography.body16Semibold,
+                            color = LessTheme.colors.textIconsBrand
+                        )
+                        Text(
+                            text = "₼",
+                            style = LessTheme.typography.body14Semibold,
+                            color = LessTheme.colors.textIconsBrand
+                        )
+                    }
+                }
+
+                // Venue name
+                if (offerItem.restaurantName.isNotEmpty()) {
                     Text(
-                        text = offerItem.currentPrice,
-                        style = LessTheme.typography.body16Semibold,
-                        color = LessTheme.colors.textIconsBrand
-                    )
-                    Text(
-                        text = "₼",
-                        style = LessTheme.typography.body14Semibold,
-                        color = LessTheme.colors.textIconsBrand
+                        modifier = Modifier.padding(top = LessTheme.spacing.xSmall),
+                        text = offerItem.restaurantName,
+                        style = LessTheme.typography.body16Bold,
+                        color = LessTheme.colors.textIconsBlack,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
-
-            // Title
-            Text(
-                text = offerItem.title,
-                style = LessTheme.typography.body16Semibold,
-                color = LessTheme.colors.textIconsBlack,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
 
             // Divider
             HorizontalDivider(
@@ -200,27 +210,31 @@ fun OfferCard(
                 thickness = 1.dp
             )
 
-            // Bag type, Category, and Pickup time
+            // Bag type, Category, and Pickup time - gap=4
             Column(
                 verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)
             ) {
-                // Bag type (green text)
+                // Bag type (green text, 14sp medium)
                 if (offerItem.bagType != null) {
                     Text(
                         text = offerItem.bagType,
                         style = LessTheme.typography.body14Medium,
-                        color = LessTheme.colors.textIconsBrand
+                        color = LessTheme.colors.textIconsBrand,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
-                // Category (black text)
+                // Category (black text, 14sp medium)
                 Text(
                     text = offerItem.category,
                     style = LessTheme.typography.body14Medium,
-                    color = LessTheme.colors.textIconsBlack
+                    color = LessTheme.colors.textIconsBlack,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                // Pickup time (grey text)
+                // Pickup time (grey text, 14sp medium)
                 val pickupParts = offerItem.pickupTime.split(" - ")
                 Text(
                     text = if (pickupParts.size == 2) {
@@ -241,23 +255,23 @@ fun OfferCard(
                 thickness = 1.dp
             )
 
-            // Rating and distance row
+            // Rating and distance row - gap=6
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Rating
+                // Rating - star icon in 20dp green rounded box + text
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Star icon
+                    // Star icon box - 20dp, rounded 8dp, 2dp padding
                     Box(
                         modifier = Modifier
                             .size(20.dp)
                             .background(
                                 color = LessTheme.colors.textIconsBrand,
-                                shape = RoundedCornerShape(LessTheme.spacing.xSmall)
+                                shape = RoundedCornerShape(8.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
@@ -276,7 +290,7 @@ fun OfferCard(
                     )
                 }
 
-                // Dot separator
+                // Dot separator - 3dp circle
                 Box(
                     modifier = Modifier
                         .size(3.dp)

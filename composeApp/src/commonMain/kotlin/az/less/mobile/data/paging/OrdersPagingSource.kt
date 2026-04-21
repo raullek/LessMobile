@@ -56,7 +56,7 @@ private fun Double.formatAmount(): String {
 
 private fun OrderItemDto.toDomain() = Order(
     id = id,
-    title = item?.name ?: venue?.name ?: "",
+    title = item?.name ?: box?.title ?: box?.defaultBoxTitle ?: venue?.name ?: "",
     imageUrl = item?.image,
     pickupTimeStart = pickupTimeStart?.extractTime(),
     pickupTimeEnd = pickupTimeEnd?.extractTime(),
