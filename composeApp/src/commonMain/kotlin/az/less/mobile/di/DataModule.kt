@@ -31,6 +31,7 @@ import az.less.mobile.domain.repository.OrdersRepository
 import az.less.mobile.domain.repository.VenuesRepository
 import az.less.mobile.domain.repository.VouchersRepository
 import az.less.mobile.domain.usecase.CalculateOrderPriceUseCase
+import az.less.mobile.domain.usecase.RefreshUserProfileUseCase
 import az.less.mobile.domain.usecase.ValidateAndBuildBoxRequestUseCase
 import az.less.mobile.domain.usecase.ValidateVoucherUseCase
 import org.koin.dsl.module
@@ -64,4 +65,5 @@ val dataModule = module {
     factory { ValidateAndBuildBoxRequestUseCase() }
     factory { CalculateOrderPriceUseCase() }
     factory { ValidateVoucherUseCase() }
+    factory { RefreshUserProfileUseCase(get(), get()) }
 }

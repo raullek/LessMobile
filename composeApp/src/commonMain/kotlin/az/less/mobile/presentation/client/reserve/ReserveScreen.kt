@@ -518,16 +518,6 @@ private fun ReserveScreenContent(
                 value = "${state.pricePerPiece.formatPrice()} ₼"
             )
 
-            // Service fee — show row if rate is configured
-            if (state.serviceFeeRate > 0.0) {
-                Spacer(modifier = Modifier.height(LessTheme.spacing.small))
-
-                PriceRow(
-                    label = stringResource(Res.string.reserve_service_fee),
-                    value = "${state.serviceFee.formatPrice()} ₼"
-                )
-            }
-
             // Discount row — only when voucher selected
             if (state.discount > 0.0) {
                 Spacer(modifier = Modifier.height(LessTheme.spacing.small))
@@ -535,6 +525,16 @@ private fun ReserveScreenContent(
                 PriceRow(
                     label = stringResource(Res.string.voucher_discount),
                     value = "${state.discount.formatPrice()} ₼"
+                )
+            }
+
+            // Service fee — show row if rate is configured
+            if (state.serviceFeeRate > 0.0) {
+                Spacer(modifier = Modifier.height(LessTheme.spacing.small))
+
+                PriceRow(
+                    label = stringResource(Res.string.reserve_service_fee),
+                    value = "${state.serviceFee.formatPrice()} ₼"
                 )
             }
 

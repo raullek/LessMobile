@@ -2,15 +2,10 @@ package az.less.mobile.presentation.merchant.more
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import az.less.mobile.domain.model.auth.AppDefaults
-import az.less.mobile.domain.model.auth.User
-import az.less.mobile.domain.model.auth.UserEcoHeroBadge
-import az.less.mobile.domain.model.auth.UserStats
-import az.less.mobile.domain.model.auth.UserVenue
-import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.ContentRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import az.less.mobile.domain.usecase.RefreshUserProfileUseCase
 import az.less.mobile.presentation.theme.ThemeManager
 import az.less.mobile.presentation.merchant.more.model.MerchCellId
 import az.less.mobile.presentation.merchant.more.model.MerchMoreCellModel
@@ -40,7 +35,7 @@ class MerchMoreViewModel(
     private val sessionLocalRepository: SessionLocalRepository,
     private val authorizationRepository: AuthorizationRepository,
     private val contentRepository: ContentRepository,
-    private val accountRepository: AccountRepository,
+    private val refreshUserProfile: RefreshUserProfileUseCase,
     private val themeManager: ThemeManager
 ) : ViewModel(), ContainerHost<MerchMoreState, MerchMoreSideEffect> {
 
@@ -74,61 +69,7 @@ class MerchMoreViewModel(
     }
 
     private fun refreshUserInBackground() {
-        viewModelScope.launch {
-            accountRepository.getProfile()
-                .onSuccess { profileData ->
-                    val userData = profileData.user
-                    val updatedUser = User(
-                        id = userData.id,
-                        name = userData.name,
-                        email = userData.email,
-                        roles = userData.roles,
-                        status = userData.status,
-                        avatarUrl = userData.avatar,
-                        phone = userData.phone,
-                        gender = userData.gender,
-                        birthDay = userData.birthDay,
-                        emailVerified = userData.emailVerified,
-                        currentLocation = userData.currentLocation,
-                        venue = userData.venue?.let {
-                            UserVenue(
-                                id = it.id,
-                                name = it.name,
-                                businessName = it.businessName,
-                                businessAddress = it.businessAddress,
-                                businessDescription = it.businessDescription,
-                                businessLogo = it.businessLogo,
-                                coverImage = it.coverImage,
-                                rating = it.rating,
-                                totalReviews = it.totalReviews,
-                                status = it.status
-                            )
-                        },
-                        stats = profileData.stats?.let {
-                            UserStats(
-                                mealsSaved = it.mealsSaved,
-                                co2Saved = it.co2Saved,
-                                moneySaved = it.moneySaved
-                            )
-                        },
-                        ecoHeroBadge = profileData.ecoHeroBadge?.let {
-                            UserEcoHeroBadge(
-                                level = it.level,
-                                message = it.message,
-                                mealsSaved = it.mealsSaved,
-                                icon = it.icon,
-                                color = it.color
-                            )
-                        },
-                        appDefaults = profileData.appDefaults?.let {
-                            AppDefaults(
-                                serviceeFeeRate = it.serviceFee?.rate ?: 0.0
-                            )
-                        }
-                    )
-                    sessionLocalRepository.updateUser(updatedUser)
-                }
-        }
+        viewModelScope.launch { refreshUserProfile() }
     }
 
     private fun observeUserState() {

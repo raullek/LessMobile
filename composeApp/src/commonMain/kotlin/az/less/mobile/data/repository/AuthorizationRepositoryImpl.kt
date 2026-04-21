@@ -8,11 +8,7 @@ import az.less.mobile.data.remote.model.auth.LogoutData
 import az.less.mobile.data.remote.model.auth.RefreshTokenData
 import az.less.mobile.data.remote.model.auth.ResendOtpData
 import az.less.mobile.data.remote.model.auth.VerifyOtpData
-import az.less.mobile.domain.model.auth.AppDefaults
-import az.less.mobile.domain.model.auth.User
-import az.less.mobile.domain.model.auth.UserEcoHeroBadge
-import az.less.mobile.domain.model.auth.UserStats
-import az.less.mobile.domain.model.auth.UserVenue
+import az.less.mobile.data.remote.model.mapper.toUser
 import az.less.mobile.domain.repository.AuthorizationRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.network.NetworkResult
@@ -50,60 +46,10 @@ class AuthorizationRepositoryImpl(
         }
 
         val profileData = (profileResult as NetworkResult.Success).data
-        val userData = profileData.user
-
-        val user = User(
-            id = userData.id,
-            name = userData.name,
-            email = userData.email,
-            roles = userData.roles,
-            status = userData.status,
-            avatarUrl = userData.avatar,
-            phone = userData.phone,
-            gender = userData.gender,
-            birthDay = userData.birthDay,
-            emailVerified = userData.emailVerified,
-            currentLocation = userData.currentLocation,
-            venue = userData.venue?.let {
-                UserVenue(
-                    id = it.id,
-                    name = it.name,
-                    businessName = it.businessName,
-                    businessAddress = it.businessAddress,
-                    businessDescription = it.businessDescription,
-                    businessLogo = it.businessLogo,
-                    coverImage = it.coverImage,
-                    rating = it.rating,
-                    totalReviews = it.totalReviews,
-                    status = it.status
-                )
-            },
-            stats = profileData.stats?.let {
-                UserStats(
-                    mealsSaved = it.mealsSaved,
-                    co2Saved = it.co2Saved,
-                    moneySaved = it.moneySaved
-                )
-            },
-            ecoHeroBadge = profileData.ecoHeroBadge?.let {
-                UserEcoHeroBadge(
-                    level = it.level,
-                    message = it.message,
-                    mealsSaved = it.mealsSaved,
-                    icon = it.icon,
-                    color = it.color
-                )
-            },
-            appDefaults = profileData.appDefaults?.let {
-                AppDefaults(
-                    serviceeFeeRate = it.serviceFee?.rate ?: 0.0
-                )
-            }
-        )
 
         // Save full session (user + tokens)
         sessionLocalRepository.saveSession(
-            user = user,
+            user = profileData.toUser(),
             accessToken = otpData.accessToken,
             refreshToken = otpData.refreshToken
         )
@@ -130,60 +76,10 @@ class AuthorizationRepositoryImpl(
         }
 
         val profileData = (profileResult as NetworkResult.Success).data
-        val userData = profileData.user
-
-        val user = User(
-            id = userData.id,
-            name = userData.name,
-            email = userData.email,
-            roles = userData.roles,
-            status = userData.status,
-            avatarUrl = userData.avatar,
-            phone = userData.phone,
-            gender = userData.gender,
-            birthDay = userData.birthDay,
-            emailVerified = userData.emailVerified,
-            currentLocation = userData.currentLocation,
-            venue = userData.venue?.let {
-                UserVenue(
-                    id = it.id,
-                    name = it.name,
-                    businessName = it.businessName,
-                    businessAddress = it.businessAddress,
-                    businessDescription = it.businessDescription,
-                    businessLogo = it.businessLogo,
-                    coverImage = it.coverImage,
-                    rating = it.rating,
-                    totalReviews = it.totalReviews,
-                    status = it.status
-                )
-            },
-            stats = profileData.stats?.let {
-                UserStats(
-                    mealsSaved = it.mealsSaved,
-                    co2Saved = it.co2Saved,
-                    moneySaved = it.moneySaved
-                )
-            },
-            ecoHeroBadge = profileData.ecoHeroBadge?.let {
-                UserEcoHeroBadge(
-                    level = it.level,
-                    message = it.message,
-                    mealsSaved = it.mealsSaved,
-                    icon = it.icon,
-                    color = it.color
-                )
-            },
-            appDefaults = profileData.appDefaults?.let {
-                AppDefaults(
-                    serviceeFeeRate = it.serviceFee?.rate ?: 0.0
-                )
-            }
-        )
 
         // Save full session (user + tokens)
         sessionLocalRepository.saveSession(
-            user = user,
+            user = profileData.toUser(),
             accessToken = loginData.accessToken,
             refreshToken = loginData.refreshToken
         )

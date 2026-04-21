@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.mobile.domain.repository.OffersRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import az.less.mobile.domain.usecase.RefreshUserProfileUseCase
 import az.less.mobile.presentation.client.main.offers.models.CategoryFilter
 import az.less.mobile.presentation.client.main.offers.models.UserInfo
 import kotlinx.serialization.encodeToString
@@ -19,7 +20,8 @@ import org.orbitmvi.orbit.container
 
 class OffersViewModel(
     private val offersRepository: OffersRepository,
-    private val sessionLocalRepository: SessionLocalRepository
+    private val sessionLocalRepository: SessionLocalRepository,
+    private val refreshUserProfile: RefreshUserProfileUseCase
 ) : ViewModel(), ContainerHost<OffersState, OffersSideEffect> {
 
     override val container: Container<OffersState, OffersSideEffect> =
@@ -29,7 +31,12 @@ class OffersViewModel(
 
     init {
         observeUserInfo()
+        refreshUserProfileIfLoggedIn()
         loadOffers()
+    }
+
+    private fun refreshUserProfileIfLoggedIn() {
+        viewModelScope.launch { refreshUserProfile() }
     }
 
     fun onIntent(intent: OffersIntent) {
