@@ -108,6 +108,20 @@ private fun daysInMonth(month: Int, year: Int): Int = when (month) {
  * 887328000000 → "14.02.1998"
  */
 fun Long.millisToDisplayDate(): String {
+    val (y, m, d) = millisToYmd()
+    return "${d.toString().padStart(2, '0')}.${m.toString().padStart(2, '0')}.$y"
+}
+
+/**
+ * Converts UTC epoch millis to API date format (YYYY-MM-DD).
+ * 887328000000 → "1998-02-14"
+ */
+fun Long.millisToApiDate(): String {
+    val (y, m, d) = millisToYmd()
+    return "$y-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}"
+}
+
+private fun Long.millisToYmd(): Triple<Int, Int, Int> {
     var days = (this / MILLIS_PER_DAY).toInt()
     var year = 1970
     while (true) {
@@ -123,8 +137,7 @@ fun Long.millisToDisplayDate(): String {
         days -= dim
         month++
     }
-    val day = days + 1
-    return "${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.$year"
+    return Triple(year, month, days + 1)
 }
 
 /**
@@ -134,10 +147,22 @@ fun Long.millisToDisplayDate(): String {
 fun String.displayDateToMillis(): Long? {
     val parts = split(".")
     if (parts.size != 3) return null
+    return ymdToMillis(parts[2].toIntOrNull(), parts[1].toIntOrNull(), parts[0].toIntOrNull())
+}
+
+/**
+ * Converts an API date string (YYYY-MM-DD) to UTC epoch millis.
+ * "1998-02-14" → 887328000000
+ */
+fun String.apiDateToMillis(): Long? {
+    val parts = split("-")
+    if (parts.size != 3) return null
+    return ymdToMillis(parts[0].toIntOrNull(), parts[1].toIntOrNull(), parts[2].toIntOrNull())
+}
+
+private fun ymdToMillis(year: Int?, month: Int?, day: Int?): Long? {
+    if (year == null || month == null || day == null) return null
     return try {
-        val day = parts[0].toInt()
-        val month = parts[1].toInt()
-        val year = parts[2].toInt()
         var totalDays = 0L
         for (y in 1970 until year) {
             totalDays += if (isLeapYear(y)) 366 else 365

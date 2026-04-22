@@ -17,8 +17,15 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,56 +36,42 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.merchant.history.components.DownloadIconButton
 import az.less.mobile.presentation.merchant.history.components.FilterButton
 import az.less.mobile.presentation.merchant.history.components.IncomePositionItem
+import az.less.mobile.utils.apiDateToMillis
+import az.less.mobile.utils.currentTimeMillis
+import az.less.mobile.utils.millisToApiDate
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.history_all_branches
+import lessmobile.composeapp.generated.resources.action_cancel
+import lessmobile.composeapp.generated.resources.action_clear
+import lessmobile.composeapp.generated.resources.action_ok
 import lessmobile.composeapp.generated.resources.history_empty
-import lessmobile.composeapp.generated.resources.history_select_month
+import lessmobile.composeapp.generated.resources.history_select_date_range
 import lessmobile.composeapp.generated.resources.history_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-/**
- * Stateful IncomeHistoryScreen that connects to ViewModel
- * This is the entry point used by navigation
- */
 @Composable
 fun IncomeHistoryScreen(
     navController: androidx.navigation.NavController,
     viewModel: IncomeHistoryViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
-    
-    // Collect side effects
+
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is IncomeHistorySideEffect.ShowError -> {
-                // TODO: Show error snackbar
-            }
-            is IncomeHistorySideEffect.ShowIncomePositionDetails -> {
-                // TODO: Navigate to income position details
-            }
-            is IncomeHistorySideEffect.ShowMonthPicker -> {
-                // TODO: Show month picker bottom sheet
-            }
-            is IncomeHistorySideEffect.ShowBranchPicker -> {
-                // TODO: Show branch picker bottom sheet
-            }
+            is IncomeHistorySideEffect.ShowError -> Unit
+            is IncomeHistorySideEffect.ShowIncomePositionDetails -> Unit
         }
     }
-    
-    // Render the stateless UI
+
     IncomeHistoryScreenContent(
         state = state,
         onIntent = viewModel::onIntent
     )
 }
 
-/**
- * Stateless IncomeHistoryScreen UI implementation
- * Pure UI that receives state and emits intents
- */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IncomeHistoryScreenContent(
     state: IncomeHistoryState,
@@ -92,7 +85,6 @@ fun IncomeHistoryScreenContent(
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,8 +98,7 @@ fun IncomeHistoryScreenContent(
                 color = LessTheme.colors.textIconsBlack
             )
         }
-        
-        // Filter buttons row
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -117,87 +108,177 @@ fun IncomeHistoryScreenContent(
                 ),
             horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
         ) {
-            // Download icon button
             DownloadIconButton(
                 onClick = { onIntent(IncomeHistoryIntent.OnDownloadClicked) }
             )
-            
-            // Month filter button
-            FilterButton(
-                text = state.selectedMonth?.displayName ?: stringResource(Res.string.history_select_month),
-                onClick = { onIntent(IncomeHistoryIntent.OnMonthFilterClicked) },
-                modifier = Modifier.weight(1f)
-            )
 
-            // Branch filter button
+            val dateRangeLabel = formatDateRangeLabel(state.startDate, state.endDate)
+                ?: stringResource(Res.string.history_select_date_range)
             FilterButton(
-                text = state.selectedBranch?.name ?: stringResource(Res.string.history_all_branches),
-                onClick = { onIntent(IncomeHistoryIntent.OnBranchFilterClicked) },
+                text = dateRangeLabel,
+                onClick = { onIntent(IncomeHistoryIntent.OnDateRangeFilterClicked) },
                 modifier = Modifier.weight(1f)
             )
         }
-        
-        // Income history list
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = LessTheme.colors.textIconsBrand
-                )
-            }
-        } else if (state.incomeHistory.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(Res.string.history_empty),
-                    style = LessTheme.typography.body16Medium,
-                    color = LessTheme.colors.textIconsGrey,
-                    textAlign = TextAlign.Center
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    start = 0.dp,
-                    end = 0.dp,
-                    bottom = LessTheme.spacing.xLarge
-                ),
-                verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
-            ) {
-                items(
-                    items = state.incomeHistory,
-                    key = { it.date }
-                ) { incomeHistory ->
-                    IncomeHistoryGroup(
-                        incomeHistory = incomeHistory,
-                        onPositionClick = { positionId ->
-                            onIntent(IncomeHistoryIntent.OnIncomePositionClicked(positionId))
+
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { onIntent(IncomeHistoryIntent.OnRefresh) },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            when {
+                state.isLoading && state.incomeHistory.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = LessTheme.colors.textIconsBrand)
+                    }
+                }
+
+                state.incomeHistory.isEmpty() -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = LessTheme.spacing.xLarge)
+                    ) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 120.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(Res.string.history_empty),
+                                    style = LessTheme.typography.body16Medium,
+                                    color = LessTheme.colors.textIconsGrey,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
-                    )
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = LessTheme.spacing.xLarge),
+                        verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
+                    ) {
+                        items(
+                            items = state.incomeHistory,
+                            key = { it.date }
+                        ) { incomeHistory ->
+                            IncomeHistoryGroup(
+                                incomeHistory = incomeHistory,
+                                onPositionClick = { positionId ->
+                                    onIntent(IncomeHistoryIntent.OnIncomePositionClicked(positionId))
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
     }
+
+    if (state.showDateRangePicker) {
+        DateRangePickerDialog(
+            initialStartMillis = state.startDate?.apiDateToMillis(),
+            initialEndMillis = state.endDate?.apiDateToMillis(),
+            hasActiveSelection = state.startDate != null && state.endDate != null,
+            onDismiss = { onIntent(IncomeHistoryIntent.OnDateRangePickerDismiss) },
+            onClear = { onIntent(IncomeHistoryIntent.OnDateRangeCleared) },
+            onConfirm = { start, end ->
+                onIntent(IncomeHistoryIntent.OnDateRangeSelected(start, end))
+            }
+        )
+    }
 }
 
-/**
- * Income history group component showing date, income value, and list of positions
- */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DateRangePickerDialog(
+    initialStartMillis: Long?,
+    initialEndMillis: Long?,
+    hasActiveSelection: Boolean,
+    onDismiss: () -> Unit,
+    onClear: () -> Unit,
+    onConfirm: (Long, Long) -> Unit
+) {
+    val todayMillis = currentTimeMillis()
+    val todayApi = todayMillis.millisToApiDate()
+    val currentYear = todayApi.substring(0, 4).toInt()
+    val todayStartMillis = todayApi.apiDateToMillis() ?: todayMillis
+    val minMillis = "${currentYear - 2}${todayApi.substring(4)}".apiDateToMillis()
+        ?: (todayStartMillis - 2L * 366 * 24 * 60 * 60 * 1000)
+
+    val selectableDates = object : SelectableDates {
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+            utcTimeMillis in minMillis..todayStartMillis
+
+        override fun isSelectableYear(year: Int): Boolean =
+            year in (currentYear - 2)..currentYear
+    }
+
+    val rangeState = rememberDateRangePickerState(
+        initialSelectedStartDateMillis = initialStartMillis,
+        initialSelectedEndDateMillis = initialEndMillis,
+        yearRange = (currentYear - 2)..currentYear,
+        selectableDates = selectableDates
+    )
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val start = rangeState.selectedStartDateMillis
+                    val end = rangeState.selectedEndDateMillis
+                    if (start != null && end != null) onConfirm(start, end) else onDismiss()
+                }
+            ) { Text(stringResource(Res.string.action_ok)) }
+        },
+        dismissButton = {
+            Row(horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxSmall)) {
+                if (hasActiveSelection) {
+                    TextButton(onClick = onClear) {
+                        Text(stringResource(Res.string.action_clear))
+                    }
+                }
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(Res.string.action_cancel))
+                }
+            }
+        }
+    ) {
+        DateRangePicker(
+            state = rangeState,
+            title = null,
+            headline = null,
+            showModeToggle = false,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+private fun formatDateRangeLabel(startDate: String?, endDate: String?): String? {
+    if (startDate.isNullOrEmpty() || endDate.isNullOrEmpty()) return null
+    return "${startDate.apiDateToDisplay()} - ${endDate.apiDateToDisplay()}"
+}
+
+private fun String.apiDateToDisplay(): String {
+    val parts = split("-")
+    if (parts.size != 3) return this
+    return "${parts[2]}.${parts[1]}.${parts[0]}"
+}
+
 @Composable
 private fun IncomeHistoryGroup(
     incomeHistory: az.less.mobile.presentation.merchant.history.model.IncomeHistory,
     onPositionClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        // Date header with total income value
+    Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -219,18 +300,13 @@ private fun IncomeHistoryGroup(
                 color = LessTheme.colors.textIconsGrey
             )
         }
-        
-        // Income positions
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
+
+        Column(modifier = Modifier.fillMaxWidth()) {
             incomeHistory.incomePositions.forEachIndexed { index, position ->
                 IncomePositionItem(
                     position = position,
                     onClick = { onPositionClick(position.id) }
                 )
-                
-                // Add divider between positions (last position doesn't need divider)
                 if (index < incomeHistory.incomePositions.size - 1) {
                     HorizontalDivider(
                         color = LessTheme.colors.backgroundSecond,
@@ -241,4 +317,3 @@ private fun IncomeHistoryGroup(
         }
     }
 }
-

@@ -208,6 +208,7 @@ fun MerchOrdersScreenContent(
                                 ) { item ->
                                     BoughtBoxCard(
                                         item = item,
+                                        venueName = state.boughtVenueName,
                                         onCardClick = {
                                             onIntent(MerchOrdersIntent.OnOrderClicked(item.orderId))
                                         },
@@ -248,6 +249,7 @@ fun MerchOrdersScreenContent(
                                 ) { item ->
                                     CreatedBoxCard(
                                         item = item,
+                                        venueName = state.createdVenueName,
                                         onCardClick = {
                                             onIntent(MerchOrdersIntent.OnOrderClicked(item.id))
                                         },

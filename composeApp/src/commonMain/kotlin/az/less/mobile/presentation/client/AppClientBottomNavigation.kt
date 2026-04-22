@@ -85,16 +85,18 @@ fun AppClientBottomNavigation(
                     onClick = {
                         val isCurrentRoute = currentRoute?.contains(item.route::class.simpleName ?: "") == true
                         if (!isCurrentRoute) {
-                            val isLeavingExplore = currentRoute?.contains(ClientRoute.Explore::class.simpleName ?: "") == true
-                            val isGoingToExplore = item.route is ClientRoute.Explore
+                            // Tabs that should always refetch on entry — back stack entry
+                            // (and therefore ViewModel) is rebuilt instead of restored.
+                            val isLeavingNonCached = nonCachedTabs.any { name ->
+                                currentRoute?.contains(name) == true
+                            }
+                            val isGoingToNonCached = item.route::class.simpleName in nonCachedTabs
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    // Don't save Explore's state when leaving it
-                                    saveState = !isLeavingExplore
+                                    saveState = !isLeavingNonCached
                                 }
                                 launchSingleTop = true
-                                // Don't restore Explore's state when going to it
-                                restoreState = !isGoingToExplore
+                                restoreState = !isGoingToNonCached
                             }
                         }
                     }
@@ -146,6 +148,12 @@ private data class BottomNavItemData(
     val icon: DrawableResource,
     val labelRes: StringResource,
     val route: ClientRoute
+)
+
+private val nonCachedTabs: Set<String> = setOfNotNull(
+    ClientRoute.Explore::class.simpleName,
+    ClientRoute.Orders::class.simpleName,
+    ClientRoute.Favorites::class.simpleName
 )
 
 private val bottomNavItems = listOf(

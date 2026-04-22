@@ -40,6 +40,7 @@ import platform.UIKit.UIImage
 import platform.UIKit.UIImageView
 import platform.UIKit.UILabel
 import platform.UIKit.UITapGestureRecognizer
+import platform.UIKit.UIUserInterfaceStyle
 import platform.UIKit.UIView
 import platform.UIKit.systemBlueColor
 import platform.darwin.NSObject
@@ -196,16 +197,16 @@ private class MapViewDelegate(
         val iconView = UIImageView()
         iconView.setFrame(platform.CoreGraphics.CGRectMake(0.0, 0.0, iconSize, iconSize))
         
-        // Use SF Symbol for location icon (mappin.circle.fill or location.fill)
-        // Fallback to a simple colored circle if system image is not available
+        // Use SF Symbol for location icon — closest match to ic_explore_24dp.
+        // Fallback to a simple colored circle if system image is not available.
+        // Brand green #2caf6e (matches LessTheme.colors.elementsPrimaryBrand on Android).
+        val brandGreen = UIColor.colorWithRed(red = 0.172, green = 0.686, blue = 0.431, alpha = 1.0)
         val systemImage = UIImage.systemImageNamed("mappin.circle.fill")
         if (systemImage != null) {
             iconView.setImage(systemImage)
-            // Tint with brand color (green as approximation)
-            iconView.setTintColor(UIColor.greenColor)
+            iconView.setTintColor(brandGreen)
         } else {
-            // Fallback: create a simple colored circle
-            iconView.setBackgroundColor(UIColor.greenColor) // Brand color
+            iconView.setBackgroundColor(brandGreen)
             iconView.layer.setCornerRadius(iconSize / 2.0)
             iconView.layer.setMasksToBounds(true)
         }
@@ -283,7 +284,7 @@ private class MapViewDelegate(
         containerView.addSubview(imageView)
 
         // Add badge for slot count if > 1
-        if (marker.itemsCount > 1) {
+        if (marker.itemsCount >= 1) {
             val badgeSize = 16.0
             val badgeView = UIView()
             badgeView.setFrame(
@@ -380,6 +381,7 @@ actual fun GoogleMaps(
     isZoomControlsVisible: Boolean,
     isCompassVisible: Boolean,
     mapType: MapType,
+    isDarkTheme: Boolean,
     isTrackingEnabled: Boolean,
     userLocation: LatLong?,
     onToggleIsTrackingEnabledClick: (() -> Unit)?,
@@ -437,6 +439,9 @@ actual fun GoogleMaps(
                 // Configure UI settings
                 mapView.setShowsCompass(isCompassVisible)
                 mapView.setShowsUserLocation(isTrackingEnabled)
+                mapView.overrideUserInterfaceStyle =
+                    if (isDarkTheme) UIUserInterfaceStyle.UIUserInterfaceStyleDark
+                    else UIUserInterfaceStyle.UIUserInterfaceStyleLight
 
                 // Set initial camera position
                 when {
@@ -539,6 +544,9 @@ actual fun GoogleMaps(
 
                 // Update tracking mode and center on user location
                 mapView.setShowsUserLocation(isTrackingEnabled)
+                mapView.overrideUserInterfaceStyle =
+                    if (isDarkTheme) UIUserInterfaceStyle.UIUserInterfaceStyleDark
+                    else UIUserInterfaceStyle.UIUserInterfaceStyleLight
                 if (isTrackingEnabled && userLocation != null) {
                     val userCoordinate = CLLocationCoordinate2DMake(
                         userLocation.latitude,

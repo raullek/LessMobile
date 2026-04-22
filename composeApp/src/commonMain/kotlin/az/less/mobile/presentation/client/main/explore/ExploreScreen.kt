@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,8 @@ import az.less.mobile.presentation.maps.LocationPermissionHandler
 import az.less.mobile.presentation.maps.models.CameraPosition
 import az.less.mobile.presentation.maps.models.LatLong
 import az.less.mobile.presentation.maps.models.MapType
+import az.less.mobile.presentation.theme.ThemeManager
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -198,26 +201,28 @@ fun ExploreScreenContent(
 
             // Google Maps - render after delay to avoid blocking tab switch
             if (shouldRenderMap) {
+                val themeManager = koinInject<ThemeManager>()
+                val isDark by themeManager.isDarkMode.collectAsState()
                 GoogleMaps(
                     modifier = Modifier.fillMaxSize(),
                     shouldSetInitialCameraPosition = CameraPosition(
-                        target = LatLong(40.4093, 49.8671), // Center on Baku
+                        target = LatLong(40.4093, 49.8671), // Baku fallback
                         zoom = 13f
                     ),
                     mapType = MapType.NORMAL,
+                    isDarkTheme = isDark,
                     isZoomControlsVisible = false,
                     isCompassVisible = true,
                     isTrackingEnabled = locationPermissionGranted,
-                    markers = state.markers, // Pass markers from state
+                    userLocation = state.userLocation,
+                    markers = state.markers,
                     onMarkerInfoClick = { marker ->
-                        // Extract venue ID from marker tag if available
                         val venueId = marker.tag as? String ?: marker.id
                         onIntent(ExploreIntent.OnMapMarkerClicked(venueId))
                     },
-                    onFindMeButtonClick = null, // Remove recenter location button
-                    shouldCenterCameraOnLatLong = state.selectedMarkerPosition, // Center camera on selected marker
+                    onFindMeButtonClick = null,
+                    shouldCenterCameraOnLatLong = state.selectedMarkerPosition,
                     onDidCenterCameraOnLatLong = {
-                        // Clear the position after camera has centered
                         onIntent(ExploreIntent.OnDidCenterCameraOnMarker)
                     }
                 )

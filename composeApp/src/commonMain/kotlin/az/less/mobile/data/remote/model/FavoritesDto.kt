@@ -86,3 +86,9 @@ data class AddFavoriteResponse(
 
 @Serializable
 data class RemoveFavoriteResponse(val message: String)
+
+@Serializable
+data class CheckFavoriteResponse(
+    val isFavorited: Boolean = false,
+    val favoriteId: String? = null
+)

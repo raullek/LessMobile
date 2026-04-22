@@ -25,6 +25,7 @@ expect fun GoogleMaps(
     isZoomControlsVisible: Boolean = true,
     isCompassVisible: Boolean = true,
     mapType: MapType = MapType.NORMAL,
+    isDarkTheme: Boolean = false,
     
     // Location Tracking
     isTrackingEnabled: Boolean = false,

@@ -58,17 +58,17 @@ private fun MerchantProfileDto.toDomain() = MerchantProfile(
     reviews = reviews.map { it.toDomain() },
     reviewsTotal = reviews.size,
     reviewsHasMore = false,
-    offers = offers.map { it.toDomain() },
+    offers = offers.map { it.toDomain(lotImage) },
     status = status ?: "",
     isFavorite = isFavorite,
     favoriteId = favoriteId
 )
 
-private fun VenueOfferDto.toDomain() = MerchantOffer(
+private fun VenueOfferDto.toDomain(merchantLotImage: String?) = MerchantOffer(
     id = id.orEmpty(),
     title = title.orEmpty(),
     description = description,
-    images = images,
+    lotImage = merchantLotImage,
     originalPrice = originalPrice,
     discountedPrice = discountedPrice,
     availableItems = availableItems,

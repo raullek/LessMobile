@@ -51,6 +51,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -72,6 +73,7 @@ actual fun GoogleMaps(
     isZoomControlsVisible: Boolean,
     isCompassVisible: Boolean,
     mapType: MapType,
+    isDarkTheme: Boolean,
     isTrackingEnabled: Boolean,
     userLocation: LatLong?,
     onToggleIsTrackingEnabledClick: (() -> Unit)?,
@@ -116,14 +118,15 @@ actual fun GoogleMaps(
         }
     }
 
-    // Center on user location when tracking becomes enabled
+    // Center on user location when tracking becomes enabled.
+    // Use direct position assignment rather than animate(CameraUpdateFactory...)
+    // because the factory isn't initialized until the GoogleMap composable has
+    // rendered, and this effect may fire as soon as userLocation arrives in state.
     LaunchedEffect(isTrackingEnabled, userLocation) {
         if (isTrackingEnabled && userLocation != null) {
-            cameraPositionState.animate(
-                com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom(
-                    LatLng(userLocation.latitude, userLocation.longitude),
-                    15f
-                )
+            cameraPositionState.position = GoogleCameraPosition.fromLatLngZoom(
+                LatLng(userLocation.latitude, userLocation.longitude),
+                15f
             )
         }
     }
@@ -176,7 +179,8 @@ actual fun GoogleMaps(
             MapType.SATELLITE -> com.google.maps.android.compose.MapType.SATELLITE
             MapType.TERRAIN -> com.google.maps.android.compose.MapType.TERRAIN
             MapType.HYBRID -> com.google.maps.android.compose.MapType.HYBRID
-        }
+        },
+        mapStyleOptions = if (isDarkTheme) MapStyleOptions(DARK_MAP_STYLE_JSON) else null
     )
 
     val uiSettings = MapUiSettings(
@@ -326,7 +330,7 @@ private fun CustomMerchantMarker(
         )
 
         // Slot count badge in top-right corner (based on Figma design)
-        if (slotCount > 1) {
+        if (slotCount >= 1) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)

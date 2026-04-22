@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
-import lessmobile.composeapp.generated.resources.ic_explore_24dp
 import lessmobile.composeapp.generated.resources.ic_map_24dp
 import lessmobile.composeapp.generated.resources.ic_phone_24dp
 import org.jetbrains.compose.resources.painterResource

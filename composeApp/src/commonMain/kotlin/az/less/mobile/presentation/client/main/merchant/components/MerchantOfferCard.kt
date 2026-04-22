@@ -80,7 +80,7 @@ fun MerchantOfferCard(
                     .background(Color(0xFFFFF2EB))
             ) {
                 AsyncImage(
-                    model = offer.images.firstOrNull(),
+                    model = offer.lotImage,
                     contentDescription = offer.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),

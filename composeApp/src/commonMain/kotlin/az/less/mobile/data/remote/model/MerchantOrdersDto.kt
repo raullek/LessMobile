@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class BoughtBoxesResponse(
-    val title: String? = null,
+    val venue: VenueInfoDto? = null,
     val data: List<BoughtBoxDto> = emptyList(),
     val total: Int? = null
 )
@@ -19,9 +19,15 @@ data class BoughtBoxesResponse(
  */
 @Serializable
 data class CreatedBoxesResponse(
-    val title: String? = null,
+    val venue: VenueInfoDto? = null,
     val data: List<CreatedBoxDto> = emptyList(),
     val total: Int? = null
+)
+
+@Serializable
+data class VenueInfoDto(
+    val id: String? = null,
+    val name: String? = null
 )
 
 @Serializable

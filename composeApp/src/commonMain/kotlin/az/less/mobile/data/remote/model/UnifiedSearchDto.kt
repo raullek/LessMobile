@@ -37,6 +37,8 @@ data class SearchBoxVenueDto(
     val id: String,
     val name: String,
     val logo: String? = null,
+    val lotImage: String? = null,
+    val coverImage: String? = null,
     val address: String? = null,
     val location: LocationDto,
     val distanceKm: Double? = null

@@ -2,6 +2,7 @@ package az.less.mobile.data.datasource
 
 import az.less.mobile.data.remote.model.AddFavoriteRequest
 import az.less.mobile.data.remote.model.AddFavoriteResponse
+import az.less.mobile.data.remote.model.CheckFavoriteResponse
 import az.less.mobile.data.remote.model.FavoritesDataDto
 import az.less.mobile.data.remote.model.RemoveFavoriteResponse
 import az.less.mobile.network.NetworkResult
@@ -43,6 +44,14 @@ class FavoritesDataSource(
     suspend fun removeFavorite(favoriteId: String): NetworkResult<RemoveFavoriteResponse> {
         return safeApiCall {
             httpClient.delete("v1/favorites/$favoriteId")
+        }
+    }
+
+    suspend fun checkFavorite(venueId: String): NetworkResult<CheckFavoriteResponse> {
+        return safeApiCall {
+            httpClient.get("v1/favorites/check") {
+                parameter("venueId", venueId)
+            }
         }
     }
 }
