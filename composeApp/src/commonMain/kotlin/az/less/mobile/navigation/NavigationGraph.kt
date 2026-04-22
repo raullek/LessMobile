@@ -21,6 +21,7 @@ import az.less.mobile.domain.model.auth.AppMode
 import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.AppClientBottomNavigation
 import az.less.mobile.presentation.merchant.AppMerchantBottomNavigation
+import az.less.mobile.presentation.partner.AppPartnerBottomNavigation
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -32,6 +33,7 @@ private fun logNavigation(tag: String, route: String) {
 
 const val ROOT_CLIENT = "rootClientNavigation"
 const val ROOT_MERCHANT = "rootMerchantNavigation"
+const val ROOT_PARTNER = "rootPartnerNavigation"
 
 
 
@@ -43,9 +45,16 @@ fun AppRootNavigation() {
     LaunchedEffect(Unit) {
         val user = sessionLocalRepository.currentUser.first()
         val lastMode = sessionLocalRepository.lastUsedMode.first()
-        if (user != null && lastMode == AppMode.MERCHANT && AppMode.MERCHANT in user.availableModes()) {
-            navController.navigate(ROOT_MERCHANT) {
-                popUpTo(ROOT_CLIENT) { inclusive = true }
+        if (user != null && lastMode in user.availableModes()) {
+            val target = when (lastMode) {
+                AppMode.MERCHANT -> ROOT_MERCHANT
+                AppMode.PARTNER -> ROOT_PARTNER
+                AppMode.CLIENT -> null
+            }
+            if (target != null) {
+                navController.navigate(target) {
+                    popUpTo(ROOT_CLIENT) { inclusive = true }
+                }
             }
         }
     }
@@ -56,6 +65,7 @@ fun AppRootNavigation() {
     ) {
         clientGraph(navController)
         merchantGraph(navController)
+        partnerGraph(navController)
     }
 }
 
@@ -162,5 +172,54 @@ fun NavGraphBuilder.merchantGraph(
 ){
     composable (ROOT_MERCHANT){
         AppMerchantRootScreen(navController)
+    }
+}
+
+fun NavGraphBuilder.partnerGraph(
+    navController: NavController
+){
+    composable (ROOT_PARTNER){
+        AppPartnerRootScreen(navController)
+    }
+}
+
+@Composable
+fun AppPartnerRootScreen(rootNavController: NavController) {
+    val navController = rememberNavController()
+    val showBottomBar = rememberSaveable { mutableStateOf(false) }
+
+    DisposableEffect(navController) {
+        val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+            logNavigation("PARTNER", destination.route ?: "unknown")
+        }
+        navController.addOnDestinationChangedListener(listener)
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
+        }
+    }
+
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
+    showBottomBar.value = partnerHomeRoutes.any { currentRoute?.contains(it.simpleName ?: "") == true }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LessTheme.colors.backgroundSecond)
+    ) {
+        NavHost(
+            navController = navController,
+            startDestination = PartnerRoute.Places,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            partnerGraph(rootNavController = rootNavController, navController = navController)
+        }
+
+        if (showBottomBar.value) {
+            AppPartnerBottomNavigation(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                navController = navController
+            )
+        }
     }
 }

@@ -27,6 +27,14 @@ import az.less.mobile.presentation.merchant.places.edit.branchusers.BranchUsersV
 import az.less.mobile.presentation.merchant.places.edit.branchusers.addbranchuser.AddBranchUserViewModel
 import az.less.mobile.presentation.merchant.places.edit.selectlocation.InputAddressViewModel
 import az.less.mobile.presentation.merchant.places.edit.selectlocation.SelectBranchLocationOnMapViewModel
+import az.less.mobile.presentation.partner.more.PartnerMoreViewModel
+import az.less.mobile.presentation.partner.places.PartnerPlacesViewModel
+import az.less.mobile.presentation.partner.history.IncomeHistoryViewModel as PartnerIncomeHistoryViewModel
+import az.less.mobile.presentation.partner.places.edit.EditMerchantProfileViewModel as PartnerEditMerchantProfileViewModel
+import az.less.mobile.presentation.partner.places.edit.branchusers.BranchUsersViewModel as PartnerBranchUsersViewModel
+import az.less.mobile.presentation.partner.places.edit.branchusers.addbranchuser.AddBranchUserViewModel as PartnerAddBranchUserViewModel
+import az.less.mobile.presentation.partner.places.edit.selectlocation.InputAddressViewModel as PartnerInputAddressViewModel
+import az.less.mobile.presentation.partner.places.edit.selectlocation.SelectBranchLocationOnMapViewModel as PartnerSelectBranchLocationOnMapViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -58,6 +66,16 @@ val viewModelModule = module {
     viewModelOf(::CategoryOffersViewModel)
     viewModelOf(::MerchantProfileViewModel)
     viewModelOf(::VoucherViewModel)
+
+    // Partner flow (scaffold — copies of merchant screens, will be adapted)
+    viewModelOf(::PartnerMoreViewModel)
+    viewModelOf(::PartnerPlacesViewModel)
+    viewModelOf(::PartnerIncomeHistoryViewModel)
+    viewModelOf(::PartnerEditMerchantProfileViewModel)
+    viewModelOf(::PartnerBranchUsersViewModel)
+    viewModelOf(::PartnerAddBranchUserViewModel)
+    viewModelOf(::PartnerInputAddressViewModel)
+    viewModelOf(::PartnerSelectBranchLocationOnMapViewModel)
 }
 
 

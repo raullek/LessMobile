@@ -46,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 fun LoginPasswordScreen(
     navController: NavController,
     navigateToMerchant: () -> Unit = {},
+    navigateToPartner: () -> Unit = {},
     viewModel: LoginPasswordViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
@@ -68,6 +69,9 @@ fun LoginPasswordScreen(
             }
             is LoginPasswordSideEffect.NavigateToMerchant -> {
                 navigateToMerchant()
+            }
+            is LoginPasswordSideEffect.NavigateToPartner -> {
+                navigateToPartner()
             }
             is LoginPasswordSideEffect.ShowError -> {
                 toastState = ToastState(sideEffect.message, ToastType.Error)

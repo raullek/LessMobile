@@ -2,7 +2,8 @@ package az.less.mobile.domain.model.auth
 
 enum class AppMode {
     CLIENT,
-    MERCHANT;
+    MERCHANT,
+    PARTNER;
 
     companion object {
         fun fromString(value: String?): AppMode =

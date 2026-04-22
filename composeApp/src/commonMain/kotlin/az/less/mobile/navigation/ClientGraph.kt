@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import az.less.mobile.domain.model.auth.AppMode
 import az.less.mobile.domain.repository.SessionLocalRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import az.less.mobile.presentation.client.account.account.AccountScreen
@@ -138,9 +139,21 @@ fun NavGraphBuilder.mainGraph(
             navController = navController,
             navigateToMerchant = {
                 coroutineScope.launch {
-                    sessionLocalRepository.saveLastUsedMode(AppMode.MERCHANT)
+                    val user = sessionLocalRepository.currentUser.first()
+                    val available = user?.availableModes().orEmpty()
+                    val target = when {
+                        AppMode.MERCHANT in available -> AppMode.MERCHANT
+                        AppMode.PARTNER in available -> AppMode.PARTNER
+                        else -> return@launch
+                    }
+                    sessionLocalRepository.saveLastUsedMode(target)
+                    val rootRoute = when (target) {
+                        AppMode.MERCHANT -> ROOT_MERCHANT
+                        AppMode.PARTNER -> ROOT_PARTNER
+                        AppMode.CLIENT -> return@launch
+                    }
+                    rootNavController.navigate(rootRoute)
                 }
-                rootNavController.navigate(ROOT_MERCHANT)
             }
         )
     }
@@ -224,6 +237,9 @@ fun NavGraphBuilder.moreGraph(
             email = args.email,
             navigateToMerchant = {
                 rootNavController.navigate(ROOT_MERCHANT)
+            },
+            navigateToPartner = {
+                rootNavController.navigate(ROOT_PARTNER)
             }
         )
     }
@@ -233,6 +249,9 @@ fun NavGraphBuilder.moreGraph(
             navController = navController,
             navigateToMerchant = {
                 rootNavController.navigate(ROOT_MERCHANT)
+            },
+            navigateToPartner = {
+                rootNavController.navigate(ROOT_PARTNER)
             }
         )
     }
