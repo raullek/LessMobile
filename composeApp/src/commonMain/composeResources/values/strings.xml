@@ -14,6 +14,8 @@
     <string name="action_back">Back</string>
     <string name="action_save">Save</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
+    <string name="action_clear">Clear</string>
     <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
     <string name="action_copy">Copy</string>
@@ -295,8 +297,7 @@
 
     <!-- Income History Screen -->
     <string name="history_title">History</string>
-    <string name="history_select_month">Select Month</string>
-    <string name="history_all_branches">All branches</string>
+    <string name="history_select_date_range">Select date range</string>
     <string name="history_empty">No income history found</string>
 
     <!-- Places Screen -->

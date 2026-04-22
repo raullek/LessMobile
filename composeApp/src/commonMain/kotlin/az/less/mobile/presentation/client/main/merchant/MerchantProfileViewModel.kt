@@ -133,18 +133,26 @@ class MerchantProfileViewModel(
                     postSideEffect(MerchantProfileSideEffect.ShowError(error.message))
                 }
         } else {
-            // Removing from favorites
-            val favoriteId = oldFavoriteId
-            if (favoriteId != null) {
-                favoritesRepository.removeFavorite(favoriteId)
-                    .onSuccess {
-                        reduce { state.copy(favoriteId = null) }
-                    }
-                    .onError { error ->
-                        reduce { state.copy(isFavorite = true, favoriteId = oldFavoriteId) }
-                        postSideEffect(MerchantProfileSideEffect.ShowError(error.message))
-                    }
+            // Removing from favorites. If the profile response didn't include a
+            // favoriteId, fall back to GET /v1/favorites/check?venueId=… which
+            // returns the id we need for DELETE.
+            val idToDelete = oldFavoriteId
+                ?: favoritesRepository.checkFavorite(state.merchantId).getOrNull()?.favoriteId
+
+            if (idToDelete == null) {
+                reduce { state.copy(isFavorite = true, favoriteId = oldFavoriteId) }
+                postSideEffect(MerchantProfileSideEffect.ShowError("Could not resolve favorite id"))
+                return@intent
             }
+
+            favoritesRepository.removeFavorite(idToDelete)
+                .onSuccess {
+                    reduce { state.copy(favoriteId = null) }
+                }
+                .onError { error ->
+                    reduce { state.copy(isFavorite = true, favoriteId = oldFavoriteId) }
+                    postSideEffect(MerchantProfileSideEffect.ShowError(error.message))
+                }
         }
     }
 

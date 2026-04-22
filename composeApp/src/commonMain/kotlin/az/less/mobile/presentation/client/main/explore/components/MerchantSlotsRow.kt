@@ -73,7 +73,8 @@ fun MerchantSlotsRow(
                 pickupTime = formattedPickupTime,
                 merchant = OfferMerchant(
                     id = slot.id,
-                    name = merchantName,
+                    name = slot.venueName ?: merchantName,
+                    logoUrl = slot.venueLogoUrl,
                     rating = 4.5f
                 )
             )

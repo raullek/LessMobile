@@ -305,7 +305,8 @@ private fun MerchantMapView(
         id = "merchant_location",
         position = merchantLocation,
         title = merchantName,
-        isVisible = true
+        isVisible = true,
+        tag = "location_pin"
     )
 
     Box(modifier = modifier.fillMaxSize()) {

@@ -29,7 +29,8 @@
       "Read(//c//**)",
       "Bash(env)",
       "WebFetch(domain:api.ktor.io)",
-      "mcp__claude_ai_Figma__get_design_context"
+      "mcp__claude_ai_Figma__get_design_context",
+      "Bash(git restore *)"
     ]
   }
 }

@@ -30,7 +30,7 @@ data class MerchantOffer(
     val id: String,
     val title: String,
     val description: String?,
-    val images: List<String>,
+    val lotImage: String?,
     val originalPrice: Double,
     val discountedPrice: Double,
     val availableItems: Int,

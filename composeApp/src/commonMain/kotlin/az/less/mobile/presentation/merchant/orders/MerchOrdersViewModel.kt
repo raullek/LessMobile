@@ -61,7 +61,7 @@ class MerchOrdersViewModel(
                     reduce {
                         state.copy(
                             createdBoxes = data.data.map { it.toCreatedBoxItem() },
-                            createdTitle = data.title?.ifEmpty { state.createdTitle } ?: state.createdTitle,
+                            createdVenueName = data.venue?.name?.ifEmpty { state.createdVenueName } ?: state.createdVenueName,
                             isCreatedBoxesReloading = false
                         )
                     }
@@ -89,16 +89,16 @@ class MerchOrdersViewModel(
     private suspend fun fetchOrders() {
         // Fetch both endpoints in parallel
         var boughtResult: List<BoughtBoxItem>? = null
-        var boughtTitle = ""
+        var boughtVenueName = ""
         var createdResult: List<CreatedBoxItem>? = null
-        var createdTitle = ""
+        var createdVenueName = ""
         var hasError = false
         var errorMessage = ""
 
         val boughtJob = viewModelScope.launch {
             ordersRepository.getBoughtBoxes()
                 .onSuccess { data ->
-                    boughtTitle = data.title ?: ""
+                    boughtVenueName = data.venue?.name ?: ""
                     boughtResult = data.data.map { it.toBoughtBoxItem() }
                 }
                 .onError { error ->
@@ -110,7 +110,7 @@ class MerchOrdersViewModel(
         val createdJob = viewModelScope.launch {
             ordersRepository.getCreatedBoxes()
                 .onSuccess { data ->
-                    createdTitle = data.title ?: ""
+                    createdVenueName = data.venue?.name ?: ""
                     createdResult = data.data.map { it.toCreatedBoxItem() }
                 }
                 .onError { error ->
@@ -133,8 +133,8 @@ class MerchOrdersViewModel(
                         isRefreshing = false,
                         boughtBoxes = boughtResult ?: state.boughtBoxes,
                         createdBoxes = createdResult ?: state.createdBoxes,
-                        boughtTitle = boughtTitle.ifEmpty { state.boughtTitle },
-                        createdTitle = createdTitle.ifEmpty { state.createdTitle }
+                        boughtVenueName = boughtVenueName.ifEmpty { state.boughtVenueName },
+                        createdVenueName = createdVenueName.ifEmpty { state.createdVenueName }
                     )
                 }
                 // Start background job for the active tab
@@ -161,7 +161,7 @@ class MerchOrdersViewModel(
                         reduce {
                             state.copy(
                                 boughtBoxes = data.data.map { it.toBoughtBoxItem() },
-                                boughtTitle = data.title?.ifEmpty { state.boughtTitle } ?: state.boughtTitle
+                                boughtVenueName = data.venue?.name?.ifEmpty { state.boughtVenueName } ?: state.boughtVenueName
                             )
                         }
                     }
@@ -240,7 +240,7 @@ class MerchOrdersViewModel(
                             reduce {
                                 state.copy(
                                     boughtBoxes = data.data.map { it.toBoughtBoxItem() },
-                                    boughtTitle = data.title?.ifEmpty { state.boughtTitle } ?: state.boughtTitle
+                                    boughtVenueName = data.venue?.name?.ifEmpty { state.boughtVenueName } ?: state.boughtVenueName
                                 )
                             }
                         }
@@ -256,7 +256,7 @@ class MerchOrdersViewModel(
                             reduce {
                                 state.copy(
                                     createdBoxes = data.data.map { it.toCreatedBoxItem() },
-                                    createdTitle = data.title?.ifEmpty { state.createdTitle } ?: state.createdTitle
+                                    createdVenueName = data.venue?.name?.ifEmpty { state.createdVenueName } ?: state.createdVenueName
                                 )
                             }
                         }

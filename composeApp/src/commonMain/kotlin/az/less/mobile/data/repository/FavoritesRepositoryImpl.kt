@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import az.less.mobile.data.datasource.FavoritesDataSource
 import az.less.mobile.data.paging.FavoritesPagingSource
 import az.less.mobile.data.remote.model.AddFavoriteResponse
+import az.less.mobile.data.remote.model.CheckFavoriteResponse
 import az.less.mobile.data.remote.model.RemoveFavoriteResponse
 import az.less.mobile.domain.repository.FavoritesRepository
 import az.less.mobile.network.NetworkResult
@@ -39,5 +40,9 @@ class FavoritesRepositoryImpl(
 
     override suspend fun removeFavorite(favoriteId: String): NetworkResult<RemoveFavoriteResponse> {
         return favoritesDataSource.removeFavorite(favoriteId)
+    }
+
+    override suspend fun checkFavorite(venueId: String): NetworkResult<CheckFavoriteResponse> {
+        return favoritesDataSource.checkFavorite(venueId)
     }
 }

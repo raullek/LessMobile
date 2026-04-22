@@ -80,9 +80,8 @@ class ExploreViewModel(
     private fun performSearch() = intent {
         reduce { state.copy(isLoading = true, error = null) }
 
-        val location = if (state.locationPermissionGranted) getLocation() else null
-        val latitude = location?.coordinates?.latitude
-        val longitude = location?.coordinates?.longitude
+        val latitude = state.userLocation?.latitude
+        val longitude = state.userLocation?.longitude
 
         val quickFilters = state.activeQuickFilters
         val isFavorite = if (QuickFilter.FAVORITE in quickFilters) true else null
@@ -220,10 +219,12 @@ class ExploreViewModel(
                 val slots = data.boxes.map { box ->
                     OfferSlot(
                         id = box.id,
-                        title = box.title,
+                        title = box.title.ifEmpty { box.venueName ?: "" },
                         price = box.discountedPrice.formatPrice(),
-                        pickupTime = "",
-                        imageUrl = box.images.firstOrNull()
+                        pickupTime = box.pickupTime.orEmpty(),
+                        imageUrl = box.venueLotImage,
+                        venueLogoUrl = box.venueLogoUrl,
+                        venueName = box.venueName
                     )
                 }
                 reduce { state.copy(selectedMerchantSlots = slots) }
@@ -236,7 +237,12 @@ class ExploreViewModel(
     private fun handleLocationPermissionChanged(granted: Boolean) = intent {
         reduce { state.copy(locationPermissionGranted = granted) }
         if (granted) {
+            val loc = getLocation()
+            val latLong = loc?.coordinates?.let { LatLong(it.latitude, it.longitude) }
+            reduce { state.copy(userLocation = latLong) }
             performSearch()
+        } else {
+            reduce { state.copy(userLocation = null) }
         }
     }
 

@@ -46,6 +46,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun BoughtBoxCard(
     item: BoughtBoxItem,
+    venueName: String,
     onCardClick: () -> Unit,
     onHandedOverClick: () -> Unit,
     isDelivering: Boolean = false,
@@ -53,11 +54,11 @@ fun BoughtBoxCard(
 ) {
     MerchBoxCardContainer(
         imageUrl = item.imageUrl,
-        imageContentDescription = item.boxTitle,
+        imageContentDescription = venueName,
         availableItems = null,
         originalPrice = item.originalPrice,
         discountedPrice = item.discountedPrice,
-        title = item.boxTitle,
+        title = venueName,
         boxType = item.boxType,
         pickupTimeFormatted = item.pickupTimeFormatted,
         reserveNumber = item.reserveNumber,
@@ -83,17 +84,18 @@ fun BoughtBoxCard(
 @Composable
 fun CreatedBoxCard(
     item: CreatedBoxItem,
+    venueName: String,
     onCardClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     MerchBoxCardContainer(
         imageUrl = item.imageUrl,
-        imageContentDescription = item.title,
+        imageContentDescription = venueName,
         availableItems = item.availableItems,
         originalPrice = item.originalPrice,
         discountedPrice = item.discountedPrice,
-        title = item.title,
+        title = venueName,
         boxType = item.boxType,
         pickupTimeFormatted = item.pickupTimeFormatted,
         reserveNumber = null,

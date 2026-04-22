@@ -14,6 +14,8 @@
     <string name="action_back">Назад</string>
     <string name="action_save">Сохранить</string>
     <string name="action_cancel">Отмена</string>
+    <string name="action_ok">OK</string>
+    <string name="action_clear">Очистить</string>
     <string name="action_delete">Удалить</string>
     <string name="action_share">Поделиться</string>
     <string name="action_copy">Копировать</string>
@@ -292,8 +294,7 @@
 
     <!-- Income History Screen -->
     <string name="history_title">История</string>
-    <string name="history_select_month">Выбрать месяц</string>
-    <string name="history_all_branches">Все филиалы</string>
+    <string name="history_select_date_range">Выбрать диапазон дат</string>
     <string name="history_empty">История доходов не найдена</string>
 
     <!-- Places Screen -->

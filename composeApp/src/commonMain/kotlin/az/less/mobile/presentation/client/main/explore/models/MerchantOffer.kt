@@ -22,6 +22,8 @@ data class OfferSlot(
     val title: String,
     val price: String, // e.g. "12.99"
     val pickupTime: String, // e.g. "17:00 - 18:00"
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val venueLogoUrl: String? = null,
+    val venueName: String? = null
 )
 
