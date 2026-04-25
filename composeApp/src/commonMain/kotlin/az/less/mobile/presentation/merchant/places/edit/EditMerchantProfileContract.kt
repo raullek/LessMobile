@@ -21,6 +21,7 @@ data class EditMerchantProfileState(
     val lotsImageUrl: String? = null,
     val lotsImageBytes: ByteArray? = null, // Selected lots image bytes
     val email: String? = null,
+    val rating: Float = 0f,
     val makeMeMerchant: Boolean = false,
     val isLoading: Boolean = false,
     // Edit Merch Details Bottom Sheet state
@@ -63,6 +64,7 @@ data class EditMerchantProfileState(
             if (!lotsImageBytes.contentEquals(other.lotsImageBytes)) return false
         } else if (other.lotsImageBytes != null) return false
         if (email != other.email) return false
+        if (rating != other.rating) return false
         if (makeMeMerchant != other.makeMeMerchant) return false
         if (isLoading != other.isLoading) return false
         if (isEditMerchDetailsBottomSheetVisible != other.isEditMerchDetailsBottomSheetVisible) return false
@@ -90,6 +92,7 @@ data class EditMerchantProfileState(
         result = 31 * result + (lotsImageUrl?.hashCode() ?: 0)
         result = 31 * result + (lotsImageBytes?.contentHashCode() ?: 0)
         result = 31 * result + (email?.hashCode() ?: 0)
+        result = 31 * result + rating.hashCode()
         result = 31 * result + makeMeMerchant.hashCode()
         result = 31 * result + isLoading.hashCode()
         result = 31 * result + isEditMerchDetailsBottomSheetVisible.hashCode()

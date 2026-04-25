@@ -51,8 +51,9 @@ class OrdersRepositoryImpl(
         page: Int,
         limit: Int,
         startDate: String?,
-        endDate: String?
+        endDate: String?,
+        venueId: String?
     ): NetworkResult<OrderHistoryDataDto> {
-        return ordersDataSource.getOrderHistory(page, limit, startDate, endDate)
+        return ordersDataSource.getOrderHistory(page, limit, startDate, endDate, venueId)
     }
 }

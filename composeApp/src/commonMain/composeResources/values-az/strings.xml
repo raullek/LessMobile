@@ -104,6 +104,7 @@
     <string name="contact_facebook">Facebook</string>
     <string name="contact_telegram">Telegram</string>
     <string name="contact_whatsapp">Whatsapp</string>
+    <string name="contact_mail">Poçt</string>
 
     <!-- Terms Bottom Sheet -->
     <string name="terms_title">Şərtlər və qaydalar</string>
@@ -232,6 +233,8 @@
     <string name="error_invalid_expiry_date">Yanlış bitmə tarixi</string>
     <string name="error_invalid_cvv">Yanlış CVV</string>
     <string name="error_generic">Xəta baş verdi</string>
+    <string name="error_generic_subtitle">Zəhmət olmasa bir az sonra yenidən cəhd edin</string>
+    <string name="error_try_again">Yenidən cəhd et</string>
 
     <!-- Currency -->
     <string name="currency_azn">%1$s &#8380;</string>
@@ -295,6 +298,10 @@
     <!-- Income History Screen -->
     <string name="history_title">Tarixçə</string>
     <string name="history_select_date_range">Tarix aralığı seç</string>
+    <string name="history_select_month">Ay seçin</string>
+    <string name="history_all_branches">Bütün filiallar</string>
+    <string name="history_all_venues">Bütün filiallar</string>
+    <string name="history_select_venue">Filial seç</string>
     <string name="history_empty">Gəlir tarixçəsi tapılmadı</string>
 
     <!-- Places Screen -->

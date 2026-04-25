@@ -104,6 +104,7 @@
     <string name="contact_facebook">Facebook</string>
     <string name="contact_telegram">Telegram</string>
     <string name="contact_whatsapp">Whatsapp</string>
+    <string name="contact_mail">Почта</string>
 
     <!-- Terms Bottom Sheet -->
     <string name="terms_title">Условия и положения</string>
@@ -232,6 +233,8 @@
     <string name="error_invalid_expiry_date">Неверная дата истечения</string>
     <string name="error_invalid_cvv">Неверный CVV</string>
     <string name="error_generic">Что-то пошло не так</string>
+    <string name="error_generic_subtitle">Пожалуйста, попробуйте позже</string>
+    <string name="error_try_again">Повторить</string>
 
     <!-- Currency -->
     <string name="currency_azn">%1$s &#8380;</string>
@@ -295,6 +298,10 @@
     <!-- Income History Screen -->
     <string name="history_title">История</string>
     <string name="history_select_date_range">Выбрать диапазон дат</string>
+    <string name="history_select_month">Выбрать месяц</string>
+    <string name="history_all_branches">Все филиалы</string>
+    <string name="history_all_venues">Все филиалы</string>
+    <string name="history_select_venue">Выбрать филиал</string>
     <string name="history_empty">История доходов не найдена</string>
 
     <!-- Places Screen -->

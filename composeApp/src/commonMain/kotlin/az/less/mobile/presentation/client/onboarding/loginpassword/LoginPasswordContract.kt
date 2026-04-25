@@ -27,5 +27,6 @@ sealed interface LoginPasswordSideEffect {
     data object NavigateBack : LoginPasswordSideEffect
     data object NavigateToClient : LoginPasswordSideEffect
     data object NavigateToMerchant : LoginPasswordSideEffect
+    data object NavigateToPartner : LoginPasswordSideEffect
     data class ShowError(val message: String) : LoginPasswordSideEffect
 }

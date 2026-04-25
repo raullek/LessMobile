@@ -1,0 +1,247 @@
+package az.less.mobile.presentation.partner.more
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import az.less.designsystem.base.LessTheme
+import az.less.designsystem.components.ButtonVariant
+import az.less.designsystem.components.CellLeadingContent
+import az.less.designsystem.components.CellType
+import az.less.designsystem.components.DsButton
+import az.less.designsystem.components.DsCell
+import az.less.designsystem.components.DsListBottomSheet
+import az.less.designsystem.components.DsSectionHeader
+import az.less.designsystem.components.DsTextBottomSheet
+import az.less.designsystem.components.ListBottomSheetItem
+import az.less.mobile.presentation.partner.more.components.PartnerMoreHeader
+import az.less.mobile.presentation.partner.more.model.PartnerMoreCellId
+import az.less.mobile.presentation.partner.more.model.PartnerMoreCellType
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.action_logout
+import lessmobile.composeapp.generated.resources.contact_facebook
+import lessmobile.composeapp.generated.resources.contact_instagram
+import lessmobile.composeapp.generated.resources.contact_telegram
+import lessmobile.composeapp.generated.resources.contact_tiktok
+import lessmobile.composeapp.generated.resources.contact_whatsapp
+import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
+import lessmobile.composeapp.generated.resources.more_contact_us
+import lessmobile.composeapp.generated.resources.terms_title
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
+
+/**
+ * Stateful PartnerMoreScreen that connects to ViewModel
+ * This is the entry point used by navigation
+ */
+@Composable
+fun PartnerMoreScreen(
+    viewModel: PartnerMoreViewModel = koinViewModel(),
+    navController: NavController,
+    navigateToClientFlow: () -> Unit
+) {
+    val state by viewModel.collectAsState()
+
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is PartnerMoreSideEffect.NavigateToClientFlow -> {
+                navigateToClientFlow.invoke()
+            }
+            is PartnerMoreSideEffect.Logout -> {
+                navigateToClientFlow.invoke()
+            }
+            is PartnerMoreSideEffect.ShowError -> {
+                // Show error snackbar or dialog
+            }
+        }
+    }
+
+    // Render the stateless UI
+    PartnerMoreScreenContent(
+        state = state,
+        onIntent = viewModel::onIntent
+    )
+
+    // Contact Us Bottom Sheet
+    if (state.showContactUsBottomSheet) {
+        val contactItems = listOf(
+            ListBottomSheetItem(
+                id = "instagram",
+                title = stringResource(Res.string.contact_instagram),
+                icon = null
+            ),
+            ListBottomSheetItem(
+                id = "tiktok",
+                title = stringResource(Res.string.contact_tiktok),
+                icon = null
+            ),
+            ListBottomSheetItem(
+                id = "facebook",
+                title = stringResource(Res.string.contact_facebook),
+                icon = null
+            ),
+            ListBottomSheetItem(
+                id = "telegram",
+                title = stringResource(Res.string.contact_telegram),
+                icon = null
+            ),
+            ListBottomSheetItem(
+                id = "whatsapp",
+                title = stringResource(Res.string.contact_whatsapp),
+                icon = null
+            )
+        )
+
+        DsListBottomSheet(
+            title = stringResource(Res.string.more_contact_us),
+            items = contactItems,
+            onItemClick = { itemId ->
+                viewModel.onIntent(PartnerMoreIntent.OnContactUsItemClick(itemId))
+            },
+            onDismiss = {
+                viewModel.onIntent(PartnerMoreIntent.OnContactUsDismiss)
+            },
+            chevronIcon = painterResource(Res.drawable.ic_chevron_right_24dp)
+        )
+    }
+
+    // Terms & Conditions Bottom Sheet
+    if (state.showTermsBottomSheet) {
+        val displayContent = if (state.isTermsLoading) {
+            ""
+        } else {
+            if (state.isTermsHtml) {
+                stripHtmlTags(state.termsContent.orEmpty())
+            } else {
+                state.termsContent.orEmpty()
+            }
+        }
+
+        DsTextBottomSheet(
+            title = state.termsTitle ?: stringResource(Res.string.terms_title),
+            content = displayContent,
+            onDismiss = {
+                viewModel.onIntent(PartnerMoreIntent.OnTermsDismiss)
+            }
+        )
+    }
+}
+
+/**
+ * Stateless PartnerMoreScreen UI implementation
+ * Pure UI that receives state and emits intents
+ */
+@Composable
+fun PartnerMoreScreenContent(
+    state: PartnerMoreState,
+    onIntent: (PartnerMoreIntent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(LessTheme.colors.backgroundPrimary)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(bottom = LessTheme.size.large)
+    ) {
+        // Header with merchant info
+        item {
+            PartnerMoreHeader(
+                venueName = state.venueName,
+                venueLogoUrl = state.venueLogoUrl
+            )
+        }
+
+        // Sections
+        state.sections.forEach { section ->
+            // Section header
+            item(key = "header_${section.titleRes}") {
+                DsSectionHeader(title = stringResource(section.titleRes))
+            }
+
+            // Section cells
+            items(
+                items = section.cells,
+                key = { cell -> cell.id }
+            ) { cell ->
+                DsCell(
+                    title = stringResource(cell.titleRes),
+                    leadingContent = cell.icon?.let { CellLeadingContent(icon = it) },
+                    type = when (cell.type) {
+                        is PartnerMoreCellType.Navigation -> CellType.Navigation(
+                            onClick = { onIntent(PartnerMoreIntent.OnCellClick(cell.id)) },
+                            trailingIcon = Res.drawable.ic_chevron_right_24dp
+                        )
+                        is PartnerMoreCellType.Toggle -> CellType.Toggle(
+                            checked = cell.type.checked,
+                            onCheckedChange = {
+                                when (cell.id) {
+                                    PartnerMoreCellId.Notification -> onIntent(PartnerMoreIntent.OnNotificationToggleClick)
+                                    PartnerMoreCellId.DarkMode -> onIntent(PartnerMoreIntent.OnDarkModeToggleClick)
+                                    else -> {}
+                                }
+                            }
+                        )
+                    },
+                    showDivider = cell.showDivider,
+                    modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
+                )
+            }
+
+            // Spacing after section
+            item(key = "spacing_${section.titleRes}") {
+                Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
+            }
+        }
+
+        // Logout button
+        item {
+            DsButton(
+                text = stringResource(Res.string.action_logout),
+                onClick = { onIntent(PartnerMoreIntent.OnLogoutClicked) },
+                variant = ButtonVariant.Secondary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = LessTheme.spacing.medium)
+            )
+        }
+
+        // Bottom spacing
+        item {
+            Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
+        }
+    }
+}
+
+private fun stripHtmlTags(html: String): String {
+    return html
+        .replace(Regex("<br\\s*/?>"), "\n")
+        .replace(Regex("</p>"), "\n\n")
+        .replace(Regex("</div>"), "\n")
+        .replace(Regex("</li>"), "\n")
+        .replace(Regex("<li[^>]*>"), "- ")
+        .replace(Regex("<[^>]+>"), "")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&nbsp;", " ")
+        .replace(Regex("\n{3,}"), "\n\n")
+        .trim()
+}

@@ -81,7 +81,8 @@ class OrdersDataSource(
         page: Int = 1,
         limit: Int = 50,
         startDate: String? = null,
-        endDate: String? = null
+        endDate: String? = null,
+        venueId: String? = null
     ): NetworkResult<OrderHistoryDataDto> {
         return safeApiCall {
             httpClient.get("v1/orders/history") {
@@ -89,6 +90,7 @@ class OrdersDataSource(
                 parameter("limit", limit)
                 startDate?.let { parameter("startDate", it) }
                 endDate?.let { parameter("endDate", it) }
+                venueId?.let { parameter("venueId", it) }
             }
         }
     }

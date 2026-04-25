@@ -52,6 +52,7 @@ fun LoginCodeScreen(
     navController: NavController,
     email: String = "",
     navigateToMerchant: () -> Unit = {},
+    navigateToPartner: () -> Unit = {},
     viewModel: LoginCodeViewModel = koinViewModel()
 ) {
     val state by viewModel.collectAsState()
@@ -86,6 +87,9 @@ fun LoginCodeScreen(
             }
             is LoginCodeSideEffect.NavigateToMerchant -> {
                 navigateToMerchant()
+            }
+            is LoginCodeSideEffect.NavigateToPartner -> {
+                navigateToPartner()
             }
             is LoginCodeSideEffect.ShowSuccess -> {
                 toastState = ToastState(sideEffect.message, ToastType.Success)

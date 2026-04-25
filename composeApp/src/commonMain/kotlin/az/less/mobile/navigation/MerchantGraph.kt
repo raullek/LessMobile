@@ -129,7 +129,7 @@ fun NavGraphBuilder.merchantGraph(
         BranchVerificationScreen(
             navController = navController,
             onAddUsersClicked = {
-                navController.navigate(MerchantRoute.BranchUsers)
+                navController.navigate(MerchantRoute.BranchUsers())
             },
             onHomeClicked = {
                 navController.popBackStack<MerchantRoute.More>(inclusive = false)

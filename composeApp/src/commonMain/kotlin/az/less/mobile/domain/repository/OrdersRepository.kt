@@ -19,6 +19,7 @@ interface OrdersRepository {
         page: Int = 1,
         limit: Int = 50,
         startDate: String? = null,
-        endDate: String? = null
+        endDate: String? = null,
+        venueId: String? = null
     ): NetworkResult<OrderHistoryDataDto>
 }

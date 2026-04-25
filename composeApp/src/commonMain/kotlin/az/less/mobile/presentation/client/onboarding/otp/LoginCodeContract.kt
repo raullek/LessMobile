@@ -23,6 +23,7 @@ sealed interface LoginCodeSideEffect {
     data object NavigateBack : LoginCodeSideEffect
     data object NavigateToClient : LoginCodeSideEffect
     data object NavigateToMerchant : LoginCodeSideEffect
+    data object NavigateToPartner : LoginCodeSideEffect
     data class ShowSuccess(val message: String) : LoginCodeSideEffect
     data class ShowError(val message: String) : LoginCodeSideEffect
 }

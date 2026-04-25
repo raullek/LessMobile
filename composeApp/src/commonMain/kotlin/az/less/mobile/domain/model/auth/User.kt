@@ -24,7 +24,8 @@ data class User(
     fun availableModes(): Set<AppMode> {
         val modes = mutableSetOf<AppMode>()
         if (isClient) modes.add(AppMode.CLIENT)
-        if (isMerchant || isPartner) modes.add(AppMode.MERCHANT)
+        if (isMerchant) modes.add(AppMode.MERCHANT)
+        else if (isPartner) modes.add(AppMode.PARTNER)
         return modes
     }
 
