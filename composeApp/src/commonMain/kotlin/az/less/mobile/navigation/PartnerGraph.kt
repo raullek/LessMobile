@@ -45,7 +45,10 @@ sealed interface PartnerRoute {
     data class EditProfile(val venueData: String? = null) : PartnerRoute
 
     @Serializable
-    data object BranchVerification : PartnerRoute
+    data class BranchVerification(
+        val venueId: String = "",
+        val venueName: String = ""
+    ) : PartnerRoute
 
     @Serializable
     data class BranchUsers(
@@ -110,11 +113,17 @@ fun NavGraphBuilder.partnerGraph(
         )
     }
 
-    composable<PartnerRoute.BranchVerification> {
+    composable<PartnerRoute.BranchVerification> { backStackEntry ->
+        val args = backStackEntry.toRoute<PartnerRoute.BranchVerification>()
         BranchVerificationScreen(
             navController = navController,
             onAddUsersClicked = {
-                navController.navigate(PartnerRoute.BranchUsers())
+                navController.navigate(
+                    PartnerRoute.BranchUsers(
+                        venueId = args.venueId,
+                        venueName = args.venueName
+                    )
+                )
             },
             onHomeClicked = {
                 navController.popBackStack<PartnerRoute.More>(inclusive = false)

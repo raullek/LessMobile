@@ -35,7 +35,8 @@ class EditMerchantProfileViewModel(
                     locationLongitude = branch.longitude,
                     defaultBoxDescription = branch.defaultBoxDescription ?: "",
                     lotsImageUrl = branch.lotImageUrl,
-                    email = branch.email
+                    email = branch.email,
+                    rating = branch.rating
                 )
             }
         }

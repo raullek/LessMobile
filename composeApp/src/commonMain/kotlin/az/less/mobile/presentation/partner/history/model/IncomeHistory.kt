@@ -23,20 +23,10 @@ data class IncomeHistory(
 )
 
 /**
- * Represents a month option for filtering
+ * Represents a venue option for filtering
  */
-data class MonthOption(
+data class VenueOption(
     val id: String,
-    val displayName: String, // e.g., "September", "October"
-    val startDate: String, // e.g., "2024-09-01" (YYYY-MM-DD for API)
-    val endDate: String // e.g., "2024-09-30" (YYYY-MM-DD for API)
+    val name: String,
+    val address: String
 )
-
-/**
- * Represents a branch option for filtering
- */
-data class BranchOption(
-    val id: String,
-    val name: String // e.g., "All branches", "Ahmdali mcdonalds"
-)
-

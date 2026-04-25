@@ -11,13 +11,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_down24dp
@@ -32,7 +33,8 @@ fun FilterButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null
+    leadingIcon: @Composable (() -> Unit)? = null,
+    isLoading: Boolean = false
 ) {
     Box(
         modifier = modifier
@@ -41,7 +43,7 @@ fun FilterButton(
                 color = LessTheme.colors.backgroundPrimary,
                 shape = RoundedCornerShape(LessTheme.radius.medium) // 16dp
             )
-            .clickable(onClick = onClick)
+            .clickable(enabled = !isLoading, onClick = onClick)
             .padding(horizontal = LessTheme.spacing.medium, vertical = LessTheme.spacing.small),
         contentAlignment = Alignment.Center
     ) {
@@ -55,7 +57,7 @@ fun FilterButton(
                 leadingIcon()
                 Spacer(modifier = Modifier.size(LessTheme.spacing.xSmall))
             }
-            
+
             // Text
             Text(
                 text = text,
@@ -64,16 +66,23 @@ fun FilterButton(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            
-            // Chevron down icon
+
+            // Trailing icon: spinner when loading, chevron otherwise
             Spacer(modifier = Modifier.size(LessTheme.spacing.xSmall))
-            Icon(
-                painter = painterResource(Res.drawable.ic_chevron_down24dp),
-                contentDescription = null,
-                modifier = Modifier.size(LessTheme.spacing.medium), // 16dp
-                tint = LessTheme.colors.textIconsBlack
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(LessTheme.spacing.medium), // 16dp
+                    color = LessTheme.colors.textIconsBlack,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_chevron_down24dp),
+                    contentDescription = null,
+                    modifier = Modifier.size(LessTheme.spacing.medium), // 16dp
+                    tint = LessTheme.colors.textIconsBlack
+                )
+            }
         }
     }
 }
-

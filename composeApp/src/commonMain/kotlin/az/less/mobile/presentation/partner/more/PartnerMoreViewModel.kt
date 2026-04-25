@@ -79,8 +79,6 @@ class PartnerMoreViewModel(
                             state.copy(
                                 venueName = user.venue?.name ?: user.name,
                                 venueLogoUrl = user.venue?.businessLogo,
-                                rating = user.venue?.rating?.toString() ?: "0.0",
-                                reviewCount = user.venue?.totalReviews?.toString() ?: "0",
                                 canSwitchMode = user.canSwitchMode(),
                                 sections = buildSections(
                                     notificationEnabled = state.notificationEnabled,

@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +35,6 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsListBottomSheet
-import az.less.designsystem.components.DsToolBar
 import az.less.designsystem.components.ListBottomSheetItem
 import az.less.mobile.navigation.PartnerRoute
 import az.less.mobile.presentation.partner.places.components.BranchCard
@@ -44,7 +46,6 @@ import lessmobile.composeapp.generated.resources.places_add_branch
 import lessmobile.composeapp.generated.resources.places_edit_merch_details
 import lessmobile.composeapp.generated.resources.places_edit_users
 import lessmobile.composeapp.generated.resources.places_edit_venue
-import lessmobile.composeapp.generated.resources.places_title
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -99,6 +100,7 @@ fun PartnerPlacesScreen(
  * Stateless PartnerPlacesScreen UI implementation
  * Pure UI that receives state and emits intents
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartnerPlacesScreenContent(
     state: PartnerPlacesState,
@@ -109,17 +111,14 @@ fun PartnerPlacesScreenContent(
         modifier = modifier
             .fillMaxSize()
             .background(LessTheme.colors.backgroundSecond)
+            .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        // Fixed Toolbar
-        DsToolBar(
-            title = stringResource(Res.string.places_title),
-            onBackClick = { onIntent(PartnerPlacesIntent.OnBackClick) },
-            backgroundColor = LessTheme.colors.backgroundSecond
-        )
-
-        // Main content
-        Box(modifier = Modifier.weight(1f)) {
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { onIntent(PartnerPlacesIntent.OnRefresh) },
+            modifier = Modifier.weight(1f)
+        ) {
             val listState = rememberLazyListState()
 
             // Trigger load more when near the end of the list
@@ -141,12 +140,8 @@ fun PartnerPlacesScreenContent(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    top = LessTheme.spacing.xxxSmall,
-                    bottom = if (state.isEmpty) {
-                        LessTheme.spacing.xLarge
-                    } else {
-                        LessTheme.spacing.xLarge + 80.dp // Space for bottom button
-                    }
+                    top = LessTheme.spacing.large,
+                    bottom = LessTheme.size.huge + LessTheme.spacing.xLarge
                 ),
                 verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.medium)
             ) {
@@ -212,30 +207,21 @@ fun PartnerPlacesScreenContent(
                             }
                         }
                     }
-                }
-            }
-            }
 
-            // Bottom Add Branch Button - only show when there are branches
-            if (!state.isEmpty) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = LessTheme.spacing.medium,
-                            vertical = LessTheme.spacing.medium
+                    // Add Branch Button as last list item
+                    item(key = "add_branch_button") {
+                        DsButton(
+                            text = stringResource(Res.string.places_add_branch),
+                            onClick = { onIntent(PartnerPlacesIntent.OnAddBranchClick) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = LessTheme.spacing.medium),
+                            variant = ButtonVariant.Primary,
+                            size = ButtonSize.Large
                         )
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                ) {
-                    DsButton(
-                        text = stringResource(Res.string.places_add_branch),
-                        onClick = { onIntent(PartnerPlacesIntent.OnAddBranchClick) },
-                        modifier = Modifier.fillMaxWidth(),
-                        variant = ButtonVariant.Primary,
-                        size = ButtonSize.Large
-                    )
+                    }
                 }
+            }
             }
         }
     }

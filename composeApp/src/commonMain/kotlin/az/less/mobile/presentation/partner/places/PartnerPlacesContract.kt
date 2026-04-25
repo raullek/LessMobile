@@ -9,6 +9,7 @@ data class PartnerPlacesState(
     val branches: List<BranchItem> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
+    val isRefreshing: Boolean = false,
     val currentPage: Int = 1,
     val hasNextPage: Boolean = false,
     val selectedBranchId: String? = null,
@@ -36,6 +37,7 @@ sealed interface PartnerPlacesIntent {
     data class OnBranchClick(val branchId: String) : PartnerPlacesIntent
     data class OnEditBranchClick(val branchId: String) : PartnerPlacesIntent
     data object OnAddBranchClick : PartnerPlacesIntent
+    data object OnRefresh : PartnerPlacesIntent
     data object OnLoadMore : PartnerPlacesIntent
     data object OnDismissEditBottomSheet : PartnerPlacesIntent
     data object OnEditVenueClick : PartnerPlacesIntent

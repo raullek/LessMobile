@@ -6,8 +6,6 @@ import az.less.mobile.presentation.partner.more.model.PartnerMoreSection
 data class PartnerMoreState(
     val venueName: String = "",
     val venueLogoUrl: String? = null,
-    val rating: String = "0.0",
-    val reviewCount: String = "0",
     val canSwitchMode: Boolean = false,
     val notificationEnabled: Boolean = true,
     val darkModeEnabled: Boolean = false,

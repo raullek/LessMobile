@@ -81,12 +81,18 @@ fun AppPartnerBottomNavigation(
                     isSelected = isSelected,
                     onClick = {
                         if (!isSelected) {
+                            // Tabs that should always refetch on entry — back stack entry
+                            // (and therefore ViewModel) is rebuilt instead of restored.
+                            val isLeavingNonCached = nonCachedTabs.any { name ->
+                                currentRoute?.contains(name) == true
+                            }
+                            val isGoingToNonCached = item.routeClass.simpleName in nonCachedTabs
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    saveState = !isLeavingNonCached
                                 }
                                 launchSingleTop = true
-                                restoreState = true
+                                restoreState = !isGoingToNonCached
                             }
                         }
                     }
@@ -139,6 +145,11 @@ private data class BottomNavItemData(
     val labelRes: StringResource,
     val route: Any,
     val routeClass: KClass<*>
+)
+
+private val nonCachedTabs: Set<String> = setOfNotNull(
+    PartnerRoute.Places::class.simpleName,
+    PartnerRoute.History::class.simpleName
 )
 
 private val bottomNavItems = listOf(

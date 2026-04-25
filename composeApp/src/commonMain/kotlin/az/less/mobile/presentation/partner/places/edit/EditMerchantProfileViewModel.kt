@@ -35,7 +35,8 @@ class EditMerchantProfileViewModel(
                     locationLongitude = branch.longitude,
                     defaultBoxDescription = branch.defaultBoxDescription ?: "",
                     lotsImageUrl = branch.lotImageUrl,
-                    email = branch.email
+                    email = branch.email,
+                    rating = branch.rating
                 )
             }
         }
@@ -202,10 +203,15 @@ class EditMerchantProfileViewModel(
                 businessLogo = state.logoImageBytes,
                 lotImage = state.lotsImageBytes
             )
-                .onSuccess {
+                .onSuccess { venue ->
                     reduce { state.copy(isLoading = false) }
                     postSideEffect(EditMerchantProfileSideEffect.ShowToast(SUCCESS_VENUE_CREATED, ToastType.Success))
-                    postSideEffect(EditMerchantProfileSideEffect.BranchCreated)
+                    postSideEffect(
+                        EditMerchantProfileSideEffect.BranchCreated(
+                            venueId = venue.id,
+                            venueName = venue.name
+                        )
+                    )
                 }
                 .onError { error ->
                     reduce { state.copy(isLoading = false) }

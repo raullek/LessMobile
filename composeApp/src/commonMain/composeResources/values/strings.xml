@@ -298,6 +298,10 @@
     <!-- Income History Screen -->
     <string name="history_title">History</string>
     <string name="history_select_date_range">Select date range</string>
+    <string name="history_select_month">Select month</string>
+    <string name="history_all_branches">All branches</string>
+    <string name="history_all_venues">All venues</string>
+    <string name="history_select_venue">Select venue</string>
     <string name="history_empty">No income history found</string>
 
     <!-- Places Screen -->

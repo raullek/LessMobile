@@ -129,7 +129,14 @@ fun EditMerchantProfileScreen(
                 )
             }
             is EditMerchantProfileSideEffect.BranchCreated -> {
-                navController.navigate(PartnerRoute.BranchVerification)
+                navController.navigate(
+                    PartnerRoute.BranchVerification(
+                        venueId = sideEffect.venueId,
+                        venueName = sideEffect.venueName
+                    )
+                ) {
+                    popUpTo<PartnerRoute.EditProfile> { inclusive = true }
+                }
             }
             is EditMerchantProfileSideEffect.BranchUpdated -> {
                 navController.popBackStack()
@@ -283,6 +290,7 @@ fun EditMerchantProfileScreenContent(
             EditMerchantProfileInfoSection(
                 venueName = state.venueName,
                 description = state.description,
+                rating = state.rating,
                 onNameEditClick = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsClick) },
                 onDescriptionChanged = { onIntent(EditMerchantProfileIntent.OnEditMerchDetailsClick) }
             )

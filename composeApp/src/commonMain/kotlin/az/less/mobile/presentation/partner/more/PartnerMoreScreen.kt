@@ -164,8 +164,6 @@ fun PartnerMoreScreenContent(
         item {
             PartnerMoreHeader(
                 venueName = state.venueName,
-                rating = state.rating,
-                reviewCount = state.reviewCount,
                 venueLogoUrl = state.venueLogoUrl
             )
         }

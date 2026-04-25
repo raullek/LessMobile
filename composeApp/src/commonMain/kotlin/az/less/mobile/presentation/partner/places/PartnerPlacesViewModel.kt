@@ -22,8 +22,11 @@ class PartnerPlacesViewModel(
         loadBranches()
     }
 
-    private fun loadBranches() = intent {
-        reduce { state.copy(isLoading = true) }
+    private fun loadBranches(isRefresh: Boolean = false) = intent {
+        reduce {
+            if (isRefresh) state.copy(isRefreshing = true)
+            else state.copy(isLoading = true)
+        }
 
         venuesRepository.getAllVenues(page = 1)
             .onSuccess { data ->
@@ -32,13 +35,14 @@ class PartnerPlacesViewModel(
                     state.copy(
                         branches = branches,
                         isLoading = false,
+                        isRefreshing = false,
                         currentPage = 1,
                         hasNextPage = data.pagination?.hasNext ?: false
                     )
                 }
             }
             .onError { error ->
-                reduce { state.copy(isLoading = false) }
+                reduce { state.copy(isLoading = false, isRefreshing = false) }
                 postSideEffect(PartnerPlacesSideEffect.ShowError(error.message))
             }
     }
@@ -76,6 +80,7 @@ class PartnerPlacesViewModel(
             is PartnerPlacesIntent.OnBranchClick -> handleBranchClick(intent.branchId)
             is PartnerPlacesIntent.OnEditBranchClick -> handleEditBranchClick(intent.branchId)
             is PartnerPlacesIntent.OnAddBranchClick -> handleAddBranchClick()
+            is PartnerPlacesIntent.OnRefresh -> loadBranches(isRefresh = true)
             is PartnerPlacesIntent.OnLoadMore -> loadMore()
             is PartnerPlacesIntent.OnDismissEditBottomSheet -> dismissEditBottomSheet()
             is PartnerPlacesIntent.OnEditVenueClick -> handleEditVenueFromBottomSheet()
