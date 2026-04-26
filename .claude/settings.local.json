@@ -31,7 +31,18 @@
       "WebFetch(domain:api.ktor.io)",
       "mcp__claude_ai_Figma__get_design_context",
       "Bash(git restore *)",
-      "Bash(sort grep *)"
+      "Bash(sort grep *)",
+      "Bash(xcodebuild *)",
+      "Bash(./gradlew :composeApp:tasks --all)",
+      "Bash(git -C /Users/raul/StudioProjects/LessMobile/ ls-files)",
+      "Bash(grep -E \"gradle.properties$|local.properties$\")",
+      "Bash(keytool -help)",
+      "Bash(keytool -list -v -keystore /Users/raul/StudioProjects/LessMobile/composeApp/keystore/upload-keystore.jks -storepass \"9oP12wvXddACmo2M2bGiEC5f\")",
+      "Bash(git -C /Users/raul/StudioProjects/LessMobile/ check-ignore keystore.properties)",
+      "Bash(keytool -printcert -jarfile /Users/raul/StudioProjects/LessMobile/composeApp/build/outputs/apk/release/composeApp-release.apk)",
+      "Bash(./gradlew :composeApp:clean)",
+      "Bash(./gradlew :composeApp:assembleDebug :composeApp:assembleRelease :composeApp:bundleRelease -x lintVitalRelease)",
+      "Read(//Users/raul/**)"
     ]
   }
 }

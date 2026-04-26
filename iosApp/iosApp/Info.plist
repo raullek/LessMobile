@@ -10,5 +10,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>Variant</key>
+	<string>$(VARIANT)</string>
 </dict>
 </plist>

@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Axsham Bazari</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_offers">Offers</string>
+    <string name="nav_explore">Explore</string>
+    <string name="nav_orders">Orders</string>
+    <string name="nav_saved">Saved</string>
+    <string name="nav_more">More</string>
+
+    <!-- Common Actions -->
+    <string name="action_back">Back</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_share">Share</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_next">Next</string>
+    <string name="action_search">Search</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_apply_filters">Apply Filters</string>
+    <string name="action_see_all">See all</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_home">Home</string>
+
+    <!-- Welcome/Onboarding Screen -->
+    <string name="welcome_title">Welcome to Less</string>
+    <string name="welcome_subtitle">Select your preferred method to log in</string>
+    <string name="welcome_login_email">Log in with email</string>
+
+    <!-- Login Email Screen -->
+    <string name="login_email_title">Email</string>
+    <string name="login_email_placeholder">Mail</string>
+
+    <!-- Login Password Screen -->
+    <string name="welcome_login_password">Log in with password</string>
+    <string name="login_password_title">Login</string>
+    <string name="login_password_placeholder">Password</string>
+    <string name="login_password_button">Log in</string>
+
+    <!-- Login Code Screen -->
+    <string name="login_code_title">Enter the 6-digit code</string>
+    <string name="login_code_subtitle">We sent it to %1$s by mail</string>
+    <string name="login_code_default_email">Less@gmail.com</string>
+    <string name="login_code_resend">Didn\'t receive it?</string>
+
+    <!-- Offers Screen -->
+    <string name="offers_greeting_guest">Dear User</string>
+    <string name="offers_greeting">Hi, %1$s!</string>
+    <string name="offers_search_placeholder">Drinks, chocolates and snacks</string>
+
+    <!-- Orders Screen -->
+    <string name="orders_title">Orders</string>
+    <string name="orders_tab_active">Active</string>
+    <string name="orders_tab_previous">Previous orders</string>
+    <string name="orders_not_logged_in_title">Sign in to see your orders</string>
+    <string name="orders_not_logged_in_description">Log in to view and manage your orders</string>
+    <string name="orders_sign_in">Sign in</string>
+    <string name="orders_empty_title">You don\'t have any orders</string>
+    <string name="orders_empty_description">Your orders will appear here once you make a purchase</string>
+    <string name="orders_explore_offers">Explore offers</string>
+    <string name="orders_reserve_number">Reserve number: </string>
+    <string name="orders_picked_up_on">Picked up on %1$s</string>
+    <string name="orders_pickup_time">Pick up from %1$s to %2$s</string>
+
+    <!-- Saved/Favorites Screen -->
+    <string name="saved_title">Favourites</string>
+    <string name="saved_empty_title">You don\'t have favorites</string>
+    <string name="saved_empty_description">Your saved items from all categories will appear here. You can delete or use them at any time</string>
+    <string name="saved_explore_venues">Explore new venues</string>
+    <string name="saved_not_logged_in_title">Sign in to see your favorites</string>
+    <string name="saved_not_logged_in_description">Log in to save and view your favorite venues</string>
+    <string name="saved_sign_in">Sign in</string>
+
+    <!-- More Screen -->
+    <string name="more_section_application">Application</string>
+    <string name="more_section_support">Support</string>
+    <string name="more_account">Account</string>
+    <string name="more_payment_methods">Payment methods</string>
+    <string name="more_vouchers">Vouchers</string>
+    <string name="more_history">History</string>
+    <string name="more_notification">Notification</string>
+    <string name="more_contact_us">Contact us</string>
+    <string name="more_terms_of_service">Terms of Service</string>
+    <string name="more_how_to_use">How to use</string>
+    <string name="more_eco_hero">Eco-hero</string>
+    <string name="more_eco_hero_description">You saved %1$d meals!</string>
+    <string name="more_location">Location</string>
+    <string name="more_location_granted">Granted</string>
+    <string name="more_location_not_granted">Not granted</string>
+    <string name="more_get_more_features">Welcome to Less</string>
+    <string name="more_get_more_features_description">Log in to the application to take advantage of special offers from Less</string>
+    <string name="more_log_in_or_sign_up">Log in</string>
+    <string name="more_co2_saved">CO2, saved</string>
+    <string name="more_money_saved">Saved</string>
+
+    <!-- Contact Us Bottom Sheet -->
+    <string name="contact_instagram">Instagram</string>
+    <string name="contact_tiktok">TikTok</string>
+    <string name="contact_facebook">Facebook</string>
+    <string name="contact_telegram">Telegram</string>
+    <string name="contact_whatsapp">Whatsapp</string>
+    <string name="contact_mail">Mail</string>
+
+    <!-- Terms Bottom Sheet -->
+    <string name="terms_title">Terms &amp; Conditions</string>
+
+    <!-- Account Screen -->
+    <string name="account_title">Account</string>
+    <string name="account_edit_photo">Edit profile photo</string>
+    <string name="account_name_placeholder">Name Surname</string>
+    <string name="account_phone_placeholder">Phone number</string>
+    <string name="account_email_placeholder">Email</string>
+    <string name="account_gender_placeholder">Gender</string>
+    <string name="account_birthday_placeholder">Birth day</string>
+    <string name="account_delete">Delete account</string>
+    <string name="account_delete_title">Delete account?</string>
+    <string name="account_delete_description">Are you sure you want to delete your account? This action cannot be undone.</string>
+    <string name="account_select_gender">Select Gender</string>
+    <string name="account_profile_photo">Profile photo</string>
+
+    <!-- Payment Methods Screen -->
+    <string name="payment_methods_title">Payment methods</string>
+    <string name="payment_credit_debit_cards">Credit &amp; Debit Cards</string>
+    <string name="payment_other_methods">Other Methods</string>
+    <string name="payment_add_new_card">Add new card</string>
+    <string name="payment_mastercard">Mastercard</string>
+    <string name="payment_visa">Visa</string>
+    <string name="payment_apple_pay">Apple Pay</string>
+    <string name="payment_google_pay">Google Pay</string>
+    <string name="payment_selected">Selected</string>
+    <string name="payment_delete_mastercard">Delete Mastercard %1$s</string>
+    <string name="payment_delete_visa">Delete Visa %1$s</string>
+    <string name="payment_delete_apple_pay">Delete Apple Pay</string>
+    <string name="payment_delete_google_pay">Delete Google Pay</string>
+    <string name="payment_delete_card">Delete Card</string>
+    <string name="payment_delete_confirmation">Are you sure to delete this card from app, after deleting you should select other card for payment</string>
+    <string name="payment_continue">Continue</string>
+
+    <!-- Add New Card Screen -->
+    <string name="add_card_title">Add new card</string>
+    <string name="add_card_number_placeholder">0000 0000 0000 0000</string>
+    <string name="add_card_expiry_placeholder">MM/YY</string>
+    <string name="add_card_cvv_placeholder">CVV/CVC</string>
+    <string name="add_card_verification_text">To verify your card, we will debit 1 AZN from your balance. The money will immediately return back to your balance.</string>
+    <string name="add_card_button">Add card</string>
+
+    <!-- Voucher Screen -->
+    <string name="voucher_title">Voucher</string>
+    <string name="voucher_discount">Discount</string>
+    <string name="voucher_expiry_date">Expiry date</string>
+    <string name="voucher_code_label">Voucher Code</string>
+    <string name="voucher_empty_title">You don\'t have vouchers</string>
+    <string name="voucher_empty_description">To earn voucher refer our app to your friends, you will get 2 ₼ for each friend after his first transaction</string>
+
+    <!-- Search Screen -->
+    <string name="search_items_on_sale">%1$d items on sale</string>
+    <string name="search_no_active_offer">No active offer</string>
+
+    <!-- Category Offers Screen -->
+    <string name="category_offers_empty">No offers available</string>
+
+    <!-- Merchant Profile Screen -->
+    <string name="merchant_no_reviews">No reviews yet</string>
+    <string name="merchant_show_direction">Show Direction</string>
+    <string name="merchant_tab_offers">Offers</string>
+    <string name="merchant_tab_reviews">Reviews</string>
+    <string name="merchant_view_location">View location</string>
+    <string name="merchant_directions">Directions</string>
+
+    <!-- Reserve Screen -->
+    <string name="reserve_lot_size_info">Lot size info</string>
+    <string name="reserve_items_left">%1$d items left</string>
+    <string name="reserve_see_more_deals">See more deals from this venue</string>
+    <string name="reserve_select_voucher">Select voucher</string>
+    <string name="reserve_price_per_piece">Price per piece</string>
+    <string name="reserve_service_fee">Service fee</string>
+    <string name="reserve_subtotal">Subtotal</string>
+    <string name="reserve_select_payment_method">Select payment method</string>
+    <string name="reserve_and_pay">Reserve and pay</string>
+
+    <!-- Order Accepted Screen -->
+    <string name="order_accepted_title">Your order is accepted</string>
+    <string name="order_accepted_description">Your order has been confirmed. Pick it up from the venue during the specified time.</string>
+    <string name="order_accepted_go_orders">Go Orders</string>
+
+    <!-- Reserve Info Bottom Sheet -->
+    <string name="reserve_info_reserve_number">Reserve number</string>
+    <string name="reserve_info_date">Date</string>
+    <string name="reserve_info_show_location">Show me location</string>
+
+    <!-- Filter Bottom Sheet -->
+    <string name="filter_title">Filters</string>
+
+    <!-- Select Payment Method Bottom Sheet -->
+    <string name="select_payment_title">Select payment method</string>
+
+    <!-- Select Voucher Bottom Sheet -->
+    <string name="select_voucher_title">Select voucher</string>
+
+    <!-- Lot Size Info Bottom Sheet -->
+    <string name="lot_size_info_title">Lot size info</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_user_avatar">User Avatar</string>
+    <string name="cd_notifications">Notifications</string>
+    <string name="cd_messages">Messages</string>
+    <string name="cd_merchant_logo">Merchant logo</string>
+    <string name="cd_merchant_hero_image">Merchant hero image</string>
+    <string name="cd_offer_image">Offer image</string>
+    <string name="cd_restaurant_logo">Restaurant Logo</string>
+    <string name="cd_rating">Rating</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_liked">Liked</string>
+    <string name="cd_completed">Completed</string>
+    <string name="cd_gift">Gift</string>
+    <string name="cd_phone">Phone</string>
+    <string name="cd_location">Location</string>
+    <string name="cd_app_logo">App Logo</string>
+    <string name="cd_plus">Plus</string>
+    <string name="cd_minus">Minus</string>
+    <string name="cd_see_more">See more</string>
+    <string name="cd_select_payment">Select payment</string>
+
+    <!-- Error Messages -->
+    <string name="error_invalid_email">Invalid email address</string>
+    <string name="error_invalid_phone">Invalid phone number</string>
+    <string name="error_invalid_card_number">Invalid card number</string>
+    <string name="error_invalid_expiry_date">Invalid expiration date</string>
+    <string name="error_invalid_cvv">Invalid CVV</string>
+    <string name="error_generic">Something went wrong</string>
+    <string name="error_generic_subtitle">Please try again later</string>
+    <string name="error_try_again">Try again</string>
+
+    <!-- Currency -->
+    <string name="currency_azn">%1$s &#8380;</string>
+
+    <!-- ==================== MERCHANT FLOW ==================== -->
+
+    <!-- Merchant Bottom Navigation -->
+    <string name="merch_nav_orders">Boxes</string>
+    <string name="merch_nav_add">Add</string>
+    <string name="merch_nav_history">History</string>
+    <string name="merch_nav_more">More</string>
+
+    <!-- Merchant More Screen -->
+    <string name="merch_more_places">Places</string>
+    <string name="merch_more_dark_mode">Dark mode</string>
+    <string name="more_switch_to_merchant">Switch to Merchant</string>
+    <string name="more_switch_to_client">Switch to Client</string>
+
+    <!-- Merchant Orders Screen -->
+    <string name="merch_orders_bought">Purchased</string>
+    <string name="merch_orders_placed_lots">Placed Lots</string>
+    <string name="merch_orders_lot_added">Lot successfully added</string>
+    <string name="merch_orders_lot_remove_info">You can remove lot only in 1 hour</string>
+    <string name="merch_orders_items_left">%1$d left</string>
+    <string name="merch_orders_pickup_time">Pick up from %1$s to %2$s</string>
+    <string name="merch_orders_handed_over">Handed Over</string>
+    <string name="merch_orders_delivered">Order delivered successfully</string>
+    <string name="merch_orders_cancel_lot">Cancel Lot</string>
+    <string name="merch_orders_cancellation_ended">Cancellation time ended, lot closes at %1$s</string>
+    <string name="merch_orders_create_lot">Create Lot</string>
+    <string name="box_type_small_bag">Small Surprise Bag</string>
+    <string name="box_type_medium_bag">Medium Surprise Bag</string>
+    <string name="box_type_large_bag">Large Surprise Bag</string>
+    <string name="merch_boxes_empty_title">No boxes yet</string>
+    <string name="merch_boxes_empty_description">Your boxes will appear here</string>
+
+    <!-- Add Lot Screen -->
+    <string name="add_lot_title">Add Lot</string>
+    <string name="add_lot_loading">Loading...</string>
+    <string name="add_lot_button">Add lots</string>
+    <string name="add_lot_select_time">Select time</string>
+    <string name="add_lot_box_type">Box type</string>
+    <string name="add_lot_choose_category">Choose category</string>
+    <string name="add_lot_tags">Some specific tags (optional)</string>
+    <string name="add_lot_choose_time_range">Choose time range</string>
+    <string name="add_lot_box_price">Box price</string>
+    <string name="add_lot_price_before">Price before</string>
+    <string name="add_lot_price_after">Price after discount</string>
+    <string name="add_lot_description">Some info for customer (optional)</string>
+    <string name="add_lot_description_placeholder">Input lot information</string>
+    <string name="add_lot_box_count">Box Count</string>
+    <string name="add_lot_box_title">Title</string>
+    <string name="add_lot_box_title_placeholder">Enter box title</string>
+    <string name="add_lot_success">Lot added successfully</string>
+    <string name="add_lot_error_select">Please select %1$s</string>
+    <string name="add_lot_error_enter">Please enter %1$s</string>
+    <string name="add_lot_error_title">Please enter a title</string>
+    <string name="add_lot_error_validation">Please fill in all required fields</string>
+    <string name="add_lot_error_submit">Failed to add lot. Please try again</string>
+
+    <!-- Income History Screen -->
+    <string name="history_title">History</string>
+    <string name="history_select_date_range">Select date range</string>
+    <string name="history_select_month">Select month</string>
+    <string name="history_all_branches">All branches</string>
+    <string name="history_all_venues">All venues</string>
+    <string name="history_select_venue">Select venue</string>
+    <string name="history_empty">No income history found</string>
+
+    <!-- Places Screen -->
+    <string name="places_title">Places</string>
+    <string name="places_add_branch">Add branch</string>
+    <string name="places_empty_title">No branches yet</string>
+    <string name="places_empty_description">Add your first branch to start managing your locations. Customers will be able to find and visit your places.</string>
+    <string name="places_cd_no_places">No places</string>
+    <string name="places_edit_merch_details">Edit merch details</string>
+    <string name="places_edit_venue">Edit venue</string>
+    <string name="places_edit_users">Edit users</string>
+
+    <!-- Edit Merchant Profile Screen -->
+    <string name="edit_profile_make_me_merchant">Make me a merchant of this venue</string>
+    <string name="edit_profile_create_branch">Create branch</string>
+    <string name="edit_profile_update_branch">Update branch</string>
+    <string name="edit_profile_error_name_required">Venue name is required</string>
+    <string name="edit_profile_error_phone_required">Phone number is required</string>
+    <string name="edit_profile_error_location_required">Location is required</string>
+    <string name="edit_profile_venue_created">Venue created successfully</string>
+    <string name="edit_profile_venue_updated">Venue updated successfully</string>
+    <string name="edit_profile_name_placeholder">Name of venue</string>
+    <string name="edit_profile_description_placeholder">Description or some notes about your perfect place to show for customers</string>
+    <string name="edit_profile_phone_number">Phone number</string>
+    <string name="edit_profile_phone_optional">Optional</string>
+    <string name="edit_profile_edit">Edit</string>
+    <string name="edit_profile_view_location">View location</string>
+    <string name="edit_profile_location_placeholder">Location of your perfect place</string>
+    <string name="edit_profile_default_box_description">Default box description</string>
+    <string name="edit_profile_box_description_placeholder">Some tips for user to understand what can be inside</string>
+    <string name="edit_profile_add_for_lots">Add for lots</string>
+    <string name="edit_profile_edit_phone_number">Edit phone number</string>
+    <string name="edit_profile_edit_merch_details">Edit merch details</string>
+    <string name="edit_profile_title_label">Title</string>
+    <string name="edit_profile_title_placeholder">Enter venue name</string>
+    <string name="edit_profile_description_label">Description</string>
+    <string name="edit_profile_description_input_placeholder">Enter description</string>
+    <string name="edit_profile_save">Save</string>
+
+    <!-- Branch Verification Screen -->
+    <string name="branch_verification_title">Venue was added</string>
+    <string name="branch_verification_description">If you need some custom edits</string>
+    <string name="branch_verification_add_users">Add users</string>
+
+    <!-- Branch Users Screen -->
+    <string name="branch_users_title">%1$s users</string>
+    <string name="branch_users_add_other">Add other user</string>
+    <string name="branch_users_empty_title">You don\'t have any added users</string>
+    <string name="branch_users_empty_description">If you need someone to add to control your orders for example cashier</string>
+    <string name="branch_users_add_user">Add user</string>
+    <string name="branch_users_cd_no_users">No users</string>
+
+    <!-- Add Branch User Screen -->
+    <string name="add_user_title">User %1$d</string>
+    <string name="add_user_name_placeholder">Name</string>
+    <string name="add_user_delete">Delete user</string>
+    <string name="add_user_save">Save changes</string>
+    <string name="add_user_saved">User added successfully</string>
+
+    <!-- Select Location Screen -->
+    <string name="select_location_title">Select address on map</string>
+    <string name="select_location_hint">Tap on map to select location</string>
+    <string name="select_location_confirm">Confirm Location</string>
+    <string name="select_location_selected">Selected Location</string>
+</resources>
