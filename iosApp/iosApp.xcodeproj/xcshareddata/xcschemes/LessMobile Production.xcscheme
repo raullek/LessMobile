@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E2F89675DD7E675474BA4107"
-               BuildableName = "LessMobile Dev.app"
+               BuildableName = "Axs&#x327;am Bazar&#x131; Dev.app"
                BlueprintName = "iosApp"
                ReferencedContainer = "container:iosApp.xcodeproj">
             </BuildableReference>
@@ -24,14 +24,14 @@
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Development Debug"
+      buildConfiguration = "Production"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Development Debug"
+      buildConfiguration = "Production"
       selectedDebuggerIdentifier = ""
       selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       launchStyle = "0"
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E2F89675DD7E675474BA4107"
-            BuildableName = "LessMobile Dev.app"
+            BuildableName = "Axs&#x327;am Bazar&#x131; Dev.app"
             BlueprintName = "iosApp"
             ReferencedContainer = "container:iosApp.xcodeproj">
          </BuildableReference>
@@ -63,7 +63,7 @@
       </LocationScenarioReference>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Development Debug"
+      buildConfiguration = "Production"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -73,17 +73,17 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E2F89675DD7E675474BA4107"
-            BuildableName = "LessMobile Dev.app"
+            BuildableName = "Axs&#x327;am Bazar&#x131; Dev.app"
             BlueprintName = "iosApp"
             ReferencedContainer = "container:iosApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = "Development Debug">
+      buildConfiguration = "Production">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Development Debug"
+      buildConfiguration = "Production"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

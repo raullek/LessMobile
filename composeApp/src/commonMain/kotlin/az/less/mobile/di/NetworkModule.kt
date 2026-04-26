@@ -1,5 +1,7 @@
 package az.less.mobile.di
 
+import az.less.mobile.BuildVariant
+import az.less.mobile.currentBuildVariant
 import az.less.mobile.data.remote.model.auth.RefreshTokenData
 import az.less.mobile.data.remote.model.auth.RefreshTokenRequest
 import az.less.mobile.domain.repository.SessionLocalRepository
@@ -37,13 +39,15 @@ val networkModule = module {
                     isLenient = true
                 })
             }
-            install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        println("HTTP: $message")
+            if (currentBuildVariant() == BuildVariant.DEVELOPMENT) {
+                install(Logging) {
+                    logger = object : Logger {
+                        override fun log(message: String) {
+                            println("HTTP: $message")
+                        }
                     }
+                    level = LogLevel.ALL
                 }
-                level = LogLevel.ALL
             }
             install(SSE)
             install(Auth) {
@@ -101,8 +105,10 @@ val networkModule = module {
                 url("https://axshambazari.com/api/")
                 contentType(ContentType.Application.Json)
                 headers.append(HttpHeaders.Accept, ContentType.Application.Json.toString())
-                headers.append("X-Data-Env", "test")
-                headers.append("X-Test-Db-Key", "axshamlar")
+                if (currentBuildVariant() == BuildVariant.DEVELOPMENT) {
+                    headers.append("X-Data-Env", "test")
+                    headers.append("X-Test-Db-Key", "axshamlar")
+                }
             }
         }
     }

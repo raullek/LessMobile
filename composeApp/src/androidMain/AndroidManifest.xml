@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permissions for Google Maps and Location -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
-    <!-- Permissions for Camera and Image Picker -->
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Permissions for Image Picker (gallery only) -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
-    <uses-feature android:name="android.hardware.camera" android:required="false"/>
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <!-- Remove CAMERA permission contributed by imagepickerkmp / other libs -->
+    <uses-permission android:name="android.permission.CAMERA" tools:node="remove"/>
+    <uses-feature android:name="android.hardware.camera" tools:node="remove"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" tools:node="remove"/>
+    <uses-feature android:name="android.hardware.camera.any" tools:node="remove"/>
 
     <application
         android:name=".LessApplication"

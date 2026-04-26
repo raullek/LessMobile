@@ -1,102 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App Name -->
-    <string name="app_name">Less</string>
+    <string name="app_name">Axşam Bazarı</string>
 
     <!-- Bottom Navigation -->
-    <string name="nav_offers">Offers</string>
-    <string name="nav_explore">Explore</string>
-    <string name="nav_orders">Orders</string>
-    <string name="nav_saved">Saved</string>
-    <string name="nav_more">More</string>
+    <string name="nav_offers">Təkliflər</string>
+    <string name="nav_explore">Kəşf et</string>
+    <string name="nav_orders">Sifarişlər</string>
+    <string name="nav_saved">Saxlanılanlar</string>
+    <string name="nav_more">Daha çox</string>
 
     <!-- Common Actions -->
-    <string name="action_back">Back</string>
-    <string name="action_save">Save</string>
-    <string name="action_cancel">Cancel</string>
+    <string name="action_back">Geri</string>
+    <string name="action_save">Saxla</string>
+    <string name="action_cancel">Ləğv et</string>
     <string name="action_ok">OK</string>
-    <string name="action_clear">Clear</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_share">Share</string>
-    <string name="action_copy">Copy</string>
-    <string name="action_next">Next</string>
-    <string name="action_search">Search</string>
-    <string name="action_filter">Filter</string>
-    <string name="action_apply_filters">Apply Filters</string>
-    <string name="action_see_all">See all</string>
-    <string name="action_logout">Logout</string>
-    <string name="action_home">Home</string>
+    <string name="action_clear">Təmizlə</string>
+    <string name="action_delete">Sil</string>
+    <string name="action_share">Paylaş</string>
+    <string name="action_copy">Kopyala</string>
+    <string name="action_next">Növbəti</string>
+    <string name="action_search">Axtar</string>
+    <string name="action_filter">Filtr</string>
+    <string name="action_apply_filters">Filtrləri tətbiq et</string>
+    <string name="action_see_all">Hamısına bax</string>
+    <string name="action_logout">Çıxış</string>
+    <string name="action_home">Ana səhifə</string>
 
     <!-- Welcome/Onboarding Screen -->
-    <string name="welcome_title">Welcome to Less</string>
-    <string name="welcome_subtitle">Select your preferred method to log in</string>
-    <string name="welcome_login_email">Log in with email</string>
+    <string name="welcome_title">Less-ə xoş gəlmisiniz</string>
+    <string name="welcome_subtitle">Daxil olmaq üçün üsul seçin</string>
+    <string name="welcome_login_email">E-poçt ilə daxil ol</string>
 
     <!-- Login Email Screen -->
-    <string name="login_email_title">Email</string>
-    <string name="login_email_placeholder">Mail</string>
+    <string name="login_email_title">E-poçt</string>
+    <string name="login_email_placeholder">E-poçt</string>
 
     <!-- Login Password Screen -->
-    <string name="welcome_login_password">Log in with password</string>
-    <string name="login_password_title">Login</string>
-    <string name="login_password_placeholder">Password</string>
-    <string name="login_password_button">Log in</string>
+    <string name="welcome_login_password">Şifrə ilə daxil ol</string>
+    <string name="login_password_title">Daxil ol</string>
+    <string name="login_password_placeholder">Şifrə</string>
+    <string name="login_password_button">Daxil ol</string>
 
     <!-- Login Code Screen -->
-    <string name="login_code_title">Enter the 6-digit code</string>
-    <string name="login_code_subtitle">We sent it to %1$s by mail</string>
+    <string name="login_code_title">6 rəqəmli kodu daxil edin</string>
+    <string name="login_code_subtitle">Biz onu %1$s ünvanına göndərdik</string>
     <string name="login_code_default_email">Less@gmail.com</string>
-    <string name="login_code_resend">Didn\'t receive it?</string>
+    <string name="login_code_resend">Kod gəlmədi?</string>
 
     <!-- Offers Screen -->
-    <string name="offers_greeting_guest">Dear User</string>
-    <string name="offers_greeting">Hi, %1$s!</string>
-    <string name="offers_search_placeholder">Drinks, chocolates and snacks</string>
+    <string name="offers_greeting_guest">Əziz istifadəçi</string>
+    <string name="offers_greeting">Salam, %1$s!</string>
+    <string name="offers_search_placeholder">İçkilər, şokoladlar və qəlyanaltılar</string>
 
     <!-- Orders Screen -->
-    <string name="orders_title">Orders</string>
-    <string name="orders_tab_active">Active</string>
-    <string name="orders_tab_previous">Previous orders</string>
-    <string name="orders_not_logged_in_title">Sign in to see your orders</string>
-    <string name="orders_not_logged_in_description">Log in to view and manage your orders</string>
-    <string name="orders_sign_in">Sign in</string>
-    <string name="orders_empty_title">You don\'t have any orders</string>
-    <string name="orders_empty_description">Your orders will appear here once you make a purchase</string>
-    <string name="orders_explore_offers">Explore offers</string>
-    <string name="orders_reserve_number">Reserve number: </string>
-    <string name="orders_picked_up_on">Picked up on %1$s</string>
-    <string name="orders_pickup_time">Pick up from %1$s to %2$s</string>
+    <string name="orders_title">Sifarişlər</string>
+    <string name="orders_tab_active">Aktiv</string>
+    <string name="orders_tab_previous">Əvvəlki sifarişlər</string>
+    <string name="orders_not_logged_in_title">Sifarişlərinizi görmək üçün daxil olun</string>
+    <string name="orders_not_logged_in_description">Sifarişlərinizi görmək və idarə etmək üçün daxil olun</string>
+    <string name="orders_sign_in">Daxil ol</string>
+    <string name="orders_empty_title">Sifarişiniz yoxdur</string>
+    <string name="orders_empty_description">Alış-veriş etdikdən sonra sifarişləriniz burada görünəcək</string>
+    <string name="orders_explore_offers">Təklifləri kəşf et</string>
+    <string name="orders_reserve_number">Rezerv nömrəsi: </string>
+    <string name="orders_picked_up_on">%1$s tarixində götürüldü</string>
+    <string name="orders_pickup_time">%1$s-dən %2$s-dək götür</string>
 
     <!-- Saved/Favorites Screen -->
-    <string name="saved_title">Favourites</string>
-    <string name="saved_empty_title">You don\'t have favorites</string>
-    <string name="saved_empty_description">Your saved items from all categories will appear here. You can delete or use them at any time</string>
-    <string name="saved_explore_venues">Explore new venues</string>
-    <string name="saved_not_logged_in_title">Sign in to see your favorites</string>
-    <string name="saved_not_logged_in_description">Log in to save and view your favorite venues</string>
-    <string name="saved_sign_in">Sign in</string>
+    <string name="saved_title">Sevimlilər</string>
+    <string name="saved_empty_title">Sevimliləriniz yoxdur</string>
+    <string name="saved_empty_description">Bütün kateqoriyalardan saxladığınız elementlər burada görünəcək. Onları istənilən vaxt silə və ya istifadə edə bilərsiniz</string>
+    <string name="saved_explore_venues">Yeni məkanları kəşf et</string>
+    <string name="saved_not_logged_in_title">Sevimlilərinizi görmək üçün daxil olun</string>
+    <string name="saved_not_logged_in_description">Sevimli məkanlarınızı saxlamaq və görmək üçün daxil olun</string>
+    <string name="saved_sign_in">Daxil ol</string>
 
     <!-- More Screen -->
-    <string name="more_section_application">Application</string>
-    <string name="more_section_support">Support</string>
-    <string name="more_account">Account</string>
-    <string name="more_payment_methods">Payment methods</string>
-    <string name="more_vouchers">Vouchers</string>
-    <string name="more_history">History</string>
-    <string name="more_notification">Notification</string>
-    <string name="more_contact_us">Contact us</string>
-    <string name="more_terms_of_service">Terms of Service</string>
-    <string name="more_how_to_use">How to use</string>
-    <string name="more_eco_hero">Eco-hero</string>
-    <string name="more_eco_hero_description">You saved %1$d meals!</string>
-    <string name="more_location">Location</string>
-    <string name="more_location_granted">Granted</string>
-    <string name="more_location_not_granted">Not granted</string>
-    <string name="more_get_more_features">Welcome to Less</string>
-    <string name="more_get_more_features_description">Log in to the application to take advantage of special offers from Less</string>
-    <string name="more_log_in_or_sign_up">Log in</string>
-    <string name="more_co2_saved">CO2, saved</string>
-    <string name="more_money_saved">Saved</string>
+    <string name="more_section_application">Tətbiq</string>
+    <string name="more_section_support">Dəstək</string>
+    <string name="more_account">Hesab</string>
+    <string name="more_payment_methods">Ödəniş üsulları</string>
+    <string name="more_vouchers">Vauçerlər</string>
+    <string name="more_history">Tarixçə</string>
+    <string name="more_notification">Bildirişlər</string>
+    <string name="more_contact_us">Bizimlə əlaqə</string>
+    <string name="more_terms_of_service">İstifadə şərtləri</string>
+    <string name="more_how_to_use">Necə istifadə etməli</string>
+    <string name="more_eco_hero">Eko-qəhrəman</string>
+    <string name="more_eco_hero_description">Siz %1$d yemək xilas etdiniz!</string>
+    <string name="more_location">Yer</string>
+    <string name="more_location_granted">İcazə verildi</string>
+    <string name="more_location_not_granted">İcazə verilməyib</string>
+    <string name="more_get_more_features">Xoş gəlmisiniz</string>
+    <string name="more_get_more_features_description">Less-in xüsusi təkliflərindən yararlanmaq üçün tətbiqə daxil olun</string>
+    <string name="more_log_in_or_sign_up">Daxil ol</string>
+    <string name="more_co2_saved">CO2, qənaət</string>
+    <string name="more_money_saved">Qənaət</string>
 
     <!-- Contact Us Bottom Sheet -->
     <string name="contact_instagram">Instagram</string>
@@ -104,137 +104,137 @@
     <string name="contact_facebook">Facebook</string>
     <string name="contact_telegram">Telegram</string>
     <string name="contact_whatsapp">Whatsapp</string>
-    <string name="contact_mail">Mail</string>
+    <string name="contact_mail">Poçt</string>
 
     <!-- Terms Bottom Sheet -->
-    <string name="terms_title">Terms &amp; Conditions</string>
+    <string name="terms_title">Şərtlər və qaydalar</string>
 
     <!-- Account Screen -->
-    <string name="account_title">Account</string>
-    <string name="account_edit_photo">Edit profile photo</string>
-    <string name="account_name_placeholder">Name Surname</string>
-    <string name="account_phone_placeholder">Phone number</string>
-    <string name="account_email_placeholder">Email</string>
-    <string name="account_gender_placeholder">Gender</string>
-    <string name="account_birthday_placeholder">Birth day</string>
-    <string name="account_delete">Delete account</string>
-    <string name="account_delete_title">Delete account?</string>
-    <string name="account_delete_description">Are you sure you want to delete your account? This action cannot be undone.</string>
-    <string name="account_select_gender">Select Gender</string>
-    <string name="account_profile_photo">Profile photo</string>
+    <string name="account_title">Hesab</string>
+    <string name="account_edit_photo">Profil şəklini dəyiş</string>
+    <string name="account_name_placeholder">Ad Soyad</string>
+    <string name="account_phone_placeholder">Telefon nömrəsi</string>
+    <string name="account_email_placeholder">E-poçt</string>
+    <string name="account_gender_placeholder">Cins</string>
+    <string name="account_birthday_placeholder">Doğum tarixi</string>
+    <string name="account_delete">Hesabı sil</string>
+    <string name="account_delete_title">Hesabı silmək istəyirsiniz?</string>
+    <string name="account_delete_description">Hesabınızı silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.</string>
+    <string name="account_select_gender">Cins seçin</string>
+    <string name="account_profile_photo">Profil şəkli</string>
 
     <!-- Payment Methods Screen -->
-    <string name="payment_methods_title">Payment methods</string>
-    <string name="payment_credit_debit_cards">Credit &amp; Debit Cards</string>
-    <string name="payment_other_methods">Other Methods</string>
-    <string name="payment_add_new_card">Add new card</string>
+    <string name="payment_methods_title">Ödəniş üsulları</string>
+    <string name="payment_credit_debit_cards">Kredit və debet kartları</string>
+    <string name="payment_other_methods">Digər üsullar</string>
+    <string name="payment_add_new_card">Yeni kart əlavə et</string>
     <string name="payment_mastercard">Mastercard</string>
     <string name="payment_visa">Visa</string>
     <string name="payment_apple_pay">Apple Pay</string>
     <string name="payment_google_pay">Google Pay</string>
-    <string name="payment_selected">Selected</string>
-    <string name="payment_delete_mastercard">Delete Mastercard %1$s</string>
-    <string name="payment_delete_visa">Delete Visa %1$s</string>
-    <string name="payment_delete_apple_pay">Delete Apple Pay</string>
-    <string name="payment_delete_google_pay">Delete Google Pay</string>
-    <string name="payment_delete_card">Delete Card</string>
-    <string name="payment_delete_confirmation">Are you sure to delete this card from app, after deleting you should select other card for payment</string>
-    <string name="payment_continue">Continue</string>
+    <string name="payment_selected">Seçildi</string>
+    <string name="payment_delete_mastercard">Mastercard %1$s sil</string>
+    <string name="payment_delete_visa">Visa %1$s sil</string>
+    <string name="payment_delete_apple_pay">Apple Pay sil</string>
+    <string name="payment_delete_google_pay">Google Pay sil</string>
+    <string name="payment_delete_card">Kartı sil</string>
+    <string name="payment_delete_confirmation">Bu kartı tətbiqdən silmək istədiyinizə əminsiniz? Sildikdən sonra ödəniş üçün başqa kart seçməlisiniz</string>
+    <string name="payment_continue">Davam et</string>
 
     <!-- Add New Card Screen -->
-    <string name="add_card_title">Add new card</string>
+    <string name="add_card_title">Yeni kart əlavə et</string>
     <string name="add_card_number_placeholder">0000 0000 0000 0000</string>
-    <string name="add_card_expiry_placeholder">MM/YY</string>
+    <string name="add_card_expiry_placeholder">AA/İİ</string>
     <string name="add_card_cvv_placeholder">CVV/CVC</string>
-    <string name="add_card_verification_text">To verify your card, we will debit 1 AZN from your balance. The money will immediately return back to your balance.</string>
-    <string name="add_card_button">Add card</string>
+    <string name="add_card_verification_text">Kartınızı yoxlamaq üçün balansınızdan 1 AZN silinəcək. Pul dərhal balansınıza geri qayıdacaq.</string>
+    <string name="add_card_button">Kart əlavə et</string>
 
     <!-- Voucher Screen -->
-    <string name="voucher_title">Voucher</string>
-    <string name="voucher_discount">Discount</string>
-    <string name="voucher_expiry_date">Expiry date</string>
-    <string name="voucher_code_label">Voucher Code</string>
-    <string name="voucher_empty_title">You don\'t have vouchers</string>
-    <string name="voucher_empty_description">To earn voucher refer our app to your friends, you will get 2 ₼ for each friend after his first transaction</string>
+    <string name="voucher_title">Vauçer</string>
+    <string name="voucher_discount">Endirim</string>
+    <string name="voucher_expiry_date">Bitmə tarixi</string>
+    <string name="voucher_code_label">Vauçer Kodu</string>
+    <string name="voucher_empty_title">Vauçerləriniz yoxdur</string>
+    <string name="voucher_empty_description">Vauçer qazanmaq üçün tətbiqimizi dostlarınıza tövsiyə edin, hər dostunuzun ilk əməliyyatından sonra 2 ₼ qazanacaqsınız</string>
 
     <!-- Search Screen -->
-    <string name="search_items_on_sale">%1$d items on sale</string>
-    <string name="search_no_active_offer">No active offer</string>
+    <string name="search_items_on_sale">%1$d məhsul endirimli</string>
+    <string name="search_no_active_offer">Aktiv təklif yoxdur</string>
 
     <!-- Category Offers Screen -->
-    <string name="category_offers_empty">No offers available</string>
+    <string name="category_offers_empty">Mövcud təklif yoxdur</string>
 
     <!-- Merchant Profile Screen -->
-    <string name="merchant_no_reviews">No reviews yet</string>
-    <string name="merchant_show_direction">Show Direction</string>
-    <string name="merchant_tab_offers">Offers</string>
-    <string name="merchant_tab_reviews">Reviews</string>
-    <string name="merchant_view_location">View location</string>
-    <string name="merchant_directions">Directions</string>
+    <string name="merchant_no_reviews">Hələ rəy yoxdur</string>
+    <string name="merchant_show_direction">İstiqaməti göstər</string>
+    <string name="merchant_tab_offers">Təkliflər</string>
+    <string name="merchant_tab_reviews">Rəylər</string>
+    <string name="merchant_view_location">Xəritədə göstər</string>
+    <string name="merchant_directions">İstiqamət</string>
 
     <!-- Reserve Screen -->
-    <string name="reserve_lot_size_info">Lot size info</string>
-    <string name="reserve_items_left">%1$d items left</string>
-    <string name="reserve_see_more_deals">See more deals from this venue</string>
-    <string name="reserve_select_voucher">Select voucher</string>
-    <string name="reserve_price_per_piece">Price per piece</string>
-    <string name="reserve_service_fee">Service fee</string>
-    <string name="reserve_subtotal">Subtotal</string>
-    <string name="reserve_select_payment_method">Select payment method</string>
-    <string name="reserve_and_pay">Reserve and pay</string>
+    <string name="reserve_lot_size_info">Porsiya məlumatı</string>
+    <string name="reserve_items_left">%1$d ədəd qalıb</string>
+    <string name="reserve_see_more_deals">Bu məkandan daha çox təklif bax</string>
+    <string name="reserve_select_voucher">Vauçer seç</string>
+    <string name="reserve_price_per_piece">Ədədi qiymət</string>
+    <string name="reserve_service_fee">Xidmət haqqı</string>
+    <string name="reserve_subtotal">Cəmi</string>
+    <string name="reserve_select_payment_method">Ödəniş üsulu seç</string>
+    <string name="reserve_and_pay">Rezerv et və ödə</string>
 
     <!-- Order Accepted Screen -->
-    <string name="order_accepted_title">Your order is accepted</string>
-    <string name="order_accepted_description">Your order has been confirmed. Pick it up from the venue during the specified time.</string>
-    <string name="order_accepted_go_orders">Go Orders</string>
+    <string name="order_accepted_title">Sifarişiniz qəbul edildi</string>
+    <string name="order_accepted_description">Sifarişiniz təsdiqləndi. Göstərilən vaxtda məkandan götürün.</string>
+    <string name="order_accepted_go_orders">Sifarişlərə keç</string>
 
     <!-- Reserve Info Bottom Sheet -->
-    <string name="reserve_info_reserve_number">Reserve number</string>
-    <string name="reserve_info_date">Date</string>
-    <string name="reserve_info_show_location">Show me location</string>
+    <string name="reserve_info_reserve_number">Rezerv nömrəsi</string>
+    <string name="reserve_info_date">Tarix</string>
+    <string name="reserve_info_show_location">Yerini göstər</string>
 
     <!-- Filter Bottom Sheet -->
-    <string name="filter_title">Filters</string>
+    <string name="filter_title">Filtrlər</string>
 
     <!-- Select Payment Method Bottom Sheet -->
-    <string name="select_payment_title">Select payment method</string>
+    <string name="select_payment_title">Ödəniş üsulu seçin</string>
 
     <!-- Select Voucher Bottom Sheet -->
-    <string name="select_voucher_title">Select voucher</string>
+    <string name="select_voucher_title">Vauçer seçin</string>
 
     <!-- Lot Size Info Bottom Sheet -->
-    <string name="lot_size_info_title">Lot size info</string>
+    <string name="lot_size_info_title">Porsiya məlumatı</string>
 
     <!-- Content Descriptions (Accessibility) -->
-    <string name="cd_user_avatar">User Avatar</string>
-    <string name="cd_notifications">Notifications</string>
-    <string name="cd_messages">Messages</string>
-    <string name="cd_merchant_logo">Merchant logo</string>
-    <string name="cd_merchant_hero_image">Merchant hero image</string>
-    <string name="cd_offer_image">Offer image</string>
-    <string name="cd_restaurant_logo">Restaurant Logo</string>
-    <string name="cd_rating">Rating</string>
-    <string name="cd_favorite">Favorite</string>
-    <string name="cd_liked">Liked</string>
-    <string name="cd_completed">Completed</string>
-    <string name="cd_gift">Gift</string>
-    <string name="cd_phone">Phone</string>
-    <string name="cd_location">Location</string>
-    <string name="cd_app_logo">App Logo</string>
-    <string name="cd_plus">Plus</string>
-    <string name="cd_minus">Minus</string>
-    <string name="cd_see_more">See more</string>
-    <string name="cd_select_payment">Select payment</string>
+    <string name="cd_user_avatar">İstifadəçi avatarı</string>
+    <string name="cd_notifications">Bildirişlər</string>
+    <string name="cd_messages">Mesajlar</string>
+    <string name="cd_merchant_logo">Məkan logosu</string>
+    <string name="cd_merchant_hero_image">Məkan şəkli</string>
+    <string name="cd_offer_image">Təklif şəkli</string>
+    <string name="cd_restaurant_logo">Restoran logosu</string>
+    <string name="cd_rating">Reytinq</string>
+    <string name="cd_favorite">Sevimli</string>
+    <string name="cd_liked">Bəyənildi</string>
+    <string name="cd_completed">Tamamlandı</string>
+    <string name="cd_gift">Hədiyyə</string>
+    <string name="cd_phone">Telefon</string>
+    <string name="cd_location">Yer</string>
+    <string name="cd_app_logo">Tətbiq logosu</string>
+    <string name="cd_plus">Artı</string>
+    <string name="cd_minus">Azalt</string>
+    <string name="cd_see_more">Daha çox bax</string>
+    <string name="cd_select_payment">Ödəniş seç</string>
 
     <!-- Error Messages -->
-    <string name="error_invalid_email">Invalid email address</string>
-    <string name="error_invalid_phone">Invalid phone number</string>
-    <string name="error_invalid_card_number">Invalid card number</string>
-    <string name="error_invalid_expiry_date">Invalid expiration date</string>
-    <string name="error_invalid_cvv">Invalid CVV</string>
-    <string name="error_generic">Something went wrong</string>
-    <string name="error_generic_subtitle">Please try again later</string>
-    <string name="error_try_again">Try again</string>
+    <string name="error_invalid_email">Yanlış e-poçt ünvanı</string>
+    <string name="error_invalid_phone">Yanlış telefon nömrəsi</string>
+    <string name="error_invalid_card_number">Yanlış kart nömrəsi</string>
+    <string name="error_invalid_expiry_date">Yanlış bitmə tarixi</string>
+    <string name="error_invalid_cvv">Yanlış CVV</string>
+    <string name="error_generic">Xəta baş verdi</string>
+    <string name="error_generic_subtitle">Zəhmət olmasa bir az sonra yenidən cəhd edin</string>
+    <string name="error_try_again">Yenidən cəhd et</string>
 
     <!-- Currency -->
     <string name="currency_azn">%1$s &#8380;</string>
@@ -242,128 +242,128 @@
     <!-- ==================== MERCHANT FLOW ==================== -->
 
     <!-- Merchant Bottom Navigation -->
-    <string name="merch_nav_orders">Boxes</string>
-    <string name="merch_nav_add">Add</string>
-    <string name="merch_nav_history">History</string>
-    <string name="merch_nav_more">More</string>
+    <string name="merch_nav_orders">Bokslar</string>
+    <string name="merch_nav_add">Əlavə et</string>
+    <string name="merch_nav_history">Tarixçə</string>
+    <string name="merch_nav_more">Daha çox</string>
 
     <!-- Merchant More Screen -->
-    <string name="merch_more_places">Places</string>
-    <string name="merch_more_dark_mode">Dark mode</string>
-    <string name="more_switch_to_merchant">Switch to Merchant</string>
-    <string name="more_switch_to_client">Switch to Client</string>
+    <string name="merch_more_places">Məkanlar</string>
+    <string name="merch_more_dark_mode">Qaranlıq rejim</string>
+    <string name="more_switch_to_merchant">Satıcı rejiminə keç</string>
+    <string name="more_switch_to_client">Müştəri rejiminə keç</string>
 
     <!-- Merchant Orders Screen -->
-    <string name="merch_orders_bought">Purchased</string>
-    <string name="merch_orders_placed_lots">Placed Lots</string>
-    <string name="merch_orders_lot_added">Lot successfully added</string>
-    <string name="merch_orders_lot_remove_info">You can remove lot only in 1 hour</string>
-    <string name="merch_orders_items_left">%1$d left</string>
-    <string name="merch_orders_pickup_time">Pick up from %1$s to %2$s</string>
-    <string name="merch_orders_handed_over">Handed Over</string>
-    <string name="merch_orders_delivered">Order delivered successfully</string>
-    <string name="merch_orders_cancel_lot">Cancel Lot</string>
-    <string name="merch_orders_cancellation_ended">Cancellation time ended, lot closes at %1$s</string>
-    <string name="merch_orders_create_lot">Create Lot</string>
-    <string name="box_type_small_bag">Small Surprise Bag</string>
-    <string name="box_type_medium_bag">Medium Surprise Bag</string>
-    <string name="box_type_large_bag">Large Surprise Bag</string>
-    <string name="merch_boxes_empty_title">No boxes yet</string>
-    <string name="merch_boxes_empty_description">Your boxes will appear here</string>
+    <string name="merch_orders_bought">Alınmış</string>
+    <string name="merch_orders_placed_lots">Yerləşdirilmiş lotlar</string>
+    <string name="merch_orders_lot_added">Lot uğurla əlavə edildi</string>
+    <string name="merch_orders_lot_remove_info">Lotu yalnız 1 saat ərzində silə bilərsiniz</string>
+    <string name="merch_orders_items_left">%1$d qaldı</string>
+    <string name="merch_orders_pickup_time">%1$s-dən %2$s-dək götür</string>
+    <string name="merch_orders_handed_over">Təhvil verildi</string>
+    <string name="merch_orders_delivered">Sifariş uğurla təhvil verildi</string>
+    <string name="merch_orders_cancel_lot">Lotu ləğv et</string>
+    <string name="merch_orders_cancellation_ended">Ləğv vaxtı bitdi, lot %1$s-də bağlanacaq</string>
+    <string name="merch_orders_create_lot">Lot yarat</string>
+    <string name="box_type_small_bag">Kiçik Sürpriz Boks</string>
+    <string name="box_type_medium_bag">Orta Sürpriz Boks</string>
+    <string name="box_type_large_bag">Böyük Sürpriz Boks</string>
+    <string name="merch_boxes_empty_title">Hələ boks yoxdur</string>
+    <string name="merch_boxes_empty_description">Bokslarınız burada görünəcək</string>
 
     <!-- Add Lot Screen -->
-    <string name="add_lot_title">Add Lot</string>
-    <string name="add_lot_loading">Loading...</string>
-    <string name="add_lot_button">Add lots</string>
-    <string name="add_lot_select_time">Select time</string>
-    <string name="add_lot_box_type">Box type</string>
-    <string name="add_lot_choose_category">Choose category</string>
-    <string name="add_lot_tags">Some specific tags (optional)</string>
-    <string name="add_lot_choose_time_range">Choose time range</string>
-    <string name="add_lot_box_price">Box price</string>
-    <string name="add_lot_price_before">Price before</string>
-    <string name="add_lot_price_after">Price after discount</string>
-    <string name="add_lot_description">Some info for customer (optional)</string>
-    <string name="add_lot_description_placeholder">Input lot information</string>
-    <string name="add_lot_box_count">Box Count</string>
-    <string name="add_lot_box_title">Title</string>
-    <string name="add_lot_box_title_placeholder">Enter box title</string>
-    <string name="add_lot_success">Lot added successfully</string>
-    <string name="add_lot_error_select">Please select %1$s</string>
-    <string name="add_lot_error_enter">Please enter %1$s</string>
-    <string name="add_lot_error_title">Please enter a title</string>
-    <string name="add_lot_error_validation">Please fill in all required fields</string>
-    <string name="add_lot_error_submit">Failed to add lot. Please try again</string>
+    <string name="add_lot_title">Lot əlavə et</string>
+    <string name="add_lot_loading">Yüklənir...</string>
+    <string name="add_lot_button">Lotları əlavə et</string>
+    <string name="add_lot_select_time">Vaxt seç</string>
+    <string name="add_lot_box_type">Qutu növü</string>
+    <string name="add_lot_choose_category">Kateqoriya seç</string>
+    <string name="add_lot_tags">Xüsusi teqlər (istəyə bağlı)</string>
+    <string name="add_lot_choose_time_range">Vaxt aralığı seç</string>
+    <string name="add_lot_box_price">Qutu qiyməti</string>
+    <string name="add_lot_price_before">Əvvəlki qiymət</string>
+    <string name="add_lot_price_after">Endirimdən sonra qiymət</string>
+    <string name="add_lot_description">Müştəri üçün məlumat (istəyə bağlı)</string>
+    <string name="add_lot_description_placeholder">Lot məlumatını daxil edin</string>
+    <string name="add_lot_box_count">Qutu sayı</string>
+    <string name="add_lot_box_title">Başlıq</string>
+    <string name="add_lot_box_title_placeholder">Başlığı daxil edin</string>
+    <string name="add_lot_success">Lot uğurla əlavə edildi</string>
+    <string name="add_lot_error_select">Zəhmət olmasa %1$s seçin</string>
+    <string name="add_lot_error_enter">Zəhmət olmasa %1$s daxil edin</string>
+    <string name="add_lot_error_title">Zəhmət olmasa başlığı daxil edin</string>
+    <string name="add_lot_error_validation">Zəhmət olmasa bütün tələb olunan sahələri doldurun</string>
+    <string name="add_lot_error_submit">Lot əlavə edilə bilmədi. Yenidən cəhd edin</string>
 
     <!-- Income History Screen -->
-    <string name="history_title">History</string>
-    <string name="history_select_date_range">Select date range</string>
-    <string name="history_select_month">Select month</string>
-    <string name="history_all_branches">All branches</string>
-    <string name="history_all_venues">All venues</string>
-    <string name="history_select_venue">Select venue</string>
-    <string name="history_empty">No income history found</string>
+    <string name="history_title">Tarixçə</string>
+    <string name="history_select_date_range">Tarix aralığı seç</string>
+    <string name="history_select_month">Ay seçin</string>
+    <string name="history_all_branches">Bütün filiallar</string>
+    <string name="history_all_venues">Bütün filiallar</string>
+    <string name="history_select_venue">Filial seç</string>
+    <string name="history_empty">Gəlir tarixçəsi tapılmadı</string>
 
     <!-- Places Screen -->
-    <string name="places_title">Places</string>
-    <string name="places_add_branch">Add branch</string>
-    <string name="places_empty_title">No branches yet</string>
-    <string name="places_empty_description">Add your first branch to start managing your locations. Customers will be able to find and visit your places.</string>
-    <string name="places_cd_no_places">No places</string>
-    <string name="places_edit_merch_details">Edit merch details</string>
-    <string name="places_edit_venue">Edit venue</string>
-    <string name="places_edit_users">Edit users</string>
+    <string name="places_title">Məkanlar</string>
+    <string name="places_add_branch">Filial əlavə et</string>
+    <string name="places_empty_title">Hələ filial yoxdur</string>
+    <string name="places_empty_description">Məkanlarınızı idarə etməyə başlamaq üçün ilk filialınızı əlavə edin. Müştərilər məkanlarınızı tapa və ziyarət edə biləcəklər.</string>
+    <string name="places_cd_no_places">Məkan yoxdur</string>
+    <string name="places_edit_merch_details">Mağaza detallarını redaktə et</string>
+    <string name="places_edit_venue">Məkanı redaktə et</string>
+    <string name="places_edit_users">İstifadəçiləri redaktə et</string>
 
     <!-- Edit Merchant Profile Screen -->
-    <string name="edit_profile_make_me_merchant">Make me a merchant of this venue</string>
-    <string name="edit_profile_create_branch">Create branch</string>
-    <string name="edit_profile_update_branch">Update branch</string>
-    <string name="edit_profile_error_name_required">Venue name is required</string>
-    <string name="edit_profile_error_phone_required">Phone number is required</string>
-    <string name="edit_profile_error_location_required">Location is required</string>
-    <string name="edit_profile_venue_created">Venue created successfully</string>
-    <string name="edit_profile_venue_updated">Venue updated successfully</string>
-    <string name="edit_profile_name_placeholder">Name of venue</string>
-    <string name="edit_profile_description_placeholder">Description or some notes about your perfect place to show for customers</string>
-    <string name="edit_profile_phone_number">Phone number</string>
-    <string name="edit_profile_phone_optional">Optional</string>
-    <string name="edit_profile_edit">Edit</string>
-    <string name="edit_profile_view_location">View location</string>
-    <string name="edit_profile_location_placeholder">Location of your perfect place</string>
-    <string name="edit_profile_default_box_description">Default box description</string>
-    <string name="edit_profile_box_description_placeholder">Some tips for user to understand what can be inside</string>
-    <string name="edit_profile_add_for_lots">Add for lots</string>
-    <string name="edit_profile_edit_phone_number">Edit phone number</string>
-    <string name="edit_profile_edit_merch_details">Edit merch details</string>
-    <string name="edit_profile_title_label">Title</string>
-    <string name="edit_profile_title_placeholder">Enter venue name</string>
-    <string name="edit_profile_description_label">Description</string>
-    <string name="edit_profile_description_input_placeholder">Enter description</string>
-    <string name="edit_profile_save">Save</string>
+    <string name="edit_profile_make_me_merchant">Məni bu məkanın merchantı et</string>
+    <string name="edit_profile_create_branch">Filial yarat</string>
+    <string name="edit_profile_update_branch">Filialı yenilə</string>
+    <string name="edit_profile_error_name_required">Məkan adı tələb olunur</string>
+    <string name="edit_profile_error_phone_required">Telefon nömrəsi tələb olunur</string>
+    <string name="edit_profile_error_location_required">Məkan tələb olunur</string>
+    <string name="edit_profile_venue_created">Məkan uğurla yaradıldı</string>
+    <string name="edit_profile_venue_updated">Məkan uğurla yeniləndi</string>
+    <string name="edit_profile_name_placeholder">Məkanın adı</string>
+    <string name="edit_profile_description_placeholder">Müştərilərə göstərmək üçün məkanınız haqqında təsvir və ya qeydlər</string>
+    <string name="edit_profile_phone_number">Telefon nömrəsi</string>
+    <string name="edit_profile_phone_optional">İstəyə bağlı</string>
+    <string name="edit_profile_edit">Redaktə et</string>
+    <string name="edit_profile_view_location">Məkanı göstər</string>
+    <string name="edit_profile_location_placeholder">Məkanınızın ünvanı</string>
+    <string name="edit_profile_default_box_description">Standart qutu təsviri</string>
+    <string name="edit_profile_box_description_placeholder">İstifadəçi üçün qutunun içində nə ola biləcəyi haqqında məsləhətlər</string>
+    <string name="edit_profile_add_for_lots">Lotlar üçün əlavə et</string>
+    <string name="edit_profile_edit_phone_number">Telefon nömrəsini redaktə et</string>
+    <string name="edit_profile_edit_merch_details">Məkan məlumatlarını redaktə et</string>
+    <string name="edit_profile_title_label">Başlıq</string>
+    <string name="edit_profile_title_placeholder">Məkan adını daxil edin</string>
+    <string name="edit_profile_description_label">Təsvir</string>
+    <string name="edit_profile_description_input_placeholder">Təsvir daxil edin</string>
+    <string name="edit_profile_save">Saxla</string>
 
     <!-- Branch Verification Screen -->
-    <string name="branch_verification_title">Venue was added</string>
-    <string name="branch_verification_description">If you need some custom edits</string>
-    <string name="branch_verification_add_users">Add users</string>
+    <string name="branch_verification_title">Məkan əlavə edildi</string>
+    <string name="branch_verification_description">Xüsusi düzəlişlərə ehtiyacınız varsa</string>
+    <string name="branch_verification_add_users">İstifadəçi əlavə et</string>
 
     <!-- Branch Users Screen -->
-    <string name="branch_users_title">%1$s users</string>
-    <string name="branch_users_add_other">Add other user</string>
-    <string name="branch_users_empty_title">You don\'t have any added users</string>
-    <string name="branch_users_empty_description">If you need someone to add to control your orders for example cashier</string>
-    <string name="branch_users_add_user">Add user</string>
-    <string name="branch_users_cd_no_users">No users</string>
+    <string name="branch_users_title">%1$s istifadəçiləri</string>
+    <string name="branch_users_add_other">Başqa istifadəçi əlavə et</string>
+    <string name="branch_users_empty_title">Əlavə edilmiş istifadəçiniz yoxdur</string>
+    <string name="branch_users_empty_description">Sifarişlərinizi idarə etmək üçün birinə ehtiyacınız varsa, məsələn kassir</string>
+    <string name="branch_users_add_user">İstifadəçi əlavə et</string>
+    <string name="branch_users_cd_no_users">İstifadəçi yoxdur</string>
 
     <!-- Add Branch User Screen -->
-    <string name="add_user_title">User %1$d</string>
-    <string name="add_user_name_placeholder">Name</string>
-    <string name="add_user_delete">Delete user</string>
-    <string name="add_user_save">Save changes</string>
-    <string name="add_user_saved">User added successfully</string>
+    <string name="add_user_title">İstifadəçi %1$d</string>
+    <string name="add_user_name_placeholder">Ad</string>
+    <string name="add_user_delete">İstifadəçini sil</string>
+    <string name="add_user_save">Dəyişiklikləri saxla</string>
+    <string name="add_user_saved">İstifadəçi uğurla əlavə edildi</string>
 
     <!-- Select Location Screen -->
-    <string name="select_location_title">Select address on map</string>
-    <string name="select_location_hint">Tap on map to select location</string>
-    <string name="select_location_confirm">Confirm Location</string>
-    <string name="select_location_selected">Selected Location</string>
+    <string name="select_location_title">Xəritədə ünvan seç</string>
+    <string name="select_location_hint">Yer seçmək üçün xəritəyə toxunun</string>
+    <string name="select_location_confirm">Yeri təsdiqlə</string>
+    <string name="select_location_selected">Seçilmiş yer</string>
 </resources>
