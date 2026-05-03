@@ -53,5 +53,14 @@ interface VenuesRepository {
         phone: String
     ): NetworkResult<Unit>
 
+    /**
+     * Removes the merchant relationship from a venue. Takes the merchant relation id
+     * (the venue-merchant `_id`), not the user id. The server auto-strips the
+     * merchant role from the user if this was their only merchant relationship.
+     */
+    suspend fun removeVenueMerchant(
+        merchantId: String
+    ): NetworkResult<Unit>
+
     suspend fun createBox(request: CreateBoxRequest): NetworkResult<CreateBoxResponseDto>
 }

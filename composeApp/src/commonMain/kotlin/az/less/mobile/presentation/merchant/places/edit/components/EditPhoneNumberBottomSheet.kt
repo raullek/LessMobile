@@ -30,6 +30,8 @@ import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
+import az.less.mobile.presentation.common.phone.PhoneCountry
+import az.less.mobile.presentation.common.phone.sanitizePhoneInput
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.edit_profile_edit_phone_number
 import lessmobile.composeapp.generated.resources.edit_profile_phone_number
@@ -40,33 +42,9 @@ import io.github.skeptick.inputmask.core.InputMasks
 import io.github.skeptick.inputmask.core.format
 
 /**
- * Phone number mask for Azerbaijan format: +994 XX XXX XX XX
- * Using special phone mask that handles pasting with or without country code
- */
-private const val PHONE_MASK = "+{994} [00] [000] [00] [00]"
-
-/**
- * Input mask instance for formatting phone numbers
- */
-private val phoneInputMask = InputMasks.getOrCreate(PHONE_MASK)
-
-/**
  * Bottom sheet for editing phone number
  * Based on Figma design: https://www.figma.com/design/LfrtpXNQmOc01fJRhY6Iwq/Less-App---EDU?node-id=2356-9855
  */
-/**
- * Extract raw digits from a phone number, removing +994 prefix and any formatting
- */
-private fun extractRawDigits(phoneNumber: String): String {
-    // Remove all non-digit characters
-    val digits = phoneNumber.filter { it.isDigit() }
-    // Remove 994 prefix if present (country code)
-    return if (digits.startsWith("994")) {
-        digits.removePrefix("994")
-    } else {
-        digits
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,10 +55,10 @@ fun EditPhoneNumberBottomSheet(
     onSave: (phoneNumber: String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    // Local state for editing - store raw digits only (without +994 prefix)
-    var phoneNumber by remember(initialPhoneNumber) { 
-        mutableStateOf(extractRawDigits(initialPhoneNumber)) 
-    }
+    // Local state for editing - store local digits + detected country
+    val initial = remember(initialPhoneNumber) { PhoneCountry.parse(initialPhoneNumber) }
+    var country by remember(initialPhoneNumber) { mutableStateOf(initial.first) }
+    var phoneNumber by remember(initialPhoneNumber) { mutableStateOf(initial.second) }
 
     if (isVisible) {
         ModalBottomSheet(
@@ -111,18 +89,22 @@ fun EditPhoneNumberBottomSheet(
                     )
                 }
 
-                // Check if phone number is valid (matches the mask completely)
-                val formatResult = phoneInputMask.format(phoneNumber)
+                val formatResult = InputMasks.getOrCreate(country.mask).format(phoneNumber)
                 val isPhoneValid = formatResult.isComplete
 
-                // Content
                 EditPhoneNumberBottomSheetContent(
                     phoneNumber = phoneNumber,
+                    country = country,
                     isPhoneValid = isPhoneValid,
-                    onPhoneNumberChange = { phoneNumber = it },
+                    onPhoneNumberChange = { newValue ->
+                        val result = sanitizePhoneInput(newValue, country)
+                        country = result.country
+                        phoneNumber = result.localDigits
+                    },
+                    onClear = { phoneNumber = "" },
                     onSaveClick = {
                         if (isPhoneValid) {
-                            onSave(formatResult.formattedValue)
+                            onSave("+${country.dialCode}$phoneNumber")
                         }
                     }
                 )
@@ -137,13 +119,14 @@ fun EditPhoneNumberBottomSheet(
 @Composable
 private fun EditPhoneNumberBottomSheetContent(
     phoneNumber: String,
+    country: PhoneCountry,
     isPhoneValid: Boolean,
     onPhoneNumberChange: (String) -> Unit,
+    onClear: () -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Phone mask with +994 prefix - handles pasting with or without country code
-    val phoneVisualTransformation = rememberPhoneInputMaskVisualTransformation(PHONE_MASK)
+    val phoneVisualTransformation = rememberPhoneInputMaskVisualTransformation(country.mask)
 
     Column(
         modifier = modifier
@@ -163,17 +146,13 @@ private fun EditPhoneNumberBottomSheetContent(
         // Phone Number TextField with mask
         DsTextField(
             value = phoneNumber,
-            onValueChange = { newValue ->
-                // Sanitize input using the mask
-                val sanitized = phoneVisualTransformation.sanitize(newValue)
-                onPhoneNumberChange(sanitized)
-            },
+            onValueChange = onPhoneNumberChange,
             label = stringResource(Res.string.edit_profile_phone_number),
-            placeholder = "+994 XX XXX XX XX",
+            placeholder = "+${country.dialCode} ...",
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             visualTransformation = phoneVisualTransformation,
-            onEndIconClick = { onPhoneNumberChange("") }
+            onEndIconClick = onClear
         )
 
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))

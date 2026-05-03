@@ -4,7 +4,11 @@ package az.less.mobile.presentation.partner.places.edit.branchusers
  * User model for Branch Users screen
  */
 data class BranchUser(
+    /** Domain user id (used for self-detection: equals cached User.id). */
     val id: String,
+    /** Venue-merchant relation id (`_id` in the API), used as the path param of
+     *  the merchant-removal endpoint. */
+    val merchantId: String,
     val name: String,
     val phoneNumber: String,
     val email: String,
@@ -14,7 +18,7 @@ data class BranchUser(
     /**
      * Encode user data to a simple delimited string for navigation
      */
-    fun encode(): String = "$id|$name|$phoneNumber|$email"
+    fun encode(): String = "$id|$merchantId|$name|$phoneNumber|$email"
 
     companion object {
         /**
@@ -22,12 +26,13 @@ data class BranchUser(
          */
         fun decode(encoded: String): BranchUser? {
             val parts = encoded.split("|")
-            if (parts.size != 4) return null
+            if (parts.size != 5) return null
             return BranchUser(
                 id = parts[0],
-                name = parts[1],
-                phoneNumber = parts[2],
-                email = parts[3]
+                merchantId = parts[1],
+                name = parts[2],
+                phoneNumber = parts[3],
+                email = parts[4]
             )
         }
     }

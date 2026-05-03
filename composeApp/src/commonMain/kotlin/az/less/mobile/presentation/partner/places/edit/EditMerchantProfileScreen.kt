@@ -32,6 +32,8 @@ import az.less.designsystem.components.CellType
 import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsCell
 import az.less.mobile.navigation.PartnerRoute
+import az.less.mobile.navigation.ROOT_MERCHANT
+import az.less.mobile.navigation.ROOT_PARTNER
 import az.less.mobile.presentation.partner.places.edit.components.EditBranchAdditionalSections
 import az.less.mobile.presentation.partner.places.edit.components.EditMerchDetailsBottomSheet
 import az.less.mobile.presentation.partner.places.edit.components.EditMerchantProfileContactSection
@@ -64,7 +66,8 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun EditMerchantProfileScreen(
     venueData: String? = null,
     viewModel: EditMerchantProfileViewModel = koinViewModel(),
-    navController: NavController
+    navController: NavController,
+    rootNavController: NavController? = null
 ) {
     val state by viewModel.collectAsState()
 
@@ -129,13 +132,23 @@ fun EditMerchantProfileScreen(
                 )
             }
             is EditMerchantProfileSideEffect.BranchCreated -> {
-                navController.navigate(
-                    PartnerRoute.BranchVerification(
-                        venueId = sideEffect.venueId,
-                        venueName = sideEffect.venueName
-                    )
-                ) {
-                    popUpTo<PartnerRoute.EditProfile> { inclusive = true }
+                if (sideEffect.becameMerchant && rootNavController != null) {
+                    // Partner just gained the merchant role for this venue: skip the
+                    // BranchVerification celebration screen and switch the navigation
+                    // root to merchant, landing on the merchant flow's startDestination.
+                    rootNavController.navigate(ROOT_MERCHANT) {
+                        popUpTo(ROOT_PARTNER) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                } else {
+                    navController.navigate(
+                        PartnerRoute.BranchVerification(
+                            venueId = sideEffect.venueId,
+                            venueName = sideEffect.venueName
+                        )
+                    ) {
+                        popUpTo<PartnerRoute.EditProfile> { inclusive = true }
+                    }
                 }
             }
             is EditMerchantProfileSideEffect.BranchUpdated -> {
@@ -317,17 +330,20 @@ fun EditMerchantProfileScreenContent(
             )
         }
 
-        // Toggle Section (using DsCell like in More screen)
-        item(key = "toggle_section") {
-            DsCell(
-                title = stringResource(Res.string.edit_profile_make_me_merchant),
-                type = CellType.Toggle(
-                    checked = state.makeMeMerchant,
-                    onCheckedChange = { onIntent(EditMerchantProfileIntent.OnMakeMeMerchantToggled(it)) }
-                ),
-                showDivider = false,
-                modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
-            )
+        // Toggle Section — only shown on Add Branch (create) flow when the partner
+        // does not already have a default/attached venue.
+        if (state.branchId == null && !state.hasAttachedVenue) {
+            item(key = "toggle_section") {
+                DsCell(
+                    title = stringResource(Res.string.edit_profile_make_me_merchant),
+                    type = CellType.Toggle(
+                        checked = state.makeMeMerchant,
+                        onCheckedChange = { onIntent(EditMerchantProfileIntent.OnMakeMeMerchantToggled(it)) }
+                    ),
+                    showDivider = false,
+                    modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
+                )
+            }
         }
 
         // Create/Update Branch Button

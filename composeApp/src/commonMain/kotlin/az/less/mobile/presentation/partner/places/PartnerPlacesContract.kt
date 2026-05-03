@@ -25,6 +25,7 @@ sealed interface PartnerPlacesSideEffect {
     data object NavigateBack : PartnerPlacesSideEffect
     data class NavigateToEditBranch(val branch: BranchItem) : PartnerPlacesSideEffect
     data class NavigateToEditUsers(val branch: BranchItem) : PartnerPlacesSideEffect
+    data class NavigateToPreview(val branch: BranchItem) : PartnerPlacesSideEffect
     data object NavigateToAddBranch : PartnerPlacesSideEffect
     data class ShowError(val message: String) : PartnerPlacesSideEffect
 }
@@ -42,4 +43,5 @@ sealed interface PartnerPlacesIntent {
     data object OnDismissEditBottomSheet : PartnerPlacesIntent
     data object OnEditVenueClick : PartnerPlacesIntent
     data object OnEditUsersClick : PartnerPlacesIntent
+    data object OnPreviewClick : PartnerPlacesIntent
 }

@@ -61,7 +61,7 @@ private fun OrderItemDto.toDomain() = Order(
     pickupTimeStart = pickupTimeStart?.extractTime(),
     pickupTimeEnd = pickupTimeEnd?.extractTime(),
     pickupTimeFormatted = pickupTimeFormatted ?: "",
-    date = dateFormatted ?: "",
+    date = dateFormatted?.replace('/', '-') ?: "",
     price = price.formatAmount(),
     pricePerPiece = pricePerPiece,
     serviceFee = serviceFee,
@@ -70,5 +70,6 @@ private fun OrderItemDto.toDomain() = Order(
     quantity = quantity,
     reserveNumber = reserveNumber ?: orderNumber ?: "",
     isCompleted = status == "completed" || status == "picked_up",
-    completedDate = completedAt
+    completedDate = completedAt,
+    venueId = venue?.id ?: ""
 )

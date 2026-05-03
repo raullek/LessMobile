@@ -25,7 +25,8 @@ import lessmobile.composeapp.generated.resources.more_contact_us
 import lessmobile.composeapp.generated.resources.more_notification
 import lessmobile.composeapp.generated.resources.more_section_application
 import lessmobile.composeapp.generated.resources.more_section_support
-import lessmobile.composeapp.generated.resources.more_switch_to_client
+import lessmobile.composeapp.generated.resources.more_switch_from_merchant
+import lessmobile.composeapp.generated.resources.more_switch_from_partner
 import lessmobile.composeapp.generated.resources.more_terms_of_service
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -58,8 +59,9 @@ class MerchMoreViewModel(
                             sections = buildSections(
                                 notificationEnabled = state.notificationEnabled,
                                 darkModeEnabled = isDark,
-                                isPartner = state.isPartner,
-                                canSwitchMode = state.canSwitchMode
+                                canManageBranches = state.canManageBranches,
+                                canSwitchMode = state.canSwitchMode,
+                                isAlsoPartner = state.isAlsoPartner
                             )
                         )
                     }
@@ -83,13 +85,15 @@ class MerchMoreViewModel(
                                 venueLogoUrl = user.venue?.businessLogo,
                                 rating = user.venue?.rating?.toString() ?: "0.0",
                                 reviewCount = user.venue?.totalReviews?.toString() ?: "0",
-                                isPartner = user.isPartner,
+                                canManageBranches = user.canManageBranches,
                                 canSwitchMode = user.canSwitchMode(),
+                                isAlsoPartner = user.isPartner,
                                 sections = buildSections(
                                     notificationEnabled = state.notificationEnabled,
                                     darkModeEnabled = state.darkModeEnabled,
-                                    isPartner = user.isPartner,
-                                    canSwitchMode = user.canSwitchMode()
+                                    canManageBranches = user.canManageBranches,
+                                    canSwitchMode = user.canSwitchMode(),
+                                    isAlsoPartner = user.isPartner
                                 )
                             )
                         }
@@ -161,7 +165,13 @@ class MerchMoreViewModel(
         reduce {
             state.copy(
                 notificationEnabled = newEnabled,
-                sections = buildSections(newEnabled, state.darkModeEnabled, isPartner = state.isPartner, canSwitchMode = state.canSwitchMode)
+                sections = buildSections(
+                    notificationEnabled = newEnabled,
+                    darkModeEnabled = state.darkModeEnabled,
+                    canManageBranches = state.canManageBranches,
+                    canSwitchMode = state.canSwitchMode,
+                    isAlsoPartner = state.isAlsoPartner
+                )
             )
         }
     }
@@ -185,12 +195,13 @@ class MerchMoreViewModel(
     private fun buildSections(
         notificationEnabled: Boolean,
         darkModeEnabled: Boolean,
-        isPartner: Boolean,
-        canSwitchMode: Boolean
+        canManageBranches: Boolean,
+        canSwitchMode: Boolean,
+        isAlsoPartner: Boolean
     ): List<MerchMoreSection> {
         val appCells = mutableListOf<MerchMoreCellModel>()
 
-        if (isPartner) {
+        if (canManageBranches) {
             appCells.add(
                 MerchMoreCellModel(
                     id = MerchCellId.Places,
@@ -224,7 +235,11 @@ class MerchMoreViewModel(
             appCells.add(
                 MerchMoreCellModel(
                     id = MerchCellId.SwitchToClient,
-                    titleRes = Res.string.more_switch_to_client,
+                    titleRes = if (isAlsoPartner) {
+                        Res.string.more_switch_from_partner
+                    } else {
+                        Res.string.more_switch_from_merchant
+                    },
                     icon = Res.drawable.ic_explore_24dp,
                     type = MerchMoreCellType.Navigation,
                     showDivider = false

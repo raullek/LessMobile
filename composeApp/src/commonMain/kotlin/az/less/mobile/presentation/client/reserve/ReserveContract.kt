@@ -47,7 +47,20 @@ data class ReserveState(
     val venueName: String = "",
     val venueId: String = "",
     val venueLogoUrl: String? = null
-)
+) {
+    /** True only when the user has a payable, in-stock selection and no
+     *  background request is in flight. The "Reserve and pay" button uses
+     *  this for its enabled / gray state. */
+    val canPlaceOrder: Boolean
+        get() = !isLoading
+                && !isPaymentLoading
+                && !isPaymentCardsLoading
+                && !isRegisterCardLoading
+                && itemsLeft > 0
+                && quantity in 1..itemsLeft
+                && selectedPaymentCard != null
+                && subtotal > 0.0
+}
 
 
 /**

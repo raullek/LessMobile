@@ -203,12 +203,27 @@ fun ExploreScreenContent(
             if (shouldRenderMap) {
                 val themeManager = koinInject<ThemeManager>()
                 val isDark by themeManager.isDarkMode.collectAsState()
+
+                // Pick the initial camera position: user location if we already
+                // have it (permission granted + first fix arrived), otherwise
+                // Baku as a sensible regional default. Without this, the
+                // GoogleMaps SDK can fall back to its hard-coded Mountain View
+                // (US) default when no initial position is honored at mount.
+                val baku = LatLong(40.4093, 49.8671)
+                val initialCamera = state.userLocation
+                    ?.let { CameraPosition(target = it, zoom = 15f) }
+                    ?: CameraPosition(target = baku, zoom = 13f)
+
+                // One-shot flag: once the user's location arrives after the
+                // map has been mounted at the Baku fallback, animate the
+                // camera to the user location exactly once.
+                var didCenterOnUserLocation by rememberSaveable { mutableStateOf(false) }
+                val pendingUserCenter: LatLong? =
+                    state.userLocation?.takeIf { !didCenterOnUserLocation }
+
                 GoogleMaps(
                     modifier = Modifier.fillMaxSize(),
-                    shouldSetInitialCameraPosition = CameraPosition(
-                        target = LatLong(40.4093, 49.8671), // Baku fallback
-                        zoom = 13f
-                    ),
+                    shouldSetInitialCameraPosition = initialCamera,
                     mapType = MapType.NORMAL,
                     isDarkTheme = isDark,
                     isZoomControlsVisible = false,
@@ -221,9 +236,16 @@ fun ExploreScreenContent(
                         onIntent(ExploreIntent.OnMapMarkerClicked(venueId))
                     },
                     onFindMeButtonClick = null,
-                    shouldCenterCameraOnLatLong = state.selectedMarkerPosition,
+                    // Marker clicks take priority; otherwise center on the
+                    // user's location the first time it becomes available.
+                    shouldCenterCameraOnLatLong = state.selectedMarkerPosition
+                        ?: pendingUserCenter,
                     onDidCenterCameraOnLatLong = {
-                        onIntent(ExploreIntent.OnDidCenterCameraOnMarker)
+                        if (state.selectedMarkerPosition != null) {
+                            onIntent(ExploreIntent.OnDidCenterCameraOnMarker)
+                        } else {
+                            didCenterOnUserLocation = true
+                        }
                     }
                 )
             }

@@ -43,18 +43,16 @@ fun AppRootNavigation() {
     val navController = rememberNavController()
 
     LaunchedEffect(Unit) {
-        val user = sessionLocalRepository.currentUser.first()
+        val user = sessionLocalRepository.currentUser.first() ?: return@LaunchedEffect
         val lastMode = sessionLocalRepository.lastUsedMode.first()
-        if (user != null && lastMode in user.availableModes()) {
-            val target = when (lastMode) {
-                AppMode.MERCHANT -> ROOT_MERCHANT
-                AppMode.PARTNER -> ROOT_PARTNER
-                AppMode.CLIENT -> null
-            }
-            if (target != null) {
-                navController.navigate(target) {
-                    popUpTo(ROOT_CLIENT) { inclusive = true }
-                }
+        val target = when (user.resolveStartMode(lastMode)) {
+            AppMode.MERCHANT -> ROOT_MERCHANT
+            AppMode.PARTNER -> ROOT_PARTNER
+            AppMode.CLIENT -> null
+        }
+        if (target != null) {
+            navController.navigate(target) {
+                popUpTo(ROOT_CLIENT) { inclusive = true }
             }
         }
     }

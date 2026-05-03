@@ -42,7 +42,9 @@
       "Bash(keytool -printcert -jarfile /Users/raul/StudioProjects/LessMobile/composeApp/build/outputs/apk/release/composeApp-release.apk)",
       "Bash(./gradlew :composeApp:clean)",
       "Bash(./gradlew :composeApp:assembleDebug :composeApp:assembleRelease :composeApp:bundleRelease -x lintVitalRelease)",
-      "Read(//Users/raul/**)"
+      "Read(//Users/raul/**)",
+      "Read(//tmp/inputmask-src/commonMain/io/github/skeptick/inputmask/**)",
+      "Read(//tmp/inputmask-src/commonMain/io/github/skeptick/inputmask/compose/**)"
     ]
   }
 }

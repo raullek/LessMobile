@@ -29,18 +29,22 @@ import az.less.designsystem.components.DsButton
 import az.less.mobile.presentation.client.reserve.models.ReserveInfo
 import az.less.mobile.utils.formatPrice
 import lessmobile.composeapp.generated.resources.Res
-import lessmobile.composeapp.generated.resources.reserve_info_reserve_number
 import lessmobile.composeapp.generated.resources.reserve_info_date
+import lessmobile.composeapp.generated.resources.reserve_info_reserve_number
+import lessmobile.composeapp.generated.resources.reserve_info_show_location
 import lessmobile.composeapp.generated.resources.reserve_price_per_piece
 import lessmobile.composeapp.generated.resources.reserve_service_fee
 import lessmobile.composeapp.generated.resources.reserve_subtotal
-import lessmobile.composeapp.generated.resources.reserve_info_show_location
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Stateful Reserve Info Bottom Sheet
- * Shows reservation details when clicking on an order item
- * Based on Figma design: https://www.figma.com/design/LfrtpXNQmOc01fJRhY6Iwq/Less-App---EDU?node-id=2244-93472&m=dev
+ * Bottom sheet for an *active* (not yet picked up) order. Single CTA:
+ * "Show me location" — deep-links into the venue map.
+ *
+ * For completed orders, see [PreviousOrderInfoBottomSheet] — that sheet owns
+ * the review / support actions, since they belong to a different lifecycle.
+ *
+ * Figma: https://www.figma.com/design/LfrtpXNQmOc01fJRhY6Iwq/?node-id=2244-93472
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,94 +62,87 @@ fun ReserveInfoBottomSheet(
             containerColor = LessTheme.colors.backgroundSecond,
             contentColor = LessTheme.colors.textIconsBlack,
             shape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp),
-            dragHandle = null, // Remove default drag handle
+            dragHandle = null,
             contentWindowInsets = { WindowInsets(0, 0, 0, 0) }
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Custom drag handle inside the shaped container
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    contentAlignment = Alignment.Center
+            Column(modifier = Modifier.fillMaxWidth()) {
+                ReserveInfoDragHandle()
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .width(32.dp)
-                            .height(3.dp)
-                            .clip(RoundedCornerShape(100.dp))
-                            .background(LessTheme.colors.borderPrimary)
+                    ReserveInfoHeader(
+                        title = reserveInfo.venueName,
+                        subtitle = reserveInfo.pickupTime,
+                        subtitleIsBrand = false
                     )
+
+                    ReserveInfoDivider()
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    ReserveNumberBlock(
+                        reserveNumber = reserveInfo.reserveNumber,
+                        statusBadgeText = null
+                    )
+
+                    Spacer(modifier = Modifier.height(28.dp))
+                    ReserveInfoDivider()
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    ReserveDetailsSection(
+                        date = reserveInfo.date,
+                        pricePerPiece = reserveInfo.pricePerPiece,
+                        serviceFee = reserveInfo.serviceFee,
+                        subtotal = reserveInfo.subtotal
+                    )
+
+                    Spacer(modifier = Modifier.height(LessTheme.spacing.large))
+
+                    DsButton(
+                        text = stringResource(Res.string.reserve_info_show_location),
+                        onClick = onShowLocationClicked,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = LessTheme.spacing.medium),
+                        variant = ButtonVariant.Primary,
+                        size = ButtonSize.Large
+                    )
+
+                    Spacer(modifier = Modifier.height(34.dp))
                 }
-                
-                // Content
-                ReserveInfoBottomSheetContent(
-                    reserveInfo = reserveInfo,
-                    onShowLocationClicked = onShowLocationClicked
-                )
             }
         }
     }
 }
 
-/**
- * Stateless Reserve Info Bottom Sheet Content
- * Pure UI that receives data and emits callbacks
- */
+// region Shared building blocks (used by both this sheet and
+// [PreviousOrderInfoBottomSheet] — kept `internal` so the two sheets stay in
+// the same package boundary without exposing them to the rest of the app).
+
 @Composable
-private fun ReserveInfoBottomSheetContent(
-    reserveInfo: ReserveInfo,
-    onShowLocationClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
+internal fun ReserveInfoDragHandle(modifier: Modifier = Modifier) {
+    Box(
         modifier = modifier
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        contentAlignment = Alignment.Center
     ) {
-        // Header section - pb=20 from design
-        HeaderSection(
-            venueName = reserveInfo.venueName,
-            pickupTime = reserveInfo.pickupTime
+        Box(
+            modifier = Modifier
+                .width(32.dp)
+                .height(3.dp)
+                .clip(RoundedCornerShape(100.dp))
+                .background(LessTheme.colors.borderPrimary)
         )
-
-        // Divider + 28dp gap
-        Divider()
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        // Reserve number section
-        ReserveNumberSection(reserveNumber = reserveInfo.reserveNumber)
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        // Divider + 28dp gap
-        Divider()
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        // Details section + 24dp gap to button
-        DetailsSection(reserveInfo = reserveInfo)
-
-        Spacer(modifier = Modifier.height(LessTheme.spacing.large))
-
-        // Action button - px=16, pb=16
-        ActionButton(onClick = onShowLocationClicked)
-
-        // Home indicator space - 34dp
-        Spacer(modifier = Modifier.height(34.dp))
     }
 }
 
-/**
- * Header section with venue name and pickup time
- */
 @Composable
-private fun HeaderSection(
-    venueName: String,
-    pickupTime: String,
+internal fun ReserveInfoHeader(
+    title: String,
+    subtitle: String,
+    subtitleIsBrand: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -156,26 +153,28 @@ private fun HeaderSection(
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
-            text = venueName,
+            text = title,
             style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsBlack,
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            text = pickupTime,
+            text = subtitle,
             style = LessTheme.typography.body16Medium,
-            color = LessTheme.colors.textIconsGrey,
+            color = if (subtitleIsBrand) {
+                LessTheme.colors.textIconsBrand
+            } else {
+                LessTheme.colors.textIconsGrey
+            },
             modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
-/**
- * Reserve number badge and label
- */
 @Composable
-private fun ReserveNumberSection(
+internal fun ReserveNumberBlock(
     reserveNumber: String,
+    statusBadgeText: String?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -183,7 +182,6 @@ private fun ReserveNumberSection(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Reserve number badge - h=56, px=20, py=12, rounded=12
         Box(
             modifier = Modifier
                 .height(56.dp)
@@ -194,29 +192,46 @@ private fun ReserveNumberSection(
         ) {
             Text(
                 text = reserveNumber,
-                style = LessTheme.typography.title28Medium,
+                style = LessTheme.typography.title28Bold,
                 color = LessTheme.colors.textIconsNested,
                 textAlign = TextAlign.Center
             )
         }
 
-        // Label
-        Text(
-            text = stringResource(Res.string.reserve_info_reserve_number),
-            style = LessTheme.typography.body16Medium,
-            color = LessTheme.colors.textIconsBlack,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.reserve_info_reserve_number),
+                style = LessTheme.typography.body16Medium,
+                color = LessTheme.colors.textIconsBlack,
+                textAlign = TextAlign.Center
+            )
+            if (statusBadgeText != null) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(1000.dp))
+                        .background(LessTheme.colors.textIconsBrand)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = statusBadgeText,
+                        style = LessTheme.typography.caption12Semibold,
+                        color = LessTheme.colors.textIconsNested
+                    )
+                }
+            }
+        }
     }
 }
 
-/**
- * Details section with date, prices, and subtotal
- */
 @Composable
-private fun DetailsSection(
-    reserveInfo: ReserveInfo,
+internal fun ReserveDetailsSection(
+    date: String,
+    pricePerPiece: Double,
+    serviceFee: Double,
+    subtotal: Double,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -225,52 +240,27 @@ private fun DetailsSection(
             .padding(horizontal = LessTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
     ) {
-        DetailRow(
+        ReserveInfoDetailRow(
             label = stringResource(Res.string.reserve_info_date),
-            value = reserveInfo.date
+            value = date
         )
-
-        DetailRow(
+        ReserveInfoDetailRow(
             label = stringResource(Res.string.reserve_price_per_piece),
-            value = "${reserveInfo.pricePerPiece.formatPrice()} ₼"
+            value = "${pricePerPiece.formatPrice()} ₼"
         )
-
-        DetailRow(
+        ReserveInfoDetailRow(
             label = stringResource(Res.string.reserve_service_fee),
-            value = "${reserveInfo.serviceFee.formatPrice()} ₼"
+            value = "${serviceFee.formatPrice()} ₼"
         )
-
-        DetailRow(
+        ReserveInfoDetailRow(
             label = stringResource(Res.string.reserve_subtotal),
-            value = "${reserveInfo.subtotal.formatPrice()} ₼"
+            value = "${subtotal.formatPrice()} ₼"
         )
     }
 }
 
-/**
- * Action button section
- */
 @Composable
-private fun ActionButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    DsButton(
-        text = stringResource(Res.string.reserve_info_show_location),
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = LessTheme.spacing.medium),
-        variant = ButtonVariant.Primary,
-        size = ButtonSize.Large
-    )
-}
-
-/**
- * Divider line
- */
-@Composable
-private fun Divider(modifier: Modifier = Modifier) {
+internal fun ReserveInfoDivider(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -279,11 +269,8 @@ private fun Divider(modifier: Modifier = Modifier) {
     )
 }
 
-/**
- * Detail row component for displaying label-value pairs
- */
 @Composable
-private fun DetailRow(
+private fun ReserveInfoDetailRow(
     label: String,
     value: String,
     modifier: Modifier = Modifier
@@ -293,16 +280,21 @@ private fun DetailRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Figma marks these rows as Medium 500, but Baloo 2 Medium renders
+        // visibly lighter in Compose than in Figma's preview, so the design
+        // *looks* like Semibold/Bold weight. Bump both label and value up to
+        // Semibold so the on-device rendering matches what's seen in Figma.
         Text(
             text = label,
-            style = LessTheme.typography.body16Medium,
+            style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsGrey
         )
         Text(
             text = value,
-            style = LessTheme.typography.body16Bold,
+            style = LessTheme.typography.body16Semibold,
             color = LessTheme.colors.textIconsBlack
         )
     }
 }
 
+// endregion

@@ -72,12 +72,12 @@ class SearchViewModel(
     private fun loadInitialData() = intent {
         reduce { state.copy(isLoading = true) }
         exploreRepository.getCategories()
-            .onSuccess { response ->
-                val categories = response.data.map { item ->
+            .onSuccess { items ->
+                val categories = items.map { item ->
                     SearchCategory(
                         id = item.id,
                         type = item.value,
-                        title = item.title,
+                        title = item.displayTitle ?: item.title,
                         imageUrl = item.imageUrl
                     )
                 }

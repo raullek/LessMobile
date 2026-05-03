@@ -36,7 +36,8 @@ fun MerchantProfileHeroSection(
     merchantLogoUrl: String?,
     isFavorite: Boolean,
     onBackClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
+    onFavoriteClick: () -> Unit = {},
+    showFavorite: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -75,22 +76,24 @@ fun MerchantProfileHeroSection(
         }
 
         // Favorite Button
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(end = LessTheme.spacing.medium, top = 48.dp)
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(Color(0x80171A1C))
-                .clickable { onFavoriteClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.ic_saved_24dp),
-                contentDescription = "Favorite",
-                tint = if (isFavorite) LessTheme.colors.textIconsBrand else LessTheme.colors.backgroundPrimary,
-                modifier = Modifier.size(24.dp)
-            )
+        if (showFavorite) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = LessTheme.spacing.medium, top = 48.dp)
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(Color(0x80171A1C))
+                    .clickable { onFavoriteClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_saved_24dp),
+                    contentDescription = "Favorite",
+                    tint = if (isFavorite) LessTheme.colors.textIconsBrand else LessTheme.colors.backgroundPrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
 
         // Merchant Logo (square with rounded corners)

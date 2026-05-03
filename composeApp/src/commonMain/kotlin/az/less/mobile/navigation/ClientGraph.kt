@@ -28,6 +28,7 @@ import az.less.mobile.presentation.client.onboarding.otp.LoginCodeScreen
 import az.less.mobile.presentation.client.onboarding.welcome.WelcomeScreen
 import az.less.mobile.presentation.client.reserve.OrderAcceptedScreen
 import az.less.mobile.presentation.client.reserve.models.OrderAccepted
+import az.less.mobile.presentation.venuemap.VenueMapScreen
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
@@ -68,6 +69,15 @@ sealed interface ClientRoute {
 
     @Serializable
     data class Merchant(val merchantId: String) : ClientRoute
+
+    /**
+     * Standalone fullscreen map showing the venue's location. Hosts the
+     * "Show Direction" hand-off to external navigation apps (Google Maps /
+     * Waze / Apple Maps). Single-purpose screen — back returns directly to
+     * the launcher (orders sheet, merchant profile, etc.).
+     */
+    @Serializable
+    data class VenueMap(val venueId: String) : ClientRoute
 
     /**
      * Reserve Flow
@@ -139,13 +149,8 @@ fun NavGraphBuilder.mainGraph(
             navController = navController,
             navigateToMerchant = {
                 coroutineScope.launch {
-                    val user = sessionLocalRepository.currentUser.first()
-                    val available = user?.availableModes().orEmpty()
-                    val target = when {
-                        AppMode.MERCHANT in available -> AppMode.MERCHANT
-                        AppMode.PARTNER in available -> AppMode.PARTNER
-                        else -> return@launch
-                    }
+                    val user = sessionLocalRepository.currentUser.first() ?: return@launch
+                    val target = user.nonClientMode() ?: return@launch
                     sessionLocalRepository.saveLastUsedMode(target)
                     val rootRoute = when (target) {
                         AppMode.MERCHANT -> ROOT_MERCHANT
@@ -175,6 +180,14 @@ fun NavGraphBuilder.mainGraph(
         val args = backStackEntry.toRoute<ClientRoute.Merchant>()
         MerchantProfileScreen(
             merchantId = args.merchantId,
+            navController = navController
+        )
+    }
+
+    composable<ClientRoute.VenueMap> { backStackEntry ->
+        val args = backStackEntry.toRoute<ClientRoute.VenueMap>()
+        VenueMapScreen(
+            venueId = args.venueId,
             navController = navController
         )
     }

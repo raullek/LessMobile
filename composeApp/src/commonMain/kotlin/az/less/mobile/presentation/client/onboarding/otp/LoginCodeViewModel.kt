@@ -50,12 +50,7 @@ class LoginCodeViewModel(
 
                     val user = sessionLocalRepository.currentUser.first()
                     val lastMode = sessionLocalRepository.lastUsedMode.first()
-                    val available = user?.availableModes().orEmpty()
-                    val target = when {
-                        lastMode == AppMode.MERCHANT && AppMode.MERCHANT in available -> AppMode.MERCHANT
-                        lastMode == AppMode.PARTNER && AppMode.PARTNER in available -> AppMode.PARTNER
-                        else -> AppMode.CLIENT
-                    }
+                    val target = user?.resolveStartMode(lastMode) ?: AppMode.CLIENT
                     sessionLocalRepository.saveLastUsedMode(target)
                     when (target) {
                         AppMode.MERCHANT -> postSideEffect(LoginCodeSideEffect.NavigateToMerchant)

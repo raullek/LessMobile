@@ -192,6 +192,18 @@
     <string name="reserve_info_reserve_number">Reserve number</string>
     <string name="reserve_info_date">Date</string>
     <string name="reserve_info_show_location">Show me location</string>
+    <string name="reserve_info_status_picked_up">Picked up</string>
+    <string name="reserve_info_leave_review">Leave review</string>
+    <string name="reserve_info_contact_support">Contact with support</string>
+
+    <!-- Leave Review Bottom Sheet -->
+    <string name="leave_review_title">Enjoyed the meal?</string>
+    <string name="leave_review_subtitle">Tell us how satisfied you are with your overall experience about %1$s</string>
+    <string name="leave_review_input_placeholder">Type some review about the venue</string>
+    <string name="leave_review_submit">Submit</string>
+
+    <!-- Contact Support Bottom Sheet -->
+    <string name="contact_support_title">Contact with support</string>
 
     <!-- Filter Bottom Sheet -->
     <string name="filter_title">Filters</string>
@@ -252,6 +264,8 @@
     <string name="merch_more_dark_mode">Dark mode</string>
     <string name="more_switch_to_merchant">Switch to Merchant</string>
     <string name="more_switch_to_client">Switch to Client</string>
+    <string name="more_switch_from_merchant">Switch from Merchant to Client</string>
+    <string name="more_switch_from_partner">Switch from Partner to Client</string>
 
     <!-- Merchant Orders Screen -->
     <string name="merch_orders_bought">Purchased</string>
@@ -313,6 +327,8 @@
     <string name="places_edit_merch_details">Edit merch details</string>
     <string name="places_edit_venue">Edit venue</string>
     <string name="places_edit_users">Edit users</string>
+    <string name="places_preview">Preview</string>
+    <string name="places_default_branch_tag">Default branch</string>
 
     <!-- Edit Merchant Profile Screen -->
     <string name="edit_profile_make_me_merchant">Make me a merchant of this venue</string>
@@ -360,6 +376,7 @@
     <string name="add_user_delete">Delete user</string>
     <string name="add_user_save">Save changes</string>
     <string name="add_user_saved">User added successfully</string>
+    <string name="add_user_deleted">User deleted successfully</string>
 
     <!-- Select Location Screen -->
     <string name="select_location_title">Select address on map</string>

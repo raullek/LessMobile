@@ -17,6 +17,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import coil3.compose.AsyncImage
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ill_venue_placeholder
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun PartnerMoreHeader(
@@ -44,7 +47,10 @@ fun PartnerMoreHeader(
                 modifier = Modifier
                     .size(96.dp)
                     .clip(RoundedCornerShape(20.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(Res.drawable.ill_venue_placeholder),
+                error = painterResource(Res.drawable.ill_venue_placeholder),
+                fallback = painterResource(Res.drawable.ill_venue_placeholder)
             )
         }
 

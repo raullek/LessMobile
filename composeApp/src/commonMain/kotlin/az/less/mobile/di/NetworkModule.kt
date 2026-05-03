@@ -6,6 +6,7 @@ import az.less.mobile.data.remote.model.auth.RefreshTokenData
 import az.less.mobile.data.remote.model.auth.RefreshTokenRequest
 import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.network.ApiResponse
+import az.less.mobile.utils.deviceLocaleHeader
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.auth.Auth
@@ -26,6 +27,14 @@ import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
+
+private val AUTH_ENDPOINTS = listOf(
+    "v1/auth/email-login",
+    "v1/auth/verify-otp",
+    "v1/auth/resend-otp",
+    "v1/auth/login",
+    "v1/auth/refresh-token",
+)
 
 val networkModule = module {
     single {
@@ -98,13 +107,17 @@ val networkModule = module {
                             null
                         }
                     }
-                    sendWithoutRequest { true }
+                    sendWithoutRequest { request ->
+                        val url = request.url.buildString()
+                        AUTH_ENDPOINTS.none { url.contains(it) }
+                    }
                 }
             }
             defaultRequest {
                 url("https://axshambazari.com/api/")
                 contentType(ContentType.Application.Json)
                 headers.append(HttpHeaders.Accept, ContentType.Application.Json.toString())
+                headers.append("x-locale", deviceLocaleHeader())
                 if (currentBuildVariant() == BuildVariant.DEVELOPMENT) {
                     headers.append("X-Data-Env", "test")
                     headers.append("X-Test-Db-Key", "axshamlar")

@@ -312,17 +312,21 @@ fun EditMerchantProfileScreenContent(
             )
         }
 
-        // Toggle Section (using DsCell like in More screen)
-        item(key = "toggle_section") {
-            DsCell(
-                title = stringResource(Res.string.edit_profile_make_me_merchant),
-                type = CellType.Toggle(
-                    checked = state.makeMeMerchant,
-                    onCheckedChange = { onIntent(EditMerchantProfileIntent.OnMakeMeMerchantToggled(it)) }
-                ),
-                showDivider = false,
-                modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
-            )
+        // Toggle Section — only on Add Branch (create) flow when the user does not
+        // already have a default/attached venue. In merchant flow this is almost always
+        // hidden because merchants always have an attached venue.
+        if (state.branchId == null && !state.hasAttachedVenue) {
+            item(key = "toggle_section") {
+                DsCell(
+                    title = stringResource(Res.string.edit_profile_make_me_merchant),
+                    type = CellType.Toggle(
+                        checked = state.makeMeMerchant,
+                        onCheckedChange = { onIntent(EditMerchantProfileIntent.OnMakeMeMerchantToggled(it)) }
+                    ),
+                    showDivider = false,
+                    modifier = Modifier.padding(horizontal = LessTheme.spacing.medium)
+                )
+            }
         }
 
         // Create/Update Branch Button

@@ -41,11 +41,13 @@ import az.less.mobile.presentation.partner.places.components.BranchCard
 import az.less.mobile.presentation.partner.places.components.PlacesEmptyState
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_edit_24dp
+import lessmobile.composeapp.generated.resources.ic_eye_24dp
 import lessmobile.composeapp.generated.resources.ic_chevron_right_24dp
 import lessmobile.composeapp.generated.resources.places_add_branch
 import lessmobile.composeapp.generated.resources.places_edit_merch_details
 import lessmobile.composeapp.generated.resources.places_edit_users
 import lessmobile.composeapp.generated.resources.places_edit_venue
+import lessmobile.composeapp.generated.resources.places_preview
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -82,6 +84,9 @@ fun PartnerPlacesScreen(
             }
             is PartnerPlacesSideEffect.NavigateToAddBranch -> {
                 navController.navigate(PartnerRoute.EditProfile())
+            }
+            is PartnerPlacesSideEffect.NavigateToPreview -> {
+                navController.navigate(PartnerRoute.VenuePreview(venueId = sideEffect.branch.id))
             }
             is PartnerPlacesSideEffect.ShowError -> {
                 // Show error snackbar or dialog
@@ -229,9 +234,15 @@ fun PartnerPlacesScreenContent(
     // Edit Merch Details Bottom Sheet
     if (state.showEditBottomSheet) {
         val editIcon = painterResource(Res.drawable.ic_edit_24dp)
+        val eyeIcon = painterResource(Res.drawable.ic_eye_24dp)
         val chevronIcon = painterResource(Res.drawable.ic_chevron_right_24dp)
 
         val editItems = listOf(
+            ListBottomSheetItem(
+                id = "preview",
+                title = stringResource(Res.string.places_preview),
+                icon = eyeIcon
+            ),
             ListBottomSheetItem(
                 id = "edit_venue",
                 title = stringResource(Res.string.places_edit_venue),
@@ -251,6 +262,7 @@ fun PartnerPlacesScreenContent(
                 when (itemId) {
                     "edit_venue" -> onIntent(PartnerPlacesIntent.OnEditVenueClick)
                     "edit_users" -> onIntent(PartnerPlacesIntent.OnEditUsersClick)
+                    "preview" -> onIntent(PartnerPlacesIntent.OnPreviewClick)
                 }
             },
             onDismiss = { onIntent(PartnerPlacesIntent.OnDismissEditBottomSheet) },

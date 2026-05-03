@@ -85,6 +85,7 @@ class PartnerPlacesViewModel(
             is PartnerPlacesIntent.OnDismissEditBottomSheet -> dismissEditBottomSheet()
             is PartnerPlacesIntent.OnEditVenueClick -> handleEditVenueFromBottomSheet()
             is PartnerPlacesIntent.OnEditUsersClick -> handleEditUsersFromBottomSheet()
+            is PartnerPlacesIntent.OnPreviewClick -> handlePreviewFromBottomSheet()
         }
     }
 
@@ -119,6 +120,12 @@ class PartnerPlacesViewModel(
         val branch = state.branches.find { it.id == state.selectedBranchId } ?: return@intent
         reduce { state.copy(showEditBottomSheet = false, selectedBranchId = null) }
         postSideEffect(PartnerPlacesSideEffect.NavigateToEditUsers(branch))
+    }
+
+    private fun handlePreviewFromBottomSheet() = intent {
+        val branch = state.branches.find { it.id == state.selectedBranchId } ?: return@intent
+        reduce { state.copy(showEditBottomSheet = false, selectedBranchId = null) }
+        postSideEffect(PartnerPlacesSideEffect.NavigateToPreview(branch))
     }
 }
 

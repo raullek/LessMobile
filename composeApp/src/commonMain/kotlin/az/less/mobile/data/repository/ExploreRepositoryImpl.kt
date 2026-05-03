@@ -6,7 +6,7 @@ import androidx.paging.PagingData
 import az.less.mobile.data.datasource.ExploreDataSource
 import az.less.mobile.data.paging.SearchBoxesPagingSource
 import az.less.mobile.data.paging.SearchVenuesPagingSource
-import az.less.mobile.data.remote.model.CategoriesResponseDto
+import az.less.mobile.data.remote.model.CategoryItemDto
 import az.less.mobile.data.remote.model.SearchFilterDto
 import az.less.mobile.domain.model.FilterBox
 import az.less.mobile.domain.model.SearchBoxesResult
@@ -65,7 +65,7 @@ class ExploreRepositoryImpl(
     override suspend fun getCategories(
         page: Int?,
         limit: Int?
-    ): NetworkResult<CategoriesResponseDto> {
+    ): NetworkResult<List<CategoryItemDto>> {
         return exploreDataSource.getCategories(page, limit)
     }
 

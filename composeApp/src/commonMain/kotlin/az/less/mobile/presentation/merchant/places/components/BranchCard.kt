@@ -32,7 +32,9 @@ import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_star_16dp
 import lessmobile.composeapp.generated.resources.ill_box_placeholder
 import lessmobile.composeapp.generated.resources.ill_venue_placeholder
+import lessmobile.composeapp.generated.resources.places_default_branch_tag
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Card component for displaying a merchant branch
@@ -43,7 +45,8 @@ fun BranchCard(
     branch: BranchItem,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDefault: Boolean = false
 ) {
     Box(
         modifier = modifier
@@ -78,31 +81,54 @@ fun BranchCard(
                     error = painterResource(Res.drawable.ill_box_placeholder)
                 )
 
-                // Top-left Badge: Items on sale or No active offer
-                Box(
+                // Top-left Badges: items-on-sale / no-active-offer + optional default-branch tag
+                Column(
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(LessTheme.spacing.small)
-                        .clip(RoundedCornerShape(LessTheme.radius.xSmall))
-                        .background(
-                            if (branch.hasActiveDiscount && branch.itemsOnSale > 0)
-                                LessTheme.colors.textIconsBrand
-                            else
-                                LessTheme.colors.textIconsGrey
-                        )
-                        .padding(
-                            horizontal = LessTheme.spacing.xSmall,
-                            vertical = LessTheme.spacing.xxxSmall
-                        )
+                        .padding(LessTheme.spacing.small),
+                    verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.xxxSmall)
                 ) {
-                    Text(
-                        text = if (branch.hasActiveDiscount && branch.itemsOnSale > 0)
-                            "${branch.itemsOnSale} items on sale"
-                        else
-                            "No active offer",
-                        style = LessTheme.typography.caption12Semibold,
-                        color = LessTheme.colors.backgroundPrimary
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(LessTheme.radius.xSmall))
+                            .background(
+                                if (branch.hasActiveDiscount && branch.itemsOnSale > 0)
+                                    LessTheme.colors.textIconsBrand
+                                else
+                                    LessTheme.colors.textIconsGrey
+                            )
+                            .padding(
+                                horizontal = LessTheme.spacing.xSmall,
+                                vertical = LessTheme.spacing.xxxSmall
+                            )
+                    ) {
+                        Text(
+                            text = if (branch.hasActiveDiscount && branch.itemsOnSale > 0)
+                                "${branch.itemsOnSale} items on sale"
+                            else
+                                "No active offer",
+                            style = LessTheme.typography.caption12Semibold,
+                            color = LessTheme.colors.backgroundPrimary
+                        )
+                    }
+
+                    if (isDefault) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(LessTheme.radius.xSmall))
+                                .background(LessTheme.colors.elementsPrimaryBrand)
+                                .padding(
+                                    horizontal = LessTheme.spacing.xSmall,
+                                    vertical = LessTheme.spacing.xxxSmall
+                                )
+                        ) {
+                            Text(
+                                text = stringResource(Res.string.places_default_branch_tag),
+                                style = LessTheme.typography.caption12Semibold,
+                                color = LessTheme.colors.backgroundPrimary
+                            )
+                        }
+                    }
                 }
             }
 

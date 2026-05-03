@@ -2,8 +2,11 @@ package az.less.mobile.presentation.merchant.places
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.domain.repository.VenuesRepository
 import az.less.mobile.presentation.merchant.places.model.BranchItem
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -12,14 +15,30 @@ import org.orbitmvi.orbit.container
  * ViewModel for Merchant Places Screen using Orbit MVI
  */
 class MerchPlacesViewModel(
-    private val venuesRepository: VenuesRepository
+    private val venuesRepository: VenuesRepository,
+    private val sessionLocalRepository: SessionLocalRepository
 ) : ViewModel(), ContainerHost<MerchPlacesState, MerchPlacesSideEffect> {
 
     override val container: Container<MerchPlacesState, MerchPlacesSideEffect> =
         viewModelScope.container(MerchPlacesState())
 
     init {
+        observeCurrentUserVenue()
         loadBranches()
+    }
+
+    private fun observeCurrentUserVenue() {
+        viewModelScope.launch {
+            sessionLocalRepository.currentUser.collectLatest { user ->
+                intent {
+                    // Tag the default venue only when this user actually administers branches
+                    // (CMP / merchant-partner). For pure merchant or pure partner the server
+                    // does not return `user.venue`, so this is also a safety net.
+                    val defaultId = user?.takeIf { it.canManageBranches }?.venue?.id
+                    reduce { state.copy(defaultVenueId = defaultId) }
+                }
+            }
+        }
     }
 
     private fun loadBranches() = intent {
@@ -80,6 +99,7 @@ class MerchPlacesViewModel(
             is MerchPlacesIntent.OnDismissEditBottomSheet -> dismissEditBottomSheet()
             is MerchPlacesIntent.OnEditVenueClick -> handleEditVenueFromBottomSheet()
             is MerchPlacesIntent.OnEditUsersClick -> handleEditUsersFromBottomSheet()
+            is MerchPlacesIntent.OnPreviewClick -> handlePreviewFromBottomSheet()
         }
     }
 
@@ -114,6 +134,12 @@ class MerchPlacesViewModel(
         val branch = state.branches.find { it.id == state.selectedBranchId } ?: return@intent
         reduce { state.copy(showEditBottomSheet = false, selectedBranchId = null) }
         postSideEffect(MerchPlacesSideEffect.NavigateToEditUsers(branch))
+    }
+
+    private fun handlePreviewFromBottomSheet() = intent {
+        val branch = state.branches.find { it.id == state.selectedBranchId } ?: return@intent
+        reduce { state.copy(showEditBottomSheet = false, selectedBranchId = null) }
+        postSideEffect(MerchPlacesSideEffect.NavigateToPreview(branch))
     }
 }
 

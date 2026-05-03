@@ -3,8 +3,10 @@ package az.less.mobile.presentation.merchant.places.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.designsystem.components.ToastType
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.domain.repository.VenuesRepository
 import az.less.mobile.presentation.merchant.places.model.BranchItem
+import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -13,11 +15,15 @@ import org.orbitmvi.orbit.container
  * ViewModel for Edit Merchant Profile Screen using Orbit MVI
  */
 class EditMerchantProfileViewModel(
-    private val venuesRepository: VenuesRepository
+    private val venuesRepository: VenuesRepository,
+    private val sessionLocalRepository: SessionLocalRepository
 ) : ViewModel(), ContainerHost<EditMerchantProfileState, EditMerchantProfileSideEffect> {
 
     override val container: Container<EditMerchantProfileState, EditMerchantProfileSideEffect> =
-        viewModelScope.container(EditMerchantProfileState())
+        viewModelScope.container(EditMerchantProfileState()) {
+            val cachedUser = sessionLocalRepository.currentUser.first()
+            reduce { state.copy(hasAttachedVenue = cachedUser?.venue != null) }
+        }
 
     fun initialize(venueData: String?) = intent {
         if (venueData != null) {
