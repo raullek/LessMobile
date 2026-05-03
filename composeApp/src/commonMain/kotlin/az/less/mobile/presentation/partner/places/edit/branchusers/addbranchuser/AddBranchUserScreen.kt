@@ -33,6 +33,9 @@ import az.less.designsystem.components.DsButton
 import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.DsToolBar
 import az.less.designsystem.components.ToastType
+import az.less.mobile.navigation.ROOT_MERCHANT
+import az.less.mobile.navigation.ROOT_PARTNER
+import az.less.mobile.presentation.common.phone.sanitizePhoneInput
 import io.github.skeptick.inputmask.compose.phone.rememberPhoneInputMaskVisualTransformation
 import kotlinx.coroutines.delay
 import lessmobile.composeapp.generated.resources.Res
@@ -40,6 +43,7 @@ import lessmobile.composeapp.generated.resources.add_user_delete
 import lessmobile.composeapp.generated.resources.add_user_name_placeholder
 import lessmobile.composeapp.generated.resources.add_user_save
 import lessmobile.composeapp.generated.resources.add_user_title
+import lessmobile.composeapp.generated.resources.add_user_deleted
 import lessmobile.composeapp.generated.resources.add_user_saved
 import lessmobile.composeapp.generated.resources.login_email_placeholder
 import org.jetbrains.compose.resources.stringResource
@@ -48,24 +52,20 @@ import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 /**
- * Phone number mask for Azerbaijan format: +994 XX XXX XX XX
- * Using special phone mask that handles pasting with or without country code
- */
-private const val PHONE_MASK = "+{994} [00] [000] [00] [00]"
-
-/**
  * Stateful AddBranchUserScreen that connects to ViewModel
  * This is the entry point used by navigation
  */
 @Composable
 fun AddBranchUserScreen(
     viewModel: AddBranchUserViewModel = koinViewModel(),
-    navController: NavController
+    navController: NavController,
+    rootNavController: NavController? = null
 ) {
     val state by viewModel.collectAsState()
     var toastMessage by remember { mutableStateOf<String?>(null) }
     var toastType by remember { mutableStateOf(ToastType.Success) }
     val userSavedMessage = stringResource(Res.string.add_user_saved)
+    val userDeletedMessage = stringResource(Res.string.add_user_deleted)
 
     // Auto-hide toast after delay
     LaunchedEffect(toastMessage) {
@@ -96,6 +96,9 @@ fun AddBranchUserScreen(
                 }
             }
             is AddBranchUserSideEffect.UserDeleted -> {
+                toastType = ToastType.Success
+                toastMessage = userDeletedMessage
+                delay(1500)
                 navController.navigate(
                     PartnerRoute.BranchUsers(
                         venueId = state.venueId,
@@ -104,6 +107,32 @@ fun AddBranchUserScreen(
                 ) {
                     popUpTo<PartnerRoute.BranchUsers> { inclusive = true }
                     launchSingleTop = true
+                }
+            }
+            is AddBranchUserSideEffect.SelfDeletedSwitchToPartner -> {
+                toastType = ToastType.Success
+                toastMessage = userDeletedMessage
+                delay(1500)
+                if (rootNavController != null) {
+                    rootNavController.navigate(ROOT_PARTNER) {
+                        popUpTo(ROOT_MERCHANT) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                } else {
+                    navController.popBackStack()
+                }
+            }
+            is AddBranchUserSideEffect.UserSavedSwitchToMerchant -> {
+                toastType = ToastType.Success
+                toastMessage = userSavedMessage
+                delay(1500)
+                if (rootNavController != null) {
+                    rootNavController.navigate(ROOT_MERCHANT) {
+                        popUpTo(ROOT_PARTNER) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                } else {
+                    navController.popBackStack()
                 }
             }
             is AddBranchUserSideEffect.ShowError -> {
@@ -141,8 +170,10 @@ fun AddBranchUserScreenContent(
     onIntent: (AddBranchUserIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Phone mask with +994 prefix - handles pasting with or without country code
-    val phoneVisualTransformation = rememberPhoneInputMaskVisualTransformation(PHONE_MASK)
+    // Country-aware phone mask. Mask switches automatically when the user
+    // pastes a full international number whose dial code matches a known
+    // [PhoneCountry].
+    val phoneVisualTransformation = rememberPhoneInputMaskVisualTransformation(state.phoneCountry.mask)
 
     Column(
         modifier = modifier
@@ -180,9 +211,11 @@ fun AddBranchUserScreenContent(
             DsTextField(
                 value = state.phoneNumber,
                 onValueChange = { newValue ->
-                    // Sanitize input using the mask
-                    val sanitized = phoneVisualTransformation.sanitize(newValue)
-                    onIntent(AddBranchUserIntent.OnPhoneNumberChange(sanitized))
+                    val result = sanitizePhoneInput(newValue, state.phoneCountry)
+                    if (result.country != state.phoneCountry) {
+                        onIntent(AddBranchUserIntent.OnPhoneCountryChange(result.country))
+                    }
+                    onIntent(AddBranchUserIntent.OnPhoneNumberChange(result.localDigits))
                 },
                 isError = state.phoneError != null,
                 errorMessage = state.phoneError,
@@ -226,7 +259,9 @@ fun AddBranchUserScreenContent(
                     onClick = { onIntent(AddBranchUserIntent.OnDeleteClick) },
                     textColor = LessTheme.colors.textIconsError,
                     variant = ButtonVariant.Secondary,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isLoading,
+                    isLoading = state.isLoading
                 )
             } else {
                 // Add mode: save button

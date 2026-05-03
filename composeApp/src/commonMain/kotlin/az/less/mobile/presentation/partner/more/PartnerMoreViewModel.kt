@@ -24,7 +24,7 @@ import lessmobile.composeapp.generated.resources.more_contact_us
 import lessmobile.composeapp.generated.resources.more_notification
 import lessmobile.composeapp.generated.resources.more_section_application
 import lessmobile.composeapp.generated.resources.more_section_support
-import lessmobile.composeapp.generated.resources.more_switch_to_client
+import lessmobile.composeapp.generated.resources.more_switch_from_partner
 import lessmobile.composeapp.generated.resources.more_terms_of_service
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -205,7 +205,7 @@ class PartnerMoreViewModel(
             appCells.add(
                 PartnerMoreCellModel(
                     id = PartnerMoreCellId.SwitchToClient,
-                    titleRes = Res.string.more_switch_to_client,
+                    titleRes = Res.string.more_switch_from_partner,
                     icon = Res.drawable.ic_explore_24dp,
                     type = PartnerMoreCellType.Navigation,
                     showDivider = false

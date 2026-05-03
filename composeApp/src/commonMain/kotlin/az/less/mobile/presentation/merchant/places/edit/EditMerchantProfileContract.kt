@@ -23,6 +23,9 @@ data class EditMerchantProfileState(
     val email: String? = null,
     val rating: Float = 0f,
     val makeMeMerchant: Boolean = false,
+    /** True if the cached current user already has an attached venue (`User.venue != null`).
+     *  Used to hide the "make me merchant for this venue" toggle. */
+    val hasAttachedVenue: Boolean = false,
     val isLoading: Boolean = false,
     // Edit Merch Details Bottom Sheet state
     val isEditMerchDetailsBottomSheetVisible: Boolean = false,
@@ -66,6 +69,7 @@ data class EditMerchantProfileState(
         if (email != other.email) return false
         if (rating != other.rating) return false
         if (makeMeMerchant != other.makeMeMerchant) return false
+        if (hasAttachedVenue != other.hasAttachedVenue) return false
         if (isLoading != other.isLoading) return false
         if (isEditMerchDetailsBottomSheetVisible != other.isEditMerchDetailsBottomSheetVisible) return false
         if (isEditPhoneNumberBottomSheetVisible != other.isEditPhoneNumberBottomSheetVisible) return false
@@ -94,6 +98,7 @@ data class EditMerchantProfileState(
         result = 31 * result + (email?.hashCode() ?: 0)
         result = 31 * result + rating.hashCode()
         result = 31 * result + makeMeMerchant.hashCode()
+        result = 31 * result + hasAttachedVenue.hashCode()
         result = 31 * result + isLoading.hashCode()
         result = 31 * result + isEditMerchDetailsBottomSheetVisible.hashCode()
         result = 31 * result + isEditPhoneNumberBottomSheetVisible.hashCode()

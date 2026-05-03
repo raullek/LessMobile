@@ -652,7 +652,10 @@ private fun ReserveScreenContent(
         Spacer(modifier = Modifier.height(LessTheme.spacing.large))
         } // end scrollable content
 
-        // Reserve and pay button — pinned at bottom, safe from nav bar
+        // Reserve and pay button — pinned at bottom, safe from nav bar.
+        // Disabled (gray) when the box is sold out, the user hasn't picked a
+        // payment method, the selected quantity exceeds stock, the subtotal
+        // is zero, or any background request is in flight.
         DsButton(
             text = stringResource(Res.string.reserve_and_pay),
             onClick = { onIntent(ReserveIntent.OnPlaceOrderClicked) },
@@ -663,8 +666,8 @@ private fun ReserveScreenContent(
                 .navigationBarsPadding(),
             variant = ButtonVariant.Primary,
             size = ButtonSize.Large,
-            enabled = !state.isLoading,
-            isLoading = state.isLoading
+            enabled = state.canPlaceOrder,
+            isLoading = state.isLoading || state.isPaymentLoading
         )
     }
 }

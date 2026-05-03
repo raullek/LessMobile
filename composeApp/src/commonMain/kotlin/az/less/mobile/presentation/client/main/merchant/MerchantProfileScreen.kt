@@ -51,7 +51,7 @@ import az.less.mobile.presentation.maps.models.MapType
 import az.less.mobile.presentation.maps.models.Marker
 import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.reserve.ReserveScreen
-import az.less.mobile.utils.shareContent
+import az.less.mobile.utils.openDirections
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.ic_chevron_left_24dp
@@ -357,12 +357,7 @@ private fun MerchantMapView(
             DsButton(
                 text = "Show Direction",
                 onClick = {
-                    val shareText = buildString {
-                        append("$merchantName\n")
-                        append("$address\n")
-                        append("geo:$latitude,$longitude")
-                    }
-                    shareContent(shareText)
+                    openDirections(latitude, longitude, merchantName)
                     onShowDirectionsClick()
                 },
                 modifier = Modifier.fillMaxWidth(),

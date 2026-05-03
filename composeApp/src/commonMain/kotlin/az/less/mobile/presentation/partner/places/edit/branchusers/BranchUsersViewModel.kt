@@ -94,8 +94,12 @@ class BranchUsersViewModel(
 }
 
 private fun VenueMerchantDto.toBranchUser(): BranchUser {
+    // `id` carries the domain user id (matched against cached User.id for
+    // self-detection); `merchantId` carries the venue-merchant relation `_id`
+    // which is the path param of `DELETE /v1/venues/merchants/{merchantId}`.
     return BranchUser(
-        id = id ?: "",
+        id = userId ?: user?.id ?: "",
+        merchantId = id ?: "",
         name = user?.name ?: "",
         phoneNumber = user?.phone ?: "",
         email = user?.email ?: "",

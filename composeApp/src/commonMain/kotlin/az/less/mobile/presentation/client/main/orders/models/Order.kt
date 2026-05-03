@@ -16,5 +16,8 @@ data class Order(
     val quantity: Int = 1,
     val reserveNumber: String = "",
     val isCompleted: Boolean = false,
-    val completedDate: String? = null
+    val completedDate: String? = null,
+    /** Id of the venue this order belongs to — used to deep-link into the
+     *  venue preview screen from the "Show me location" action. */
+    val venueId: String = ""
 )

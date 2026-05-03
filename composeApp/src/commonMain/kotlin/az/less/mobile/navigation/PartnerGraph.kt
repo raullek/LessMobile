@@ -18,6 +18,7 @@ import az.less.mobile.presentation.partner.places.edit.branchusers.BranchUsersSc
 import az.less.mobile.presentation.partner.places.edit.branchusers.addbranchuser.AddBranchUserScreen
 import az.less.mobile.presentation.partner.places.edit.selectlocation.InputAddressScreen
 import az.less.mobile.presentation.partner.places.edit.selectlocation.SelectBranchLocationOnMapScreen
+import az.less.mobile.presentation.partner.preview.VenuePreviewScreen
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
@@ -74,6 +75,9 @@ sealed interface PartnerRoute {
 
     @Serializable
     data object InputAddress : PartnerRoute
+
+    @Serializable
+    data class VenuePreview(val venueId: String) : PartnerRoute
 }
 
 /**
@@ -109,7 +113,8 @@ fun NavGraphBuilder.partnerGraph(
         val args = backStackEntry.toRoute<PartnerRoute.EditProfile>()
         EditMerchantProfileScreen(
             venueData = args.venueData,
-            navController = navController
+            navController = navController,
+            rootNavController = rootNavController
         )
     }
 
@@ -126,7 +131,10 @@ fun NavGraphBuilder.partnerGraph(
                 )
             },
             onHomeClicked = {
-                navController.popBackStack<PartnerRoute.More>(inclusive = false)
+                navController.navigate(PartnerRoute.More) {
+                    popUpTo<PartnerRoute.Places> { inclusive = true }
+                    launchSingleTop = true
+                }
             }
         )
     }
@@ -141,7 +149,7 @@ fun NavGraphBuilder.partnerGraph(
     }
 
     composable<PartnerRoute.AddBranchUser> {
-        AddBranchUserScreen(navController = navController)
+        AddBranchUserScreen(navController = navController, rootNavController = rootNavController)
     }
 
     composable<PartnerRoute.SelectBranchLocation> { backStackEntry ->
@@ -156,6 +164,14 @@ fun NavGraphBuilder.partnerGraph(
 
     composable<PartnerRoute.InputAddress> {
         InputAddressScreen(navController = navController)
+    }
+
+    composable<PartnerRoute.VenuePreview> { backStackEntry ->
+        val args = backStackEntry.toRoute<PartnerRoute.VenuePreview>()
+        VenuePreviewScreen(
+            venueId = args.venueId,
+            navController = navController
+        )
     }
 }
 

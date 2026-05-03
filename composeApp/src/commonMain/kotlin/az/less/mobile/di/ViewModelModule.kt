@@ -29,6 +29,7 @@ import az.less.mobile.presentation.merchant.places.edit.selectlocation.InputAddr
 import az.less.mobile.presentation.merchant.places.edit.selectlocation.SelectBranchLocationOnMapViewModel
 import az.less.mobile.presentation.partner.more.PartnerMoreViewModel
 import az.less.mobile.presentation.partner.places.PartnerPlacesViewModel
+import az.less.mobile.presentation.partner.preview.VenuePreviewViewModel
 import az.less.mobile.presentation.partner.history.IncomeHistoryViewModel as PartnerIncomeHistoryViewModel
 import az.less.mobile.presentation.partner.places.edit.EditMerchantProfileViewModel as PartnerEditMerchantProfileViewModel
 import az.less.mobile.presentation.partner.places.edit.branchusers.BranchUsersViewModel as PartnerBranchUsersViewModel
@@ -76,6 +77,7 @@ val viewModelModule = module {
     viewModelOf(::PartnerAddBranchUserViewModel)
     viewModelOf(::PartnerInputAddressViewModel)
     viewModelOf(::PartnerSelectBranchLocationOnMapViewModel)
+    viewModelOf(::VenuePreviewViewModel)
 }
 
 

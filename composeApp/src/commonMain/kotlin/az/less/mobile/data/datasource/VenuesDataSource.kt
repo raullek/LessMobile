@@ -10,6 +10,7 @@ import az.less.mobile.network.NetworkResult
 import az.less.mobile.network.safeApiCall
 import az.less.mobile.network.safeApiCallUnit
 import io.ktor.client.HttpClient
+import io.ktor.client.request.delete
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
@@ -139,6 +140,22 @@ class VenuesDataSource(
                     )
                 )
             }
+        }
+    }
+
+    /**
+     * Removes the merchant relationship from a venue. The merchant loses access to
+     * manage boxes/orders for this venue. The user account remains active. If this
+     * was the user's only merchant relationship, the server auto-strips the merchant
+     * role from the user.
+     *
+     * Path takes the merchant relation id (the venue-merchant `_id`), not the user id.
+     */
+    suspend fun removeVenueMerchant(
+        merchantId: String
+    ): NetworkResult<Unit> {
+        return safeApiCallUnit {
+            httpClient.delete("v1/venues/merchants/$merchantId")
         }
     }
 

@@ -192,6 +192,18 @@
     <string name="reserve_info_reserve_number">Rezerv nömrəsi</string>
     <string name="reserve_info_date">Tarix</string>
     <string name="reserve_info_show_location">Yerini göstər</string>
+    <string name="reserve_info_status_picked_up">Götürüldü</string>
+    <string name="reserve_info_leave_review">Rəy bildir</string>
+    <string name="reserve_info_contact_support">Dəstəklə əlaqə</string>
+
+    <!-- Leave Review Bottom Sheet -->
+    <string name="leave_review_title">Yeməkdən razı qaldınız?</string>
+    <string name="leave_review_subtitle">%1$s haqqında ümumi təcrübənizdən nə qədər razı olduğunuzu bizə bildirin</string>
+    <string name="leave_review_input_placeholder">Məkan haqqında rəy yazın</string>
+    <string name="leave_review_submit">Göndər</string>
+
+    <!-- Contact Support Bottom Sheet -->
+    <string name="contact_support_title">Dəstəklə əlaqə</string>
 
     <!-- Filter Bottom Sheet -->
     <string name="filter_title">Filtrlər</string>
@@ -252,6 +264,8 @@
     <string name="merch_more_dark_mode">Qaranlıq rejim</string>
     <string name="more_switch_to_merchant">Satıcı rejiminə keç</string>
     <string name="more_switch_to_client">Müştəri rejiminə keç</string>
+    <string name="more_switch_from_merchant">Satıcı rejimindən müştəri rejiminə keç</string>
+    <string name="more_switch_from_partner">Tərəfdaş rejimindən müştəri rejiminə keç</string>
 
     <!-- Merchant Orders Screen -->
     <string name="merch_orders_bought">Alınmış</string>
@@ -313,6 +327,8 @@
     <string name="places_edit_merch_details">Mağaza detallarını redaktə et</string>
     <string name="places_edit_venue">Məkanı redaktə et</string>
     <string name="places_edit_users">İstifadəçiləri redaktə et</string>
+    <string name="places_preview">Önizləmə</string>
+    <string name="places_default_branch_tag">Əsas filial</string>
 
     <!-- Edit Merchant Profile Screen -->
     <string name="edit_profile_make_me_merchant">Məni bu məkanın merchantı et</string>
@@ -360,6 +376,7 @@
     <string name="add_user_delete">İstifadəçini sil</string>
     <string name="add_user_save">Dəyişiklikləri saxla</string>
     <string name="add_user_saved">İstifadəçi uğurla əlavə edildi</string>
+    <string name="add_user_deleted">İstifadəçi uğurla silindi</string>
 
     <!-- Select Location Screen -->
     <string name="select_location_title">Xəritədə ünvan seç</string>

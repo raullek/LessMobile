@@ -103,6 +103,12 @@ class VenuesRepositoryImpl(
         )
     }
 
+    override suspend fun removeVenueMerchant(
+        merchantId: String
+    ): NetworkResult<Unit> {
+        return venuesDataSource.removeVenueMerchant(merchantId)
+    }
+
     override suspend fun createBox(request: CreateBoxRequest): NetworkResult<CreateBoxResponseDto> {
         return venuesDataSource.createBox(request)
     }

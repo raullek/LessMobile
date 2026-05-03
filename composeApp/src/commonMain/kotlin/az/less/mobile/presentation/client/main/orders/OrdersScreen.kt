@@ -44,7 +44,11 @@ import az.less.mobile.presentation.client.main.orders.components.OrdersEmptyStat
 import az.less.mobile.presentation.client.main.orders.components.OrdersNotLoggedInState
 import az.less.mobile.presentation.client.main.orders.components.OrdersScreenShimmer
 import az.less.mobile.presentation.client.main.orders.models.Order
+import az.less.mobile.presentation.client.reserve.ContactSupportBottomSheet
+import az.less.mobile.presentation.client.reserve.LeaveReviewBottomSheet
+import az.less.mobile.presentation.client.reserve.PreviousOrderInfoBottomSheet
 import az.less.mobile.presentation.client.reserve.ReserveInfoBottomSheet
+import az.less.mobile.presentation.client.reserve.models.PreviousOrderInfo
 import az.less.mobile.presentation.client.reserve.models.ReserveInfo
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
@@ -71,30 +75,60 @@ fun OrdersScreen(
     val activeOrders = viewModel.activeOrders.collectAsLazyPagingItems()
     val previousOrders = viewModel.previousOrders.collectAsLazyPagingItems()
 
-    // Reserve info bottom sheet state
+    // Active-order ("Show me location") sheet state.
     var isReserveInfoVisible by remember { mutableStateOf(false) }
     var selectedReserveInfo by remember { mutableStateOf<ReserveInfo?>(null) }
     val reserveInfoSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+    // Previous-order ("Leave review" / "Contact with support") sheet state —
+    // separate sheet because the actions are unrelated to the active flow.
+    var isPreviousOrderInfoVisible by remember { mutableStateOf(false) }
+    var selectedPreviousOrderInfo by remember { mutableStateOf<PreviousOrderInfo?>(null) }
+    val previousOrderSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    // Leave-review sheet state — opened from the previous-order sheet.
+    var isLeaveReviewVisible by remember { mutableStateOf(false) }
+    var leaveReviewVenueName by remember { mutableStateOf("") }
+    val leaveReviewSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    // Contact-support sheet state — same DsListBottomSheet pattern as the
+    // More-screen "Contact us" sheet; opened from the previous-order sheet.
+    var isContactSupportVisible by remember { mutableStateOf(false) }
 
     // Collect side effects
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is OrdersSideEffect.ShowReserveInfo -> {
                 val order = sideEffect.order
-                selectedReserveInfo = ReserveInfo(
-                    venueName = order.title,
-                    pickupTime = order.pickupTimeFormatted,
-                    reserveNumber = order.reserveNumber,
-                    date = order.date,
-                    pricePerPiece = order.pricePerPiece,
-                    serviceFee = order.serviceFee,
-                    subtotal = order.subtotalAmount
-                )
-                isReserveInfoVisible = true
-                scope.launch {
-                    reserveInfoSheetState.expand()
+                if (order.isCompleted) {
+                    selectedPreviousOrderInfo = PreviousOrderInfo(
+                        boxTitle = order.title,
+                        pickedUpOn = order.completedDate ?: order.pickupTimeFormatted,
+                        reserveNumber = order.reserveNumber,
+                        date = order.date,
+                        pricePerPiece = order.pricePerPiece,
+                        serviceFee = order.serviceFee,
+                        subtotal = order.subtotalAmount,
+                        orderId = order.id
+                    )
+                    isPreviousOrderInfoVisible = true
+                    scope.launch { previousOrderSheetState.expand() }
+                } else {
+                    selectedReserveInfo = ReserveInfo(
+                        venueName = order.title,
+                        pickupTime = order.pickupTimeFormatted,
+                        reserveNumber = order.reserveNumber,
+                        date = order.date,
+                        pricePerPiece = order.pricePerPiece,
+                        serviceFee = order.serviceFee,
+                        subtotal = order.subtotalAmount,
+                        venueId = order.venueId
+                    )
+                    isReserveInfoVisible = true
+                    scope.launch { reserveInfoSheetState.expand() }
                 }
             }
             is OrdersSideEffect.NavigateToCheckout -> {
@@ -123,21 +157,94 @@ fun OrdersScreen(
         onIntent = viewModel::onIntent
     )
 
-    // Reserve Info Bottom Sheet
+    // Active-order info sheet — single "Show me location" CTA.
     selectedReserveInfo?.let { reserveInfo ->
         ReserveInfoBottomSheet(
             isVisible = isReserveInfoVisible,
             sheetState = reserveInfoSheetState,
             reserveInfo = reserveInfo,
             onShowLocationClicked = {
-                // TODO: Navigate to map/location
+                if (reserveInfo.venueId.isNotBlank()) {
+                    scope.launch { reserveInfoSheetState.hide() }
+                        .invokeOnCompletion {
+                            isReserveInfoVisible = false
+                            navController.navigate(
+                                ClientRoute.VenueMap(venueId = reserveInfo.venueId)
+                            )
+                        }
+                }
             },
             onDismiss = {
-                scope.launch {
-                    reserveInfoSheetState.hide()
-                }.invokeOnCompletion {
-                    isReserveInfoVisible = false
-                }
+                scope.launch { reserveInfoSheetState.hide() }
+                    .invokeOnCompletion { isReserveInfoVisible = false }
+            }
+        )
+    }
+
+    // Previous-order info sheet — "Leave review" / "Contact with support".
+    selectedPreviousOrderInfo?.let { info ->
+        PreviousOrderInfoBottomSheet(
+            isVisible = isPreviousOrderInfoVisible,
+            sheetState = previousOrderSheetState,
+            info = info,
+            onLeaveReviewClicked = {
+                // Hand off to the leave-review sheet: hide the current one
+                // first so the user sees a clean transition rather than
+                // two stacked sheets, then open the review sheet for the
+                // same venue.
+                val venueName = info.boxTitle
+                scope.launch { previousOrderSheetState.hide() }
+                    .invokeOnCompletion {
+                        isPreviousOrderInfoVisible = false
+                        leaveReviewVenueName = venueName
+                        isLeaveReviewVisible = true
+                        scope.launch { leaveReviewSheetState.expand() }
+                    }
+            },
+            onContactSupportClicked = {
+                // Same hand-off pattern as the leave-review path: hide the
+                // previous-order sheet first, then open the support sheet.
+                scope.launch { previousOrderSheetState.hide() }
+                    .invokeOnCompletion {
+                        isPreviousOrderInfoVisible = false
+                        isContactSupportVisible = true
+                    }
+            },
+            onDismiss = {
+                scope.launch { previousOrderSheetState.hide() }
+                    .invokeOnCompletion { isPreviousOrderInfoVisible = false }
+            }
+        )
+    }
+
+    // Contact-support sheet — list of social channels (Instagram, TikTok,
+    // Facebook, Telegram, WhatsApp). Reuses [DsListBottomSheet], the same
+    // primitive the More screen's "Contact us" sheet is built on, so the
+    // row layout / icons stay consistent across the app.
+    ContactSupportBottomSheet(
+        isVisible = isContactSupportVisible,
+        onChannelClick = { _ ->
+            // TODO: launch the channel's URL once support links are wired.
+            isContactSupportVisible = false
+        },
+        onDismiss = { isContactSupportVisible = false }
+    )
+
+    // Leave-review sheet — owns its own rating + comment local state.
+    if (isLeaveReviewVisible) {
+        LeaveReviewBottomSheet(
+            isVisible = true,
+            sheetState = leaveReviewSheetState,
+            venueName = leaveReviewVenueName,
+            onSubmit = { _, _ ->
+                // TODO: post the review to the backend via a viewmodel intent
+                // once the endpoint is wired. For now just dismiss the sheet.
+                scope.launch { leaveReviewSheetState.hide() }
+                    .invokeOnCompletion { isLeaveReviewVisible = false }
+            },
+            onDismiss = {
+                scope.launch { leaveReviewSheetState.hide() }
+                    .invokeOnCompletion { isLeaveReviewVisible = false }
             }
         )
     }

@@ -192,6 +192,18 @@
     <string name="reserve_info_reserve_number">Номер брони</string>
     <string name="reserve_info_date">Дата</string>
     <string name="reserve_info_show_location">Показать местоположение</string>
+    <string name="reserve_info_status_picked_up">Получен</string>
+    <string name="reserve_info_leave_review">Оставить отзыв</string>
+    <string name="reserve_info_contact_support">Связаться с поддержкой</string>
+
+    <!-- Leave Review Bottom Sheet -->
+    <string name="leave_review_title">Понравилось блюдо?</string>
+    <string name="leave_review_subtitle">Расскажите, насколько вы довольны общим впечатлением о %1$s</string>
+    <string name="leave_review_input_placeholder">Напишите отзыв о месте</string>
+    <string name="leave_review_submit">Отправить</string>
+
+    <!-- Contact Support Bottom Sheet -->
+    <string name="contact_support_title">Связаться с поддержкой</string>
 
     <!-- Filter Bottom Sheet -->
     <string name="filter_title">Фильтры</string>
@@ -252,6 +264,8 @@
     <string name="merch_more_dark_mode">Тёмная тема</string>
     <string name="more_switch_to_merchant">Перейти в режим продавца</string>
     <string name="more_switch_to_client">Перейти в режим клиента</string>
+    <string name="more_switch_from_merchant">Перейти из режима продавца в режим клиента</string>
+    <string name="more_switch_from_partner">Перейти из режима партнёра в режим клиента</string>
 
     <!-- Merchant Orders Screen -->
     <string name="merch_orders_bought">Купленные</string>
@@ -313,6 +327,8 @@
     <string name="places_edit_merch_details">Редактировать данные</string>
     <string name="places_edit_venue">Редактировать заведение</string>
     <string name="places_edit_users">Редактировать пользователей</string>
+    <string name="places_preview">Предпросмотр</string>
+    <string name="places_default_branch_tag">Основная точка</string>
 
     <!-- Edit Merchant Profile Screen -->
     <string name="edit_profile_make_me_merchant">Сделать меня мерчантом этого заведения</string>
@@ -360,6 +376,7 @@
     <string name="add_user_delete">Удалить пользователя</string>
     <string name="add_user_save">Сохранить изменения</string>
     <string name="add_user_saved">Пользователь успешно добавлен</string>
+    <string name="add_user_deleted">Пользователь успешно удалён</string>
 
     <!-- Select Location Screen -->
     <string name="select_location_title">Выберите адрес на карте</string>

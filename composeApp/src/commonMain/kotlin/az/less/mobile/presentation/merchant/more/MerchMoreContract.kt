@@ -13,8 +13,9 @@ data class MerchMoreState(
     val venueLogoUrl: String? = null,
     val rating: String = "0.0",
     val reviewCount: String = "0",
-    val isPartner: Boolean = false,
+    val canManageBranches: Boolean = false,
     val canSwitchMode: Boolean = false,
+    val isAlsoPartner: Boolean = false,
     // Settings
     val notificationEnabled: Boolean = true,
     val darkModeEnabled: Boolean = false,

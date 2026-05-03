@@ -3,8 +3,14 @@ package az.less.mobile.presentation.partner.places.edit.branchusers.addbranchuse
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import az.less.mobile.data.remote.model.mapper.toUser
+import az.less.mobile.domain.model.auth.AppMode
+import az.less.mobile.domain.repository.AccountRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.domain.repository.VenuesRepository
+import az.less.mobile.presentation.common.phone.PhoneCountry
 import az.less.mobile.presentation.partner.places.edit.branchusers.BranchUser
+import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -16,7 +22,9 @@ import org.orbitmvi.orbit.container
  */
 class AddBranchUserViewModel(
     savedStateHandle: SavedStateHandle,
-    private val venuesRepository: VenuesRepository
+    private val venuesRepository: VenuesRepository,
+    private val accountRepository: AccountRepository,
+    private val sessionLocalRepository: SessionLocalRepository
 ) : ViewModel(), ContainerHost<AddBranchUserState, AddBranchUserSideEffect> {
 
     private val venueId: String = savedStateHandle.get<String>("venueId") ?: ""
@@ -28,22 +36,39 @@ class AddBranchUserViewModel(
 
     override val container: Container<AddBranchUserState, AddBranchUserSideEffect> =
         viewModelScope.container(
-            AddBranchUserState(
-                venueId = venueId,
-                venueName = venueName,
-                userId = user?.id,
-                userNumber = userNumber,
-                name = user?.name ?: "",
-                phoneNumber = user?.phoneNumber?.removePrefix("+994") ?: "",
-                email = user?.email ?: ""
-            )
-        )
+            run {
+                val (country, local) = PhoneCountry.parse(user?.phoneNumber.orEmpty())
+                AddBranchUserState(
+                    venueId = venueId,
+                    venueName = venueName,
+                    userId = user?.id,
+                    merchantId = user?.merchantId,
+                    userNumber = userNumber,
+                    name = user?.name ?: "",
+                    phoneNumber = local,
+                    phoneCountry = country,
+                    email = user?.email ?: ""
+                )
+            }
+        ) {
+            // Detect whether the user being edited is the cached current user AND
+            // whether they are currently a merchant of THIS venue. Only then does
+            // a self-delete trigger the role-replace flow.
+            val cached = sessionLocalRepository.currentUser.first()
+            val isSelfMerchant = cached != null
+                    && user?.id != null
+                    && cached.id == user.id
+                    && cached.isMerchant
+                    && cached.venue?.id == venueId
+            reduce { state.copy(isSelfMerchant = isSelfMerchant) }
+        }
 
     fun onIntent(intent: AddBranchUserIntent) {
         when (intent) {
             is AddBranchUserIntent.OnBackClick -> onBackClick()
             is AddBranchUserIntent.OnNameChange -> onNameChange(intent.name)
             is AddBranchUserIntent.OnPhoneNumberChange -> onPhoneNumberChange(intent.phoneNumber)
+            is AddBranchUserIntent.OnPhoneCountryChange -> onPhoneCountryChange(intent.country)
             is AddBranchUserIntent.OnEmailChange -> onEmailChange(intent.email)
             is AddBranchUserIntent.OnSaveClick -> onSaveClick()
             is AddBranchUserIntent.OnDeleteClick -> onDeleteClick()
@@ -72,6 +97,15 @@ class AddBranchUserViewModel(
         }
     }
 
+    private fun onPhoneCountryChange(country: PhoneCountry) = intent {
+        reduce {
+            state.copy(
+                phoneCountry = country,
+                phoneError = null
+            )
+        }
+    }
+
     private fun onEmailChange(email: String) = intent {
         reduce {
             state.copy(
@@ -88,9 +122,8 @@ class AddBranchUserViewModel(
     }
 
     private fun onSaveClick() = intent {
-        // Validate all fields
         val nameError = if (state.name.isBlank()) "Name is required" else null
-        val phoneError = if (state.phoneNumber.length < 9) "Invalid phone number" else null
+        val phoneError = if (state.phoneNumber.length != state.phoneCountry.localDigits) "Invalid phone number" else null
         val emailError = validateEmail(state.email) ?: if (state.email.isBlank()) "Email is required" else null
 
         if (nameError != null || phoneError != null || emailError != null) {
@@ -106,11 +139,7 @@ class AddBranchUserViewModel(
 
         reduce { state.copy(isLoading = true) }
 
-        val phone = if (state.phoneNumber.startsWith("+")) {
-            state.phoneNumber
-        } else {
-            "+994${state.phoneNumber}"
-        }
+        val phone = "+${state.phoneCountry.dialCode}${state.phoneNumber}"
 
         venuesRepository.addVenueMerchant(
             venueId = state.venueId,
@@ -120,8 +149,26 @@ class AddBranchUserViewModel(
             phone = phone
         )
             .onSuccess {
-                reduce { state.copy(isLoading = false) }
-                postSideEffect(AddBranchUserSideEffect.UserSaved)
+                // The added email may belong to the cached current user (partner adds
+                // themselves as a merchant of this venue). Refetch the profile and,
+                // if the merchant role just appeared, switch the nav root.
+                val before = sessionLocalRepository.currentUser.first()
+                val wasMerchantBefore = before?.isMerchant == true
+                var becameMerchant = false
+                accountRepository.getProfile()
+                    .onSuccess { profile ->
+                        val refreshed = profile.toUser()
+                        sessionLocalRepository.updateUser(refreshed)
+                        becameMerchant = !wasMerchantBefore && refreshed.isMerchant
+                    }
+                if (becameMerchant) {
+                    sessionLocalRepository.saveLastUsedMode(AppMode.MERCHANT)
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(AddBranchUserSideEffect.UserSavedSwitchToMerchant)
+                } else {
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(AddBranchUserSideEffect.UserSaved)
+                }
             }
             .onError { error ->
                 reduce { state.copy(isLoading = false) }
@@ -130,12 +177,31 @@ class AddBranchUserViewModel(
     }
 
     private fun onDeleteClick() = intent {
-        if (state.userId == null) return@intent
+        val merchantId = state.merchantId ?: return@intent
 
         reduce { state.copy(isLoading = true) }
 
-        // TODO: Delete user via repository
-        reduce { state.copy(isLoading = false) }
-        postSideEffect(AddBranchUserSideEffect.UserDeleted)
+        venuesRepository.removeVenueMerchant(merchantId)
+            .onSuccess {
+                if (state.isSelfMerchant) {
+                    // Server may have auto-stripped the merchant role. Refetch the
+                    // profile to find out, persist locally, then ask the screen to
+                    // swap the navigation root back to partner.
+                    accountRepository.getProfile()
+                        .onSuccess { profile ->
+                            sessionLocalRepository.updateUser(profile.toUser())
+                        }
+                    sessionLocalRepository.saveLastUsedMode(AppMode.PARTNER)
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(AddBranchUserSideEffect.SelfDeletedSwitchToPartner)
+                } else {
+                    reduce { state.copy(isLoading = false) }
+                    postSideEffect(AddBranchUserSideEffect.UserDeleted)
+                }
+            }
+            .onError { error ->
+                reduce { state.copy(isLoading = false) }
+                postSideEffect(AddBranchUserSideEffect.ShowError(error.message))
+            }
     }
 }

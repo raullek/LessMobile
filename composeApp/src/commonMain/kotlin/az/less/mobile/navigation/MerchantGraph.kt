@@ -20,6 +20,7 @@ import az.less.mobile.presentation.merchant.places.edit.branchusers.BranchUsersS
 import az.less.mobile.presentation.merchant.places.edit.branchusers.addbranchuser.AddBranchUserScreen
 import az.less.mobile.presentation.merchant.places.edit.selectlocation.InputAddressScreen
 import az.less.mobile.presentation.merchant.places.edit.selectlocation.SelectBranchLocationOnMapScreen
+import az.less.mobile.presentation.partner.preview.VenuePreviewScreen
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
@@ -75,6 +76,9 @@ sealed interface MerchantRoute {
 
     @Serializable
     data object InputAddress : MerchantRoute
+
+    @Serializable
+    data class VenuePreview(val venueId: String) : MerchantRoute
 }
 
 /**
@@ -132,7 +136,10 @@ fun NavGraphBuilder.merchantGraph(
                 navController.navigate(MerchantRoute.BranchUsers())
             },
             onHomeClicked = {
-                navController.popBackStack<MerchantRoute.More>(inclusive = false)
+                navController.navigate(MerchantRoute.More) {
+                    popUpTo<MerchantRoute.Orders> { inclusive = true }
+                    launchSingleTop = true
+                }
             }
         )
     }
@@ -147,7 +154,7 @@ fun NavGraphBuilder.merchantGraph(
     }
 
     composable<MerchantRoute.AddBranchUser> {
-        AddBranchUserScreen(navController = navController)
+        AddBranchUserScreen(navController = navController, rootNavController = rootNavController)
     }
 
     // Location selection flow screens
@@ -163,6 +170,14 @@ fun NavGraphBuilder.merchantGraph(
 
     composable<MerchantRoute.InputAddress> {
         InputAddressScreen(navController = navController)
+    }
+
+    composable<MerchantRoute.VenuePreview> { backStackEntry ->
+        val args = backStackEntry.toRoute<MerchantRoute.VenuePreview>()
+        VenuePreviewScreen(
+            venueId = args.venueId,
+            navController = navController
+        )
     }
 }
 

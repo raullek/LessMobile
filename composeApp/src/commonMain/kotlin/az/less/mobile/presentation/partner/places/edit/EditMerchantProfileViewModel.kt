@@ -3,8 +3,13 @@ package az.less.mobile.presentation.partner.places.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import az.less.designsystem.components.ToastType
+import az.less.mobile.data.remote.model.mapper.toUser
+import az.less.mobile.domain.model.auth.AppMode
+import az.less.mobile.domain.repository.AccountRepository
+import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.domain.repository.VenuesRepository
 import az.less.mobile.presentation.partner.places.model.BranchItem
+import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.container
@@ -13,11 +18,17 @@ import org.orbitmvi.orbit.container
  * ViewModel for Edit Merchant Profile Screen using Orbit MVI
  */
 class EditMerchantProfileViewModel(
-    private val venuesRepository: VenuesRepository
+    private val venuesRepository: VenuesRepository,
+    private val accountRepository: AccountRepository,
+    private val sessionLocalRepository: SessionLocalRepository
 ) : ViewModel(), ContainerHost<EditMerchantProfileState, EditMerchantProfileSideEffect> {
 
     override val container: Container<EditMerchantProfileState, EditMerchantProfileSideEffect> =
-        viewModelScope.container(EditMerchantProfileState())
+        viewModelScope.container(EditMerchantProfileState()) {
+            // Hide "make me merchant" toggle when partner already has a default venue.
+            val cachedUser = sessionLocalRepository.currentUser.first()
+            reduce { state.copy(hasAttachedVenue = cachedUser?.venue != null) }
+        }
 
     fun initialize(venueData: String?) = intent {
         if (venueData != null) {
@@ -204,12 +215,26 @@ class EditMerchantProfileViewModel(
                 lotImage = state.lotsImageBytes
             )
                 .onSuccess { venue ->
+                    val wasMerchantBefore = sessionLocalRepository.currentUser.first()?.isMerchant == true
+                    var becameMerchant = false
+                    if (state.makeMeMerchant && !wasMerchantBefore) {
+                        accountRepository.getProfile()
+                            .onSuccess { profile ->
+                                val refreshed = profile.toUser()
+                                sessionLocalRepository.updateUser(refreshed)
+                                becameMerchant = refreshed.isMerchant
+                            }
+                        if (becameMerchant) {
+                            sessionLocalRepository.saveLastUsedMode(AppMode.MERCHANT)
+                        }
+                    }
                     reduce { state.copy(isLoading = false) }
                     postSideEffect(EditMerchantProfileSideEffect.ShowToast(SUCCESS_VENUE_CREATED, ToastType.Success))
                     postSideEffect(
                         EditMerchantProfileSideEffect.BranchCreated(
                             venueId = venue.id,
-                            venueName = venue.name
+                            venueName = venue.name,
+                            becameMerchant = becameMerchant
                         )
                     )
                 }

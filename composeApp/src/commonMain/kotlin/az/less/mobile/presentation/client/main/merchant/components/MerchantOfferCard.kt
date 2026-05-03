@@ -49,7 +49,7 @@ fun MerchantOfferCard(
     merchantLogoUrl: String?,
     rating: Float,
     distance: String,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -63,7 +63,7 @@ fun MerchantOfferCard(
             )
             .clip(RoundedCornerShape(LessTheme.radius.medium))
             .background(LessTheme.colors.backgroundPrimary)
-            .clickable { onClick() }
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
     ) {
         // Image section with badge and logo
         Box(

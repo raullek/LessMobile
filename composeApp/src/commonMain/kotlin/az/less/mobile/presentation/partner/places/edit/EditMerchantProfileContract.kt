@@ -23,6 +23,10 @@ data class EditMerchantProfileState(
     val email: String? = null,
     val rating: Float = 0f,
     val makeMeMerchant: Boolean = false,
+    /** True if the cached current user already has an attached venue (`User.venue != null`).
+     *  Used to hide the "make me merchant for this venue" toggle when the partner already
+     *  has a default venue. */
+    val hasAttachedVenue: Boolean = false,
     val isLoading: Boolean = false,
     // Edit Merch Details Bottom Sheet state
     val isEditMerchDetailsBottomSheetVisible: Boolean = false,
@@ -66,6 +70,7 @@ data class EditMerchantProfileState(
         if (email != other.email) return false
         if (rating != other.rating) return false
         if (makeMeMerchant != other.makeMeMerchant) return false
+        if (hasAttachedVenue != other.hasAttachedVenue) return false
         if (isLoading != other.isLoading) return false
         if (isEditMerchDetailsBottomSheetVisible != other.isEditMerchDetailsBottomSheetVisible) return false
         if (isEditPhoneNumberBottomSheetVisible != other.isEditPhoneNumberBottomSheetVisible) return false
@@ -94,6 +99,7 @@ data class EditMerchantProfileState(
         result = 31 * result + (email?.hashCode() ?: 0)
         result = 31 * result + rating.hashCode()
         result = 31 * result + makeMeMerchant.hashCode()
+        result = 31 * result + hasAttachedVenue.hashCode()
         result = 31 * result + isLoading.hashCode()
         result = 31 * result + isEditMerchDetailsBottomSheetVisible.hashCode()
         result = 31 * result + isEditPhoneNumberBottomSheetVisible.hashCode()
@@ -113,7 +119,16 @@ sealed interface EditMerchantProfileSideEffect {
     data object NavigateToLogoPicker : EditMerchantProfileSideEffect
     data object NavigateToLotsPicker : EditMerchantProfileSideEffect
     data class NavigateToLocationPicker(val latitude: Double?, val longitude: Double?, val address: String?) : EditMerchantProfileSideEffect
-    data class BranchCreated(val venueId: String, val venueName: String) : EditMerchantProfileSideEffect
+    /**
+     * @param becameMerchant true if the user just gained the merchant role from this
+     * venue creation (makeMeMerchant=true and the profile refetch confirmed the role
+     * is now present). The screen uses this to switch the navigation root to merchant.
+     */
+    data class BranchCreated(
+        val venueId: String,
+        val venueName: String,
+        val becameMerchant: Boolean
+    ) : EditMerchantProfileSideEffect
     data object BranchUpdated : EditMerchantProfileSideEffect
     data class ShowToast(val message: String, val type: ToastType) : EditMerchantProfileSideEffect
 }
