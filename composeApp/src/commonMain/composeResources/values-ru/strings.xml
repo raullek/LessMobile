@@ -201,6 +201,7 @@
     <string name="leave_review_subtitle">Расскажите, насколько вы довольны общим впечатлением о %1$s</string>
     <string name="leave_review_input_placeholder">Напишите отзыв о месте</string>
     <string name="leave_review_submit">Отправить</string>
+    <string name="leave_review_success_toast">Ваш отзыв отправлен</string>
 
     <!-- Contact Support Bottom Sheet -->
     <string name="contact_support_title">Связаться с поддержкой</string>

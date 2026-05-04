@@ -58,6 +58,8 @@ import az.less.designsystem.components.DsTextField
 import az.less.designsystem.components.TextFieldColors
 import az.less.designsystem.components.DsToolBar
 import az.less.mobile.presentation.client.account.account.components.AccountScreenShimmer
+import az.less.mobile.presentation.common.phone.sanitizePhoneInput
+import io.github.skeptick.inputmask.compose.phone.rememberPhoneInputMaskVisualTransformation
 import kotlinx.coroutines.delay
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.account_title
@@ -127,6 +129,7 @@ private fun AccountScreenContent(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
+    val phoneVisualTransformation = rememberPhoneInputMaskVisualTransformation(state.phoneCountry.mask)
 
     LaunchedEffect(state.showGenderBottomSheet) {
         if (state.showGenderBottomSheet) {
@@ -282,16 +285,19 @@ private fun AccountScreenContent(
                     DsTextField(
                         value = state.phoneNumber,
                         onValueChange = { newValue ->
-                            // Allow only digits, +, spaces, dashes, parentheses
-                            val filtered = newValue.filter { it.isDigit() || it in "+- ()" }
-                            onIntent(AccountIntent.OnPhoneChanged(filtered))
+                            val result = sanitizePhoneInput(newValue, state.phoneCountry)
+                            if (result.country != state.phoneCountry) {
+                                onIntent(AccountIntent.OnPhoneCountryChanged(result.country))
+                            }
+                            onIntent(AccountIntent.OnPhoneChanged(result.localDigits))
                         },
                         onEndIconClick = { onIntent(AccountIntent.OnPhoneChanged("")) },
                         placeholder = stringResource(Res.string.account_phone_placeholder),
                         isError = state.phoneNumberError != null,
                         errorMessage = state.phoneNumberError,
                         modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        visualTransformation = phoneVisualTransformation
                     )
 
                     Spacer(modifier = Modifier.height(LessTheme.spacing.small))

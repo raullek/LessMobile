@@ -13,4 +13,11 @@ interface MerchantRepository {
         latitude: Double? = null,
         longitude: Double? = null
     ): NetworkResult<MerchantProfile>
+
+    suspend fun createReview(
+        venueId: String,
+        orderId: String,
+        rating: Int,
+        comment: String
+    ): NetworkResult<Unit>
 }

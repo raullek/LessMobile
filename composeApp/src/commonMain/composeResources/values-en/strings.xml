@@ -201,6 +201,7 @@
     <string name="leave_review_subtitle">Tell us how satisfied you are with your overall experience about %1$s</string>
     <string name="leave_review_input_placeholder">Type some review about the venue</string>
     <string name="leave_review_submit">Submit</string>
+    <string name="leave_review_success_toast">Your review has been submitted</string>
 
     <!-- Contact Support Bottom Sheet -->
     <string name="contact_support_title">Contact with support</string>

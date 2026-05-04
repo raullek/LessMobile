@@ -201,6 +201,7 @@
     <string name="leave_review_subtitle">%1$s haqqında ümumi təcrübənizdən nə qədər razı olduğunuzu bizə bildirin</string>
     <string name="leave_review_input_placeholder">Məkan haqqında rəy yazın</string>
     <string name="leave_review_submit">Göndər</string>
+    <string name="leave_review_success_toast">Rəyiniz göndərildi</string>
 
     <!-- Contact Support Bottom Sheet -->
     <string name="contact_support_title">Dəstəklə əlaqə</string>

@@ -15,17 +15,22 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,9 +41,9 @@ import az.less.designsystem.base.LessTheme
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
+import az.less.mobile.presentation.client.main.merchant.components.CollapsingMerchantToolbar
 import az.less.mobile.presentation.client.main.merchant.components.MerchantOfferCard
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileContactSection
-import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileHeroSection
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileInfoSection
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileShimmer
 import az.less.mobile.presentation.client.main.merchant.components.MerchantProfileTabsSection
@@ -137,6 +142,7 @@ fun MerchantProfileScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MerchantProfileScreenContent(
     state: MerchantProfileState,
@@ -156,21 +162,36 @@ fun MerchantProfileScreenContent(
             modifier = modifier
         )
     } else {
-        LazyColumn(
+        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+            state = rememberTopAppBarState()
+        )
+        val lazyListState = rememberLazyListState()
+        Scaffold(
             modifier = modifier
                 .fillMaxSize()
-                .background(LessTheme.colors.backgroundSecond)
-        ) {
-            item(key = "hero_section") {
-                MerchantProfileHeroSection(
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                CollapsingMerchantToolbar(
+                    title = state.merchantName,
                     heroImageUrl = state.heroImageUrl,
                     merchantLogoUrl = state.merchantLogoUrl,
                     isFavorite = state.isFavorite,
+                    showFavorite = true,
                     onBackClick = { onIntent(MerchantProfileIntent.OnBackClicked) },
-                    onFavoriteClick = { onIntent(MerchantProfileIntent.OnFavoriteClicked) }
+                    onFavoriteClick = { onIntent(MerchantProfileIntent.OnFavoriteClicked) },
+                    scrollBehavior = scrollBehavior,
+                    lazyListState = lazyListState
                 )
-            }
-
+            },
+            containerColor = LessTheme.colors.backgroundSecond
+        ) { innerPadding ->
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(LessTheme.colors.backgroundSecond)
+        ) {
             item(key = "merchant_info") {
                 MerchantProfileInfoSection(
                     merchantName = state.merchantName,
@@ -286,6 +307,7 @@ fun MerchantProfileScreenContent(
             item(key = "bottom_spacing") {
                 Spacer(modifier = Modifier.height(LessTheme.spacing.xLarge))
             }
+        }
         }
     }
 }

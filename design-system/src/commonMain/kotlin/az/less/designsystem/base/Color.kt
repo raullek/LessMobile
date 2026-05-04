@@ -134,7 +134,7 @@ object DarkColors {
     val BackgroundSecond = Color(0xFF171A1C)
     val BackgroundBrand = Color(0xFF15260D)
     val ElementsPrimaryElement = Color(0xFF1F2522)
-    val ElementsSecondaryElement = Color(0xFF1F2522)
+    val ElementsSecondaryElement = Color(0xFF343B37)
     val ElementsPrimaryBrand = Color(0xFF46A566)
     val ElementsSecondaryBrand = Color(0xFF1F5027)
     val ElementPressedPrimaryBrand = Color(0xFF94E08A)

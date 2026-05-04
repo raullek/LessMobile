@@ -125,7 +125,7 @@ fun ExploreVenueCard(
                     .align(Alignment.TopEnd)
                     .size(LessTheme.size.large)
                     .clip(RoundedCornerShape(LessTheme.radius.small))
-                    .background(Color.White),
+                    .background(LessTheme.colors.backgroundPrimary),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(

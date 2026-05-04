@@ -17,6 +17,14 @@ import lessmobile.design_system.generated.resources.ic_back_24dp
 import org.jetbrains.compose.resources.painterResource
 
 /**
+ * Returns the design-system back arrow painter so consumers outside the design-system
+ * module (whose own generated `Res` namespace is module-local) can render the same
+ * back icon `DsToolBar` uses, without duplicating the asset.
+ */
+@Composable
+fun rememberDsBackIconPainter(): Painter = painterResource(Res.drawable.ic_back_24dp)
+
+/**
  * Design system Top Bar component.
  * Reusable toolbar for all screens:
  * - Back button (optional)

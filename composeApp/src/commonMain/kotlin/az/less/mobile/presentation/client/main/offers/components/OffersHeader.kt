@@ -78,7 +78,7 @@ fun OffersHeader(
             modifier = Modifier
                 .size(LessTheme.size.xLarge + LessTheme.spacing.xxSmall)
                 .clip(RoundedCornerShape(LessTheme.radius.medium))
-                .background(LessTheme.colors.textIconsNested)
+                .background(LessTheme.colors.elementsPrimaryElement)
                 .clickable { onMessageClick() },
             contentAlignment = Alignment.Center
         ) {

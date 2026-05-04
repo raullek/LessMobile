@@ -21,6 +21,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,8 +37,10 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import az.less.designsystem.base.LessTheme
+import az.less.designsystem.components.AnimatedToast
 import az.less.designsystem.components.SegmentOption
 import az.less.designsystem.components.SegmentedButton
+import az.less.designsystem.components.ToastType
 import az.less.mobile.navigation.ClientRoute
 import az.less.mobile.presentation.client.main.orders.components.OrderItem
 import az.less.mobile.presentation.client.main.orders.components.OrdersEmptyState
@@ -50,8 +53,10 @@ import az.less.mobile.presentation.client.reserve.PreviousOrderInfoBottomSheet
 import az.less.mobile.presentation.client.reserve.ReserveInfoBottomSheet
 import az.less.mobile.presentation.client.reserve.models.PreviousOrderInfo
 import az.less.mobile.presentation.client.reserve.models.ReserveInfo
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.leave_review_success_toast
 import lessmobile.composeapp.generated.resources.orders_title
 import lessmobile.composeapp.generated.resources.orders_tab_active
 import lessmobile.composeapp.generated.resources.orders_tab_previous
@@ -91,12 +96,27 @@ fun OrdersScreen(
     // Leave-review sheet state — opened from the previous-order sheet.
     var isLeaveReviewVisible by remember { mutableStateOf(false) }
     var leaveReviewVenueName by remember { mutableStateOf("") }
+    var leaveReviewVenueId by remember { mutableStateOf("") }
+    var leaveReviewOrderId by remember { mutableStateOf("") }
     val leaveReviewSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
     // Contact-support sheet state — same DsListBottomSheet pattern as the
     // More-screen "Contact us" sheet; opened from the previous-order sheet.
     var isContactSupportVisible by remember { mutableStateOf(false) }
+
+    // Toast state — shown after a successful review submission. Auto-dismisses
+    // after 3s via the LaunchedEffect below.
+    var toastMessage by remember { mutableStateOf<String?>(null) }
+    var toastType by remember { mutableStateOf(ToastType.Success) }
+    val reviewSuccessText = stringResource(Res.string.leave_review_success_toast)
+
+    LaunchedEffect(toastMessage) {
+        if (toastMessage != null) {
+            delay(3000)
+            toastMessage = null
+        }
+    }
 
     // Collect side effects
     viewModel.collectSideEffect { sideEffect ->
@@ -112,7 +132,8 @@ fun OrdersScreen(
                         pricePerPiece = order.pricePerPiece,
                         serviceFee = order.serviceFee,
                         subtotal = order.subtotalAmount,
-                        orderId = order.id
+                        orderId = order.id,
+                        venueId = order.venueId
                     )
                     isPreviousOrderInfoVisible = true
                     scope.launch { previousOrderSheetState.expand() }
@@ -137,25 +158,42 @@ fun OrdersScreen(
             is OrdersSideEffect.NavigateBack -> {
                 navController.popBackStack()
             }
-            is OrdersSideEffect.ShowError -> {
-                // Show error snackbar
-            }
             is OrdersSideEffect.NavigateToOffers -> {
                 navController.navigate(ClientRoute.Offers)
             }
             is OrdersSideEffect.NavigateToMore -> {
                 navController.navigate(ClientRoute.More)
             }
+            is OrdersSideEffect.ReviewSubmitted -> {
+                scope.launch { leaveReviewSheetState.hide() }
+                    .invokeOnCompletion { isLeaveReviewVisible = false }
+                toastType = ToastType.Success
+                toastMessage = reviewSuccessText
+            }
+            is OrdersSideEffect.ShowError -> {
+                toastType = ToastType.Error
+                toastMessage = sideEffect.message
+            }
         }
     }
 
-    // Render the stateless UI
-    OrdersScreenContent(
-        state = state,
-        activeOrders = activeOrders,
-        previousOrders = previousOrders,
-        onIntent = viewModel::onIntent
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Render the stateless UI
+        OrdersScreenContent(
+            state = state,
+            activeOrders = activeOrders,
+            previousOrders = previousOrders,
+            onIntent = viewModel::onIntent
+        )
+
+        AnimatedToast(
+            visible = toastMessage != null,
+            title = toastMessage ?: "",
+            type = toastType,
+            modifier = Modifier.align(Alignment.TopCenter),
+            showGradientScrim = false
+        )
+    }
 
     // Active-order info sheet — single "Show me location" CTA.
     selectedReserveInfo?.let { reserveInfo ->
@@ -193,10 +231,14 @@ fun OrdersScreen(
                 // two stacked sheets, then open the review sheet for the
                 // same venue.
                 val venueName = info.boxTitle
+                val venueId = info.venueId
+                val orderId = info.orderId
                 scope.launch { previousOrderSheetState.hide() }
                     .invokeOnCompletion {
                         isPreviousOrderInfoVisible = false
                         leaveReviewVenueName = venueName
+                        leaveReviewVenueId = venueId
+                        leaveReviewOrderId = orderId
                         isLeaveReviewVisible = true
                         scope.launch { leaveReviewSheetState.expand() }
                     }
@@ -230,24 +272,29 @@ fun OrdersScreen(
         onDismiss = { isContactSupportVisible = false }
     )
 
-    // Leave-review sheet — owns its own rating + comment local state.
-    if (isLeaveReviewVisible) {
-        LeaveReviewBottomSheet(
-            isVisible = true,
-            sheetState = leaveReviewSheetState,
-            venueName = leaveReviewVenueName,
-            onSubmit = { _, _ ->
-                // TODO: post the review to the backend via a viewmodel intent
-                // once the endpoint is wired. For now just dismiss the sheet.
-                scope.launch { leaveReviewSheetState.hide() }
-                    .invokeOnCompletion { isLeaveReviewVisible = false }
-            },
-            onDismiss = {
-                scope.launch { leaveReviewSheetState.hide() }
-                    .invokeOnCompletion { isLeaveReviewVisible = false }
-            }
-        )
-    }
+    // Leave-review sheet — owns its own rating + comment local state. The
+    // submit action delegates to the viewmodel; success dismisses the sheet
+    // via the ReviewSubmitted side effect, errors keep it open.
+    LeaveReviewBottomSheet(
+        isVisible = isLeaveReviewVisible,
+        sheetState = leaveReviewSheetState,
+        venueName = leaveReviewVenueName,
+        isSubmitting = state.isSubmittingReview,
+        onSubmit = { rating, comment ->
+            viewModel.onIntent(
+                OrdersIntent.OnReviewSubmitted(
+                    venueId = leaveReviewVenueId,
+                    orderId = leaveReviewOrderId,
+                    rating = rating,
+                    comment = comment
+                )
+            )
+        },
+        onDismiss = {
+            scope.launch { leaveReviewSheetState.hide() }
+                .invokeOnCompletion { isLeaveReviewVisible = false }
+        }
+    )
 }
 
 /**

@@ -7,7 +7,8 @@ import az.less.mobile.presentation.client.main.orders.models.Order
  */
 data class OrdersState(
     val selectedTab: OrderTab = OrderTab.ACTIVE,
-    val isLoggedIn: Boolean = true
+    val isLoggedIn: Boolean = true,
+    val isSubmittingReview: Boolean = false
 )
 
 /**
@@ -28,6 +29,7 @@ sealed interface OrdersSideEffect {
     data class ShowError(val message: String) : OrdersSideEffect
     data object NavigateToOffers : OrdersSideEffect
     data object NavigateToMore : OrdersSideEffect
+    data object ReviewSubmitted : OrdersSideEffect
 }
 
 /**
@@ -40,4 +42,10 @@ sealed interface OrdersIntent {
     data object OnBackClicked : OrdersIntent
     data object OnExploreOffersClicked : OrdersIntent
     data object OnSignInClicked : OrdersIntent
+    data class OnReviewSubmitted(
+        val venueId: String,
+        val orderId: String,
+        val rating: Int,
+        val comment: String
+    ) : OrdersIntent
 }

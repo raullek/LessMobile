@@ -141,7 +141,7 @@ fun AddForLotsSection(
                 Icon(
                     painter = painterResource(Res.drawable.ic_edit_24dp),
                     contentDescription = "Edit lots image",
-                    tint = Color.White,
+                    tint = LessTheme.colors.textIconsNested,
                     modifier = Modifier.size(24.dp)
                 )
             }
