@@ -62,6 +62,7 @@ fun FilterCategoryItem(
                 modifier = Modifier.padding(start = LessTheme.radius.xSmall),
                 style = LessTheme.typography.body14Regular,
                 text = text,
+                color = LessTheme.colors.textIconsBlack,
                 maxLines = 1
             )
         }

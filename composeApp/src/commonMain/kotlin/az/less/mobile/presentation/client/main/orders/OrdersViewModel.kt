@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import az.less.mobile.domain.repository.MerchantRepository
 import az.less.mobile.domain.repository.OrdersRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
 import az.less.mobile.presentation.client.main.orders.models.Order
@@ -23,7 +24,8 @@ import org.orbitmvi.orbit.container
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrdersViewModel(
     private val ordersRepository: OrdersRepository,
-    private val sessionLocalRepository: SessionLocalRepository
+    private val sessionLocalRepository: SessionLocalRepository,
+    private val merchantRepository: MerchantRepository
 ) : ViewModel(), ContainerHost<OrdersState, OrdersSideEffect> {
 
     override val container: Container<OrdersState, OrdersSideEffect> =
@@ -67,6 +69,7 @@ class OrdersViewModel(
             is OrdersIntent.OnBackClicked -> handleBackClicked()
             is OrdersIntent.OnExploreOffersClicked -> handleExploreOffersClicked()
             is OrdersIntent.OnSignInClicked -> handleSignInClicked()
+            is OrdersIntent.OnReviewSubmitted -> handleReviewSubmitted(intent)
         }
     }
 
@@ -104,5 +107,24 @@ class OrdersViewModel(
 
     private fun handleSignInClicked() = intent {
         postSideEffect(OrdersSideEffect.NavigateToMore)
+    }
+
+    private fun handleReviewSubmitted(payload: OrdersIntent.OnReviewSubmitted) = intent {
+        if (state.isSubmittingReview) return@intent
+        reduce { state.copy(isSubmittingReview = true) }
+        merchantRepository.createReview(
+            venueId = payload.venueId,
+            orderId = payload.orderId,
+            rating = payload.rating,
+            comment = payload.comment
+        )
+            .onSuccess {
+                reduce { state.copy(isSubmittingReview = false) }
+                postSideEffect(OrdersSideEffect.ReviewSubmitted)
+            }
+            .onError { error ->
+                reduce { state.copy(isSubmittingReview = false) }
+                postSideEffect(OrdersSideEffect.ShowError(error.message))
+            }
     }
 }

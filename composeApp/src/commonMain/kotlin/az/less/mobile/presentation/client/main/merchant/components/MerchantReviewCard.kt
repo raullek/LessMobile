@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -101,7 +100,7 @@ fun MerchantReviewCard(
                     Text(
                         text = formatReviewDate(review.createdAt),
                         style = LessTheme.typography.body14Regular,
-                        color = Color(0x59131313)
+                        color = LessTheme.colors.textIconsGrey
                     )
                 }
 

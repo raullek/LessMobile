@@ -1,6 +1,7 @@
 package az.less.mobile.data.repository
 
 import az.less.mobile.data.datasource.MerchantDataSource
+import az.less.mobile.data.remote.model.CreateReviewRequest
 import az.less.mobile.data.remote.model.MerchantProfileDto
 import az.less.mobile.data.remote.model.VenueOfferDto
 import az.less.mobile.data.remote.model.VenueReviewItemDto
@@ -32,6 +33,22 @@ class MerchantRepositoryImpl(
             latitude = latitude,
             longitude = longitude
         ).map { it.toDomain() }
+    }
+
+    override suspend fun createReview(
+        venueId: String,
+        orderId: String,
+        rating: Int,
+        comment: String
+    ): NetworkResult<Unit> {
+        return merchantDataSource.createReview(
+            venueId = venueId,
+            request = CreateReviewRequest(
+                orderId = orderId,
+                rating = rating,
+                comment = comment
+            )
+        ).map { }
     }
 }
 

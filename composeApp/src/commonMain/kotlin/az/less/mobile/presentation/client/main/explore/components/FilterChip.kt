@@ -63,7 +63,7 @@ fun FilterChip(
                         painter = painterResource(Res.drawable.ic_filter_24dp),
                         contentDescription = "Filter",
                         tint = if (isSelected) {
-                            LessTheme.colors.surfaceWhite
+                            LessTheme.colors.textIconsNested
                         } else {
                             LessTheme.colors.textIconsBlack
                         },
@@ -75,7 +75,7 @@ fun FilterChip(
                         painter = painterResource(Res.drawable.ic_heart_20dp),
                         contentDescription = "Liked",
                         tint = if (isSelected) {
-                            LessTheme.colors.surfaceWhite
+                            LessTheme.colors.textIconsNested
                         } else {
                             LessTheme.colors.textIconsBlack
                         },
@@ -98,7 +98,7 @@ fun FilterChip(
                     text = text,
                     style = LessTheme.typography.body14Semibold,
                     color = if (isSelected) {
-                        LessTheme.colors.surfaceWhite
+                        LessTheme.colors.textIconsNested
                     } else {
                         LessTheme.colors.textIconsBlack
                     }

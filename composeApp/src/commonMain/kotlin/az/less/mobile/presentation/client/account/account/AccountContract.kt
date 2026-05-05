@@ -1,6 +1,7 @@
 package az.less.mobile.presentation.client.account.account
 
 import az.less.designsystem.components.ToastType
+import az.less.mobile.presentation.common.phone.PhoneCountry
 
 
 data class AccountState(
@@ -8,6 +9,7 @@ data class AccountState(
     val isLoading: Boolean = false,
     val fullName: String = "",
     val phoneNumber: String = "",
+    val phoneCountry: PhoneCountry = PhoneCountry.Default,
     val email: String = "",
     val gender: Gender? = null,
     val birthDate: String = "",
@@ -20,7 +22,10 @@ data class AccountState(
     val toastType: ToastType = ToastType.Success,
     val showDeleteConfirmation: Boolean = false,
     val showDatePicker: Boolean = false
-)
+) {
+    val isPhoneValid: Boolean
+        get() = phoneNumber.isEmpty() || phoneNumber.length == phoneCountry.localDigits
+}
 
 sealed interface AccountSideEffect {
     data object NavigateBack : AccountSideEffect
@@ -34,6 +39,7 @@ sealed interface AccountIntent {
     data object OnProfilePhotoPickerDismiss : AccountIntent
     data class OnFullNameChanged(val fullName: String) : AccountIntent
     data class OnPhoneChanged(val phone: String) : AccountIntent
+    data class OnPhoneCountryChanged(val country: PhoneCountry) : AccountIntent
     data class OnEmailChanged(val email: String) : AccountIntent
     data class OnGenderChanged(val gender: Gender) : AccountIntent
     data class OnBirthDateChanged(val birthDate: String) : AccountIntent

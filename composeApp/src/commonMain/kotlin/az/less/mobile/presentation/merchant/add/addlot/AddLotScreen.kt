@@ -66,6 +66,7 @@ import az.less.mobile.presentation.merchant.add.addlot.model.TimeRangeSelectorSe
 import az.less.mobile.presentation.merchant.add.addlot.model.TwoInputsSection
 import az.less.mobile.presentation.merchant.add.addlot.model.AddLotResponseModel.Companion.FIELD_PRICE_BEFORE
 import az.less.mobile.presentation.merchant.add.addlot.model.tagValueToIcon
+import az.less.mobile.utils.PriceInputFilter
 import lessmobile.composeapp.generated.resources.Res
 import lessmobile.composeapp.generated.resources.add_lot_button
 import lessmobile.composeapp.generated.resources.add_lot_error_submit
@@ -506,12 +507,13 @@ private fun TwoInputsSectionContent(
             DsTextField(
                 value = state.getInputValue(field.id),
                 onValueChange = { newValue ->
-                    if (field.inputType == InputType.CURRENCY || field.inputType == InputType.NUMBER) {
-                        if (newValue.all { it.isDigit() || it == '.' }) {
-                            onIntent(AddLotIntent.OnInputChanged(field.id, newValue))
-                        }
-                    } else {
-                        onIntent(AddLotIntent.OnInputChanged(field.id, newValue))
+                    val sanitized = when (field.inputType) {
+                        InputType.CURRENCY -> PriceInputFilter.sanitizeCurrency(newValue)
+                        InputType.NUMBER -> PriceInputFilter.sanitizeInteger(newValue)
+                        InputType.TEXT -> newValue
+                    }
+                    if (sanitized != null) {
+                        onIntent(AddLotIntent.OnInputChanged(field.id, sanitized))
                     }
                 },
                 placeholder = stringResource(field.labelRes),

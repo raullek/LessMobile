@@ -21,5 +21,7 @@ data class PreviousOrderInfo(
     val serviceFee: Double,
     val subtotal: Double,
     /** Order id, passed to the review/support flows. */
-    val orderId: String = ""
+    val orderId: String = "",
+    /** Venue id — needed for `POST /v1/merchants/{venueId}/reviews`. */
+    val venueId: String = ""
 )

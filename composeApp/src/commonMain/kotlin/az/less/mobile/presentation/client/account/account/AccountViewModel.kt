@@ -8,6 +8,7 @@ import az.less.mobile.domain.model.auth.User
 import az.less.mobile.domain.model.auth.UserVenue
 import az.less.mobile.domain.repository.AccountRepository
 import az.less.mobile.domain.repository.SessionLocalRepository
+import az.less.mobile.presentation.common.phone.PhoneCountry
 import az.less.mobile.utils.displayDateToIsoDateTime
 import az.less.mobile.utils.isoDateToDisplayDate
 import kotlinx.coroutines.flow.first
@@ -32,12 +33,14 @@ class AccountViewModel(
         reduce { state.copy(isDataLoading = true) }
         val user = sessionLocalRepository.currentUser.firstOrNull()
         if (user != null) {
+            val (country, local) = PhoneCountry.parse(user.phone.orEmpty())
             reduce {
                 state.copy(
                     isDataLoading = false,
                     fullName = user.name,
                     email = user.email,
-                    phoneNumber = user.phone ?: "",
+                    phoneNumber = local,
+                    phoneCountry = country,
                     gender = Gender.fromApiValue(user.gender),
                     birthDate = user.birthDay?.isoDateToDisplayDate() ?: ""
                 )
@@ -55,6 +58,7 @@ class AccountViewModel(
             is AccountIntent.OnProfilePhotoPickerDismiss -> handleProfilePhotoPickerDismiss()
             is AccountIntent.OnFullNameChanged -> handleFullNameChanged(intent.fullName)
             is AccountIntent.OnPhoneChanged -> handlePhoneChanged(intent.phone)
+            is AccountIntent.OnPhoneCountryChanged -> handlePhoneCountryChanged(intent.country)
             is AccountIntent.OnEmailChanged -> handleEmailChanged(intent.email)
             is AccountIntent.OnGenderChanged -> handleGenderChanged(intent.gender)
             is AccountIntent.OnBirthDateChanged -> handleBirthDateChanged(intent.birthDate)
@@ -113,6 +117,15 @@ class AccountViewModel(
         }
     }
 
+    private fun handlePhoneCountryChanged(country: PhoneCountry) = intent {
+        reduce {
+            state.copy(
+                phoneCountry = country,
+                phoneNumberError = null
+            )
+        }
+    }
+
     private fun handleEmailChanged(email: String) = intent {
         reduce {
             state.copy(
@@ -122,16 +135,9 @@ class AccountViewModel(
         }
     }
 
-    private fun validatePhoneNumber(phone: String): String? {
+    private fun validatePhoneNumber(phone: String, country: PhoneCountry): String? {
         if (phone.isEmpty()) return null
-
-        val digits = phone.filter { it.isDigit() }
-
-        return when {
-            digits.length < 7 -> "Phone number is too short"
-            digits.length > 15 -> "Phone number is too long"
-            else -> null
-        }
+        return if (phone.length != country.localDigits) "Invalid phone number" else null
     }
 
     private fun validateEmail(email: String): String? {
@@ -227,7 +233,7 @@ class AccountViewModel(
     }
 
     private fun handleSaveClicked() = intent {
-        val phoneError = validatePhoneNumber(state.phoneNumber)
+        val phoneError = validatePhoneNumber(state.phoneNumber, state.phoneCountry)
         reduce {
             state.copy(phoneNumberError = phoneError)
         }
@@ -236,9 +242,12 @@ class AccountViewModel(
 
         reduce { state.copy(isLoading = true) }
 
+        val phoneE164 = state.phoneNumber.takeIf { it.isNotEmpty() }
+            ?.let { "+${state.phoneCountry.dialCode}$it" }
+
         val request = UpdateUserRequest(
             name = state.fullName.takeIf { it.isNotEmpty() },
-            phone = state.phoneNumber.takeIf { it.isNotEmpty() },
+            phone = phoneE164,
             gender = state.gender?.apiValue,
             birthDay = state.birthDate.displayDateToIsoDateTime()
         )
