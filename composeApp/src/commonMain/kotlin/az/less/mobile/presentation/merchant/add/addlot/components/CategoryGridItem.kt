@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
 import az.less.mobile.presentation.merchant.add.addlot.model.IconGridOption
 import coil3.compose.AsyncImage
+import lessmobile.composeapp.generated.resources.Res
+import lessmobile.composeapp.generated.resources.ill_category_placeholder
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -82,6 +84,16 @@ fun CategoryGridItem(
                             .size(60.dp)
                             .clip(RoundedCornerShape(LessTheme.radius.xSmall)),
                         contentScale = ContentScale.Crop
+                    )
+                }
+                else -> {
+                    Image(
+                        painter = painterResource(Res.drawable.ill_category_placeholder),
+                        contentDescription = option.label,
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(LessTheme.radius.xSmall)),
+                        contentScale = ContentScale.Fit
                     )
                 }
             }

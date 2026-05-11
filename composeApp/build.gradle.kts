@@ -4,8 +4,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
-val appVersionName = "0.1.0"
-val appVersionCode = 2
+val appVersionName = "0.1.1"
+val appVersionCode = 3
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties().apply {

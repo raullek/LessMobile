@@ -370,44 +370,13 @@ private fun IconGridSectionContent(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
         ) {
-            val firstRowOptions = section.options.take(4)
-            val secondRowOptions = section.options.drop(4)
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
-            ) {
-                firstRowOptions.forEach { option ->
-                    val isSelected = if (section.multiSelect) {
-                        state.getMultiSelection(section.id).contains(option.id)
-                    } else {
-                        state.getSingleSelection(section.id) == option.id
-                    }
-                    CategoryGridItem(
-                        option = option,
-                        isSelected = isSelected,
-                        hasError = sectionHasError,
-                        onSelected = {
-                            if (section.multiSelect) {
-                                onIntent(AddLotIntent.OnMultiSelectToggle(section.id, option.id))
-                            } else {
-                                onIntent(AddLotIntent.OnSingleSelect(section.id, option.id))
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                repeat(4 - firstRowOptions.size) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-
-            if (secondRowOptions.isNotEmpty()) {
+            val columnsPerRow = 4
+            section.options.chunked(columnsPerRow).forEach { rowOptions ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(LessTheme.spacing.small)
                 ) {
-                    secondRowOptions.forEach { option ->
+                    rowOptions.forEach { option ->
                         val isSelected = if (section.multiSelect) {
                             state.getMultiSelection(section.id).contains(option.id)
                         } else {
@@ -427,7 +396,7 @@ private fun IconGridSectionContent(
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    repeat(4 - secondRowOptions.size) {
+                    repeat(columnsPerRow - rowOptions.size) {
                         Spacer(modifier = Modifier.weight(1f))
                     }
                 }
