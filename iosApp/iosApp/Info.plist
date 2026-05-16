@@ -9,7 +9,7 @@
 		<string>Intent</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<true/>
 	<key>Variant</key>
 	<string>$(VARIANT)</string>
 </dict>

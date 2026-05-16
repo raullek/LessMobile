@@ -7,6 +7,7 @@ import az.less.designsystem.base.LessTheme
 import az.less.mobile.navigation.AppClientRootScreen
 import az.less.mobile.navigation.AppRootNavigation
 import az.less.mobile.presentation.theme.ThemeManager
+import az.less.mobile.utils.SystemBarsEffect
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
@@ -18,6 +19,7 @@ fun App() {
         val themeManager = koinInject<ThemeManager>()
         val isDarkMode by themeManager.isDarkMode.collectAsState()
 
+        SystemBarsEffect(darkTheme = isDarkMode)
         LessTheme(darkTheme = isDarkMode) {
             AppRootNavigation()
         }

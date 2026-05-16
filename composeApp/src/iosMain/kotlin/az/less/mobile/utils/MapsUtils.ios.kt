@@ -26,7 +26,7 @@ actual fun openDirections(latitude: Double, longitude: Double, label: String) {
         "comgooglemaps://?daddr=$latitude,$longitude&directionsmode=driving"
     )
     if (googleMapsUrl != null && app.canOpenURL(googleMapsUrl)) {
-        app.openURL(googleMapsUrl)
+        app.openURL(googleMapsUrl, options = emptyMap<Any?, Any>(), completionHandler = null)
         return
     }
 
@@ -34,7 +34,7 @@ actual fun openDirections(latitude: Double, longitude: Double, label: String) {
         "waze://?ll=$latitude,$longitude&navigate=yes"
     )
     if (wazeUrl != null && app.canOpenURL(wazeUrl)) {
-        app.openURL(wazeUrl)
+        app.openURL(wazeUrl, options = emptyMap<Any?, Any>(), completionHandler = null)
         return
     }
 
@@ -48,5 +48,5 @@ actual fun openDirections(latitude: Double, longitude: Double, label: String) {
         )
     }
     val appleUrl = components.URL ?: return
-    app.openURL(appleUrl)
+    app.openURL(appleUrl, options = emptyMap<Any?, Any>(), completionHandler = null)
 }
