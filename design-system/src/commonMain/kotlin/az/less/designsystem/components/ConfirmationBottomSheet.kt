@@ -39,7 +39,8 @@ fun DsConfirmationBottomSheet(
     onSecondaryClick: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    primaryButtonEnabled: Boolean = true
+    primaryButtonEnabled: Boolean = true,
+    primaryButtonLoading: Boolean = false
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -122,7 +123,8 @@ fun DsConfirmationBottomSheet(
                 onClick = onPrimaryClick,
                 modifier = Modifier.fillMaxWidth(),
                 variant = ButtonVariant.Primary,
-                enabled = primaryButtonEnabled
+                enabled = primaryButtonEnabled,
+                isLoading = primaryButtonLoading
             )
 
             Spacer(modifier = Modifier.height(LessTheme.spacing.small))
