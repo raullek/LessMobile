@@ -138,7 +138,11 @@ fun PaymentMethodsScreen(
             secondaryButtonText = "Cancel",
             onPrimaryClick = { viewModel.onIntent(PaymentMethodsIntent.OnConfirmDelete) },
             onSecondaryClick = { viewModel.onIntent(PaymentMethodsIntent.OnCancelDelete) },
-            onDismiss = { viewModel.onIntent(PaymentMethodsIntent.OnCancelDelete) }
+            onDismiss = {
+                if (!state.isDeleting) viewModel.onIntent(PaymentMethodsIntent.OnCancelDelete)
+            },
+            primaryButtonEnabled = !state.isDeleting,
+            primaryButtonLoading = state.isDeleting
         )
     }
 }

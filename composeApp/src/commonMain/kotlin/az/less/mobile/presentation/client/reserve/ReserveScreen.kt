@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -45,9 +46,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import az.less.designsystem.base.LessTheme
+import az.less.designsystem.components.AnimatedToast
 import az.less.designsystem.components.ButtonSize
 import az.less.designsystem.components.ButtonVariant
 import az.less.designsystem.components.DsButton
+import az.less.designsystem.components.ToastType
+import kotlinx.coroutines.delay
 import az.less.mobile.utils.formatPrice
 import az.less.mobile.presentation.client.reserve.components.LotSizeInfoBottomSheet
 import az.less.mobile.presentation.client.reserve.components.PaymentMethodShimmer
@@ -102,9 +106,14 @@ fun ReserveScreen(
     val state by viewModel.collectAsState()
     val scope = rememberCoroutineScope()
 
-    // Initialize with offerId
-    LaunchedEffect(offerId) {
-        if (offerId.isNotEmpty()) {
+    var toastVisible by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
+
+    // The ViewModel survives navigation (tab screen stays in back stack), so re-initialize
+    // every time the sheet opens — otherwise cached state (e.g. selected payment card)
+    // can be stale after the user manages cards elsewhere.
+    LaunchedEffect(offerId, isVisible) {
+        if (isVisible && offerId.isNotEmpty()) {
             viewModel.onIntent(ReserveIntent.Initialize(offerId))
         }
     }
@@ -132,7 +141,12 @@ fun ReserveScreen(
                 // Handle navigation to address selection
             }
             is ReserveSideEffect.ShowError -> {
-                // Show error snackbar
+                toastMessage = sideEffect.message
+                toastVisible = true
+                scope.launch {
+                    delay(3000)
+                    toastVisible = false
+                }
             }
             is ReserveSideEffect.OrderPlaced -> {
                 // Handle order placed - navigate to order accepted screen
@@ -161,17 +175,26 @@ fun ReserveScreen(
             BoxWithConstraints {
                 val maxSheetHeight = maxHeight * 0.9f
 
-                Column(
-                    modifier = Modifier.heightIn(max = maxSheetHeight)
-                ) {
-                    if (state.isLoading) {
-                        ReserveScreenShimmer()
-                    } else {
-                        ReserveScreenContent(
-                            state = state,
-                            onIntent = viewModel::onIntent
-                        )
+                Box(modifier = Modifier.heightIn(max = maxSheetHeight)) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        if (state.isLoading) {
+                            ReserveScreenShimmer()
+                        } else {
+                            ReserveScreenContent(
+                                state = state,
+                                onIntent = viewModel::onIntent
+                            )
+                        }
                     }
+
+                    AnimatedToast(
+                        visible = toastVisible,
+                        title = toastMessage,
+                        type = ToastType.Error,
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 16.dp)
+                    )
                 }
             }
         }

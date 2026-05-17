@@ -69,16 +69,43 @@ class PaymentMethodsViewModel(
     }
 
     private fun handleConfirmDelete() = intent {
-        val cardId = state.cardToDelete?.id
-        if (cardId != null) {
-            reduce {
-                val updatedCards = state.creditDebitCards.filter { it.id != cardId }
-                state.copy(
-                    creditDebitCards = updatedCards,
-                    cardToDelete = null
+        val cardId = state.cardToDelete?.id ?: return@intent
+
+        reduce { state.copy(isDeleting = true) }
+
+        offersRepository.deletePaymentMethod(cardId)
+            .onSuccess { result ->
+                reduce {
+                    state.copy(
+                        isDeleting = false,
+                        creditDebitCards = state.creditDebitCards.filter { it.id != cardId },
+                        cardToDelete = null
+                    )
+                }
+                postSideEffect(
+                    PaymentMethodsSideEffect.ShowToast(
+                        message = result.message ?: "Payment method deleted successfully",
+                        type = ToastType.Success
+                    )
+                )
+                if (result.newDefaultSet) {
+                    loadCards()
+                }
+            }
+            .onError { error ->
+                reduce {
+                    state.copy(
+                        isDeleting = false,
+                        cardToDelete = null
+                    )
+                }
+                postSideEffect(
+                    PaymentMethodsSideEffect.ShowToast(
+                        message = error.message,
+                        type = ToastType.Error
+                    )
                 )
             }
-        }
     }
 
     private fun handleCancelDelete() = intent {

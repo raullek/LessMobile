@@ -4,6 +4,7 @@ import az.less.mobile.data.datasource.OffersDataSource
 import az.less.mobile.data.remote.model.BoxDetailDto
 import az.less.mobile.data.remote.model.BoxVenueDto
 import az.less.mobile.data.remote.model.DefaultPaymentDto
+import az.less.mobile.data.remote.model.DeletePaymentMethodDto
 import az.less.mobile.data.remote.model.PaymentCardDto
 import az.less.mobile.data.remote.model.PlaceOrderData
 import az.less.mobile.data.remote.model.RegisterCardDto
@@ -64,6 +65,10 @@ class OffersRepositoryImpl(
 
     override suspend fun setDefaultPaymentMethod(methodId: String): NetworkResult<PaymentMethod> {
         return offersDataSource.setDefaultPaymentMethod(methodId).map { it.toDomain() }
+    }
+
+    override suspend fun deletePaymentMethod(methodId: String): NetworkResult<DeletePaymentMethodDto> {
+        return offersDataSource.deletePaymentMethod(methodId)
     }
 
     override suspend fun placeOrder(

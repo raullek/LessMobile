@@ -19,6 +19,7 @@ enum class PaymentMethodType {
 data class PaymentMethodsState(
     val isLoading: Boolean = false,
     val isRegisterCardLoading: Boolean = false,
+    val isDeleting: Boolean = false,
     val creditDebitCards: List<PaymentMethod> = emptyList(),
     val cardToDelete: PaymentMethod? = null
 )

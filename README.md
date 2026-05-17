@@ -22,7 +22,7 @@ in your IDE’s toolbar or build it directly from the terminal:
   ```
 - on Windows
   ```shell
-  .\gradlew.bat :composeApp:assembleDebug
+  .\gradlew.bat :composeApp:assembleDebug 
   ```
 
 ### Build and Run iOS Application

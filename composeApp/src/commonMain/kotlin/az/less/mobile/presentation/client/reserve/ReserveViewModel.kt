@@ -30,8 +30,6 @@ class ReserveViewModel(
     override val container: Container<ReserveState, ReserveSideEffect> =
         viewModelScope.container(ReserveState())
 
-    private var currentBoxId: String? = null
-
     fun onIntent(intent: ReserveIntent) {
         when (intent) {
             is ReserveIntent.Initialize -> handleInitialize(intent.boxId)
@@ -56,8 +54,6 @@ class ReserveViewModel(
     // --- Data loading ---
 
     private fun handleInitialize(boxId: String) {
-        if (boxId == currentBoxId) return
-        currentBoxId = boxId
         loadBoxDetail(boxId)
     }
 
@@ -121,7 +117,15 @@ class ReserveViewModel(
                     )
                 }
             }
-            .onError { reduce { state.copy(isPaymentLoading = false) } }
+            .onError {
+                reduce {
+                    state.copy(
+                        isPaymentLoading = false,
+                        selectedPaymentCard = null,
+                        paymentMethodDisplay = ""
+                    )
+                }
+            }
     }
 
     private fun loadVouchers() = intent {
@@ -280,8 +284,13 @@ class ReserveViewModel(
         reduce { state.copy(isRegisterCardLoading = true) }
         offersRepository.registerCard()
             .onSuccess { response ->
-                reduce { state.copy(isRegisterCardLoading = false) }
                 val url = response.redirectUrl ?: response.url
+                reduce {
+                    state.copy(
+                        isRegisterCardLoading = false,
+                        isPaymentSheetVisible = false
+                    )
+                }
                 if (url != null) postSideEffect(ReserveSideEffect.OpenRedirectUrl(url))
             }
             .onError { error ->
